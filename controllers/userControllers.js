@@ -133,10 +133,8 @@ const profileUpdate = async (req, res, next) => {
     let verify_card = req?.body?.license_card?.verify_card;
     let back_side_card = req?.body?.license_card?.back_side_card;
     let front_side_card = req?.body?.license_card?.front_side_card;
-    // console.log(req.user.role=== 'buyer')
-    //updated 
     try {
-        if (!req.user.role) {
+        if (!(req.user.role === 'seller' || 'buyer' || 'rider')) {
             return res.status(400).json({ error: { "role": "profile update permission denied! please switch to another role!" } })
         }
         if (req?.user?.role === 'buyer') {
