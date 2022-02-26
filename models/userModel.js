@@ -65,10 +65,10 @@ const userSchema = mongoose.Schema({
         type: String,
         default: 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg'
     },
-    shop: {
+    shop: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Shop',
-    }
+        ref: 'Shop'
+    }],
 }, {
     timestamps: true,
 })
