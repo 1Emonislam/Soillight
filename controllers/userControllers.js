@@ -3,15 +3,16 @@ const { genToken } = require('../utils/genToken');
 const login = async (req, res, next) => {
     let { email, password } = req.body;
     email?.toLowerCase();
+    const user = await User.findOne({ email });
     try {
-        const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ error: { "email": "Could not find user" } })
         }
         if (!(user && (await user.matchPassword(password)))) {
             return res.status(400).json({ error: { "password": "Password invalid! please provide valid password!" } });
         } else if (user && (await user.matchPassword(password))) {
-            return res.status(200).json({ message: "Login Successfully!", data: user, token: genToken(user._id) });
+            const userExists = await User.findOne({ email }).select("-password");
+            return res.status(200).json({ message: "Login Successfully!", data: userExists, token: genToken(user._id) });
         }
     }
     catch (error) {
@@ -29,7 +30,7 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
     const userExist = await User.findOne({ email });
-    const phoneExist = await User.findOne({ phone }); 
+    const phoneExist = await User.findOne({ phone });
     if (userExist) {
         return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
     }
@@ -42,7 +43,8 @@ const registrationBuyer = async (req, res, next) => {
             return res.status(400).json({ error: { "buyer": "Buyer Registration failed!" } });
         }
         if (created) {
-            return res.status(200).json({ message: "Buyer Registration successfully!", data: created, token: genToken(created._id) })
+            const userRes = await User.findOne({ _id: created._id }).select("-password");
+            return res.status(200).json({ message: "Buyer Registration successfully!", data: userRes, token: genToken(created._id) })
         }
     }
     catch (error) {
@@ -61,7 +63,7 @@ const registrationSeller = async (req, res, next) => {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
     const userExist = await User.findOne({ email });
-    const phoneExist = await User.findOne({ phone }); 
+    const phoneExist = await User.findOne({ phone });
     if (userExist) {
         return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
     }
@@ -73,11 +75,13 @@ const registrationSeller = async (req, res, next) => {
     }
     try {
         const created = await User.create({ name, phone, email, role: 'seller', password, address });
+
         if (!created) {
             return res.status(400).json({ error: { "seller": "Seller Registration failed!" } });
         }
         if (created) {
-            return res.status(200).json({ message: "Seller Registration successfully!", data: created, token: genToken(created._id) })
+            const userRes = await User.findOne({ _id: created._id }).select("-password");
+            return res.status(200).json({ message: "Seller Registration successfully!", data: userRes, token: genToken(created._id) })
         }
     }
     catch (error) {
@@ -103,7 +107,7 @@ const registrationRider = async (req, res, next) => {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
     const userExist = await User.findOne({ email });
-    const phoneExist = await User.findOne({ phone }); 
+    const phoneExist = await User.findOne({ phone });
     if (userExist) {
         return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
     }
@@ -131,14 +135,15 @@ const registrationRider = async (req, res, next) => {
             return res.status(400).json({ error: { "rider": "Rider Registration failed!" } });
         }
         if (created) {
-            return res.status(200).json({ message: "Rider Registration successfully!", data: created, token: genToken(created._id) })
+            const userRes = await User.findOne({ _id: created._id }).select("-password");
+            return res.status(200).json({ message: "Rider Registration successfully!", data: userRes, token: genToken(created._id) })
         }
     } catch (error) {
         next(error)
     }
 }
 const profileUpdate = async (req, res, next) => {
-    let { name, email, role, phone, address } = req.body;
+    let { name, email, role, phone, password, address } = req.body;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -151,32 +156,35 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, phone, address
-            }, { new: true })
+                name, email, role: role || req.user.role, phone, address, password
+            }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
             } if (updatedCheck) {
-                return res.status(200).json({ message: "Buyer profile updated successfully!", data: updatedCheck })
+                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
+                return res.status(200).json({ message: "Buyer profile updated successfully!", data: resData })
             }
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, phone, address
+                name, email, role: role || req.user.role, phone, address, password
             }, { new: true })
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
             } if (updatedCheck) {
-                return res.status(200).json({ message: "Seller profile updated successfully!", data: updatedCheck })
+                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
+                return res.status(200).json({ message: "Seller profile updated successfully!", data: resData })
             }
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, role: role || req.user.role, address, valid_id: { verify_id, back_side_id, front_side_id }, license_card: { verify_card, back_side_card, front_side_card }
-            }, { new: true })
+                name, email, phone, password, role: role || req.user.role, address, valid_id: { verify_id, back_side_id, front_side_id }, license_card: { verify_card, back_side_card, front_side_card }
+            }, { new: true }).select("-password");
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
             } if (updatedCheck) {
-                return res.status(200).json({ message: "Rider profile updated successfully!", data: updatedCheck })
+                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
+                return res.status(200).json({ message: "Rider profile updated successfully!", data: resData })
             }
         }
     } catch (error) {

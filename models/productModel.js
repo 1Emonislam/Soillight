@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = require('mongoose').Schema;
 const productSchema = mongoose.Schema({
     name: {
         type: String,
@@ -23,6 +24,10 @@ const productSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please select a serving size!']
     },
+    status: {
+        type: String,
+        default: 'pending'
+    },
     quantity: {
         type: Number,
         default: 1,
@@ -42,6 +47,10 @@ const productSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Review'
     }],
+    shop: {
+        type: Schema.Types.ObjectId,
+        ref: 'Shop'
+    },
     rating: {
         type: Number,
         default: 0,

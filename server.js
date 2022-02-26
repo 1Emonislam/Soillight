@@ -5,7 +5,9 @@ const app = express()
 const port = process.env.PORT || 5000;
 const { errorLog, errorHandlerNotify } = require("express-error-handle");
 const dbConnect = require('./config/db');
-const userRoutes = require('./routes/userRoutes')
+const userRoutes = require('./routes/userRoutes');
+const shopRoutes = require('./routes/shopRoutes');
+const productRoutes = require('./routes/productRoutes');
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -16,7 +18,9 @@ app.get('/', (req, res) => {
 //db connected
 dbConnect();
 //main routes
-app.use('/', userRoutes)
+app.use('/', userRoutes);
+app.use('/', shopRoutes);
+app.use('/', productRoutes)
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = require('mongoose').Schema;
 const bcrypt = require('bcryptjs');
 const userSchema = mongoose.Schema({
     role: {
@@ -7,7 +8,7 @@ const userSchema = mongoose.Schema({
         required: [true, 'Please Select your Role!']
     },
     isAdmin: {
-        type: String,
+        type: Boolean,
         default: false
     },
     name: {
@@ -54,8 +55,8 @@ const userSchema = mongoose.Schema({
         }
     },
     my_balance: {
-        type: Number,
-        default: 0
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MyBalance'
     },
     address: {
         type: String,
