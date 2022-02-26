@@ -136,6 +136,9 @@ const profileUpdate = async (req, res, next) => {
     // console.log(req.user.role=== 'buyer')
     //updated 
     try {
+        if (!req.user.role) {
+            return res.status(400).json({ error: { "role": "profile update permission denied! please switch to another role!" } })
+        }
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
                 name, email, role: role || req.user.role, phone, address
@@ -145,32 +148,26 @@ const profileUpdate = async (req, res, next) => {
             } if (updatedCheck) {
                 return res.status(200).json({ message: "Buyer profile updated successfully!", data: updatedCheck })
             }
-        } else {
-            return res.status(400).json({ error: { "buyer": "Buyer profile update permission denied! please switch to another role!" } })
         }
         if (req?.user?.role === 'seller') {
-            await User.findOneAndUpdate({ _id: req.user._id }, {
+            const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
                 name, email, role: role || req.user.role, phone, address
-            }, { new: true }, { new: true })
+            }, { new: true })
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
             } if (updatedCheck) {
                 return res.status(200).json({ message: "Seller profile updated successfully!", data: updatedCheck })
             }
-        } else {
-            return res.status(400).json({ error: { seller: "Seller profile update permission denied! please switch to another role!" } })
         }
         if (req?.user?.role === 'rider') {
-            await User.findOneAndUpdate({ _id: req.user._id }, {
+            const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
                 name, email, phone, role: role || req.user.role, address, valid_id: { verify_id, back_side_id, front_side_id }, license_card: { verify_card, back_side_card, front_side_card }
-            }, { new: true }, { new: true })
+            }, { new: true })
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
             } if (updatedCheck) {
                 return res.status(200).json({ message: "Rider profile updated successfully!", data: updatedCheck })
             }
-        } else {
-            return res.status(400).json({ error: { "rider": "Rider profile update permission denied! please switch to another role!" } })
         }
     } catch (error) {
         next(error)
