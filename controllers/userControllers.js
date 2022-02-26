@@ -29,8 +29,12 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
     const userExist = await User.findOne({ email });
+    const phoneExist = await User.findOne({ phone }); 
     if (userExist) {
         return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
+    }
+    if (phoneExist) {
+        return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
     }
     try {
         const created = await User.create({ name, phone, email, role: 'buyer', password, address });
@@ -57,8 +61,12 @@ const registrationSeller = async (req, res, next) => {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
     const userExist = await User.findOne({ email });
+    const phoneExist = await User.findOne({ phone }); 
     if (userExist) {
-        return res.status(302).json({ error: { "seller": "Already exists! please login!" } })
+        return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
+    }
+    if (phoneExist) {
+        return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
     }
     if (!address) {
         return res.json({ error: { address: "Please fillup the Address!" } })
@@ -95,8 +103,12 @@ const registrationRider = async (req, res, next) => {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
     const userExist = await User.findOne({ email });
+    const phoneExist = await User.findOne({ phone }); 
     if (userExist) {
-        return res.status(302).json({ error: { "rider": "Already exists! please login!" } })
+        return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
+    }
+    if (phoneExist) {
+        return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
     }
     if (!address) {
         return res.json({ error: { address: "Please fillup the Address!" } })
