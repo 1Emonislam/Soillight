@@ -57,14 +57,17 @@ const userSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
-    address:{
-        type:String,
+    address: {
+        type: String,
     },
     pic: {
         type: String,
         default: 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg'
+    },
+    shop: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Shop',
     }
-
 }, {
     timestamps: true,
 })
