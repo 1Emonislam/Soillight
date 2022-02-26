@@ -1,5 +1,6 @@
 const Shop = require('../models/shopModel');
 const Product = require('../models/productModel');
+const User = require('../models/userModel')
 const productCreate = async (req, res, next) => {
     const { name, category, subCategory, pack_type, serving_size, quantity, price } = req.body;
     if (!name) {
@@ -28,8 +29,11 @@ const productCreate = async (req, res, next) => {
         if (shop) {
             if (req?.user?.isAdmin === true) {
                 const productCreated = await Product.create({
-                    name, category, subCategory, pack_type, serving_size, status: 'approved', quantity, price, shop: shop._id, user: req.user._id
+                    name, category, subCategory, pack_type, serving_size, status: 'approved', quantity, price, user: req.user._id
                 });
+                const addedProductUser = await User.findOne({ _id: req.user._id });
+                addedProductUser.shop = shop._id;
+                await addedProductUser.save();
                 if (!productCreated) {
                     return res.status(400).json({ error: { "admin": "Products submission failed! Please try again!" } })
                 }
@@ -39,8 +43,11 @@ const productCreate = async (req, res, next) => {
             }
             if ((req?.user?.role === 'seller')) {
                 const productCreated = await Product.create({
-                    name, category, subCategory, pack_type, serving_size, quantity, price, shop: shop._id, user: req.user._id
+                    name, category, subCategory, pack_type, serving_size, quantity, price, user: req.user._id
                 });
+                const addedProductUser = await User.findOne({ _id: req.user._id });
+                addedProductUser.shop = shop._id;
+                await addedProductUser.save();
                 if (!productCreated) {
                     return res.status(400).json({ error: { "seller": "Products submission failed! Please try again!" } })
                 }
