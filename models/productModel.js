@@ -6,7 +6,7 @@ const productSchema = mongoose.Schema({
         trim: true,
         required: [true, 'Please write a unique product name!']
     },
-  
+
     category: {
         type: String,
         trim: true,
@@ -36,10 +36,10 @@ const productSchema = mongoose.Schema({
     price: {
         type: Number,
         required: [true, 'Please select a product price!']
-    },  
-    img:{
-        type:String,
-        required:[true, 'Please select a product Image!']
+    },
+    img: {
+        type: String,
+        required: [true, 'Please select a product Image!']
     },
     user: {
         type: Schema.Types.ObjectId,
@@ -48,7 +48,7 @@ const productSchema = mongoose.Schema({
     },
     reviews: [{
         type: Schema.Types.ObjectId,
-        ref: 'Review'
+        ref: 'ProductReview'
     }],
     rating: {
         type: Number,
