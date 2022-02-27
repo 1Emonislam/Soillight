@@ -1,7 +1,7 @@
 const Shop = require('../models/shopModel');
 const Product = require('../models/productModel');
 const productCreate = async (req, res, next) => {
-    const { name, category, subCategory, pack_type, serving_size, quantity, price } = req.body;
+    const { name, category, subCategory, pack_type, serving_size, img, quantity, price } = req.body;
     if (!name) {
         return res.status(400).json({ error: { "name": "Please fill up the Product Name!" } });
     }
@@ -23,15 +23,15 @@ const productCreate = async (req, res, next) => {
     try {
         const shop = await Shop.findOne({ user: req.user._id });
         if (!shop) {
-            return res.status(400).json({ error: { "shop": "Shop registration required! Register Your Own Store!" } })
+            return res.status(400).json({ error: { "product": "Shop registration required! Register Your Own Store!" } })
         }
         if (shop) {
             if (req?.user?.isAdmin === true) {
                 const productCreated = await Product.create({
-                    name, category, subCategory, pack_type, serving_size, status: 'approved', quantity, price, user: req.user._id
+                    name, category, subCategory, pack_type, serving_size, status: 'approved', quantity, price, img, user: req.user._id
                 });
                 if (!productCreated) {
-                    return res.status(400).json({ error: { "admin": "Products submission failed! Please try again!" } })
+                    return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })
                 }
                 if (productCreated) {
                     return res.status(200).json({ message: "Product submission successfully! The product is approved!." })
@@ -39,16 +39,16 @@ const productCreate = async (req, res, next) => {
             }
             if ((req?.user?.role === 'seller')) {
                 const productCreated = await Product.create({
-                    name, category, subCategory, pack_type, serving_size, quantity, price, user: req.user._id
+                    name, category, subCategory, pack_type, serving_size, quantity, price, img, user: req.user._id
                 });
                 if (!productCreated) {
-                    return res.status(400).json({ error: { "seller": "Products submission failed! Please try again!" } })
+                    return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })
                 }
                 if (productCreated) {
                     return res.status(200).json({ message: "Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered." })
                 }
             } else {
-                return res.status(400).json({ error: { "buyer": "Permission denied! You can perform only seller!" } })
+                return res.status(400).json({ error: { "product": "Permission denied! You can perform only seller!" } })
             }
         }
     }
@@ -56,4 +56,43 @@ const productCreate = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { productCreate }
+const productUpdate = async (req, res, next) => {
+    const { name, category, subCategory, pack_type, serving_size, img, quantity, price } = req.body;
+    try {
+        if (!(req?.user?.role === 'seller' || req?.user?.isAdmin === true)) {
+            return res.status(400).json({ error: { "product": "Permission denied! Buyers do not update the products!." } })
+        } else {
+            const productUpdated = await Product.findByIdAndUpdate(req.params.id, {
+                name, category, subCategory, pack_type, serving_size, img, quantity, price
+            }, { new: true });
+            if (!productUpdated) {
+                return res.status(400).json({ error: { "product": "Product not founds!" } })
+            }
+            if (productUpdated) {
+                return res.status(200).json({ message: "Product updated successfully!", data: productUpdated })
+            }
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const productRemove = async (req, res, next) => {
+    try {
+        if (!(req?.user?.role === 'seller' || req?.user?.isAdmin === true)) {
+            return res.status(400).json({ error: { "product": "Permission denied! Buyers do not remove the products!." } })
+        } else {
+            const productRemove = await Product.findByIdAndRemove(req.params.id);
+            if (!productRemove) {
+                return res.status(400).json({ error: { "product": "Product not founds!" } })
+            }
+            if (productRemove) {
+                return res.status(200).json({ message: "Product removed successfully!" })
+            }
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = { productCreate, productUpdate, productRemove }

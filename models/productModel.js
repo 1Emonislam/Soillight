@@ -4,8 +4,9 @@ const productSchema = mongoose.Schema({
     name: {
         type: String,
         trim: true,
-        required: [true, 'Please select a product name!']
+        required: [true, 'Please write a unique product name!']
     },
+  
     category: {
         type: String,
         trim: true,
@@ -34,9 +35,11 @@ const productSchema = mongoose.Schema({
     },
     price: {
         type: Number,
-        get: (v) => (v / 100).toFixed(2),
-        set: (v) => v * 100,
         required: [true, 'Please select a product price!']
+    },  
+    img:{
+        type:String,
+        required:[true, 'Please select a product Image!']
     },
     user: {
         type: Schema.Types.ObjectId,
@@ -47,10 +50,6 @@ const productSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Review'
     }],
-    shop: {
-        type: Schema.Types.ObjectId,
-        ref: 'Shop'
-    },
     rating: {
         type: Number,
         default: 0,
@@ -60,9 +59,6 @@ const productSchema = mongoose.Schema({
         default: 0,
     },
 },
-    {
-        toJSON: { getters: true }
-    },
     { timestamps: true }
 )
 const Product = mongoose.model('Product', productSchema);

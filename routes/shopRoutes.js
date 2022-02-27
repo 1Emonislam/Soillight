@@ -3,6 +3,6 @@ const { shopRegister, updateShop, shopRemove } = require('../controllers/shopCon
 const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.route('/shop/register').post(protect, shopRegister);
-router.route('/shop/update/:id').post(protect, updateShop);
-router.route('/shop/remove/:id').post(protect, shopRemove);
+router.route('/shop/update/:id').put(protect, updateShop);
+router.route('/shop/remove/:id').delete(protect, shopRemove);
 module.exports = router;
