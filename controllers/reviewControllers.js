@@ -7,11 +7,13 @@ const giveAReview = async (req, res, next) => {
         return res.status(404).json({ error: { "product": "Product review failed! Please enter a minimum of 1 to a maximum of 5" } })
     }
     try {
+        // console.log(req?.params?.id)
         const product = await Product.findOne({ _id: req?.params?.id });
+        // console.log(product)
         if (product) {
             const productReviewed = await ProductReview.findOne({ user: req.user._id, product: req.params.id })
             if (productReviewed) {
-                res.status(400).json({ error: { "product": "Product already reviewed!" } })
+                return res.status(400).json({ error: { "product": "Product already reviewed!" } })
             } else {
                 const review = {
                     name: req?.user?.name,
@@ -22,13 +24,12 @@ const giveAReview = async (req, res, next) => {
                 }
                 const reviewAdded = await ProductReview.create(review);
                 product.reviews.unshift(reviewAdded._id);
-                product.numReviews = product.reviews.length;
-                const finding = await ProductReview.find();
-                product.rating = finding.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
+                const finding = await ProductReview.find({ product: req.params.id });
+                product.numReviews = finding?.length;
+                product.rating = finding.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
                 await product.save();
                 return res.status(201).json({ message: 'Review added' });
             }
-
         } else {
             return res.status(404).json({ error: { "product": "Product review failed!" } })
         }
