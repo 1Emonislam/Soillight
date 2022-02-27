@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = require('mongoose').Schema;
 const shopSchema = mongoose.Schema({
     name: { type: String, required: [true, "Please write your Shop Name!"] },
-    phone: { type: Number, required: [true, "Please write your Shop Phone Number!"] },
+    phone: { type: String, required: [true, "Please write your Shop Phone Number!"] },
     address: { type: String, required: [true, "please write your Shop Address!"] },
     openDate: {
         type: Date,
