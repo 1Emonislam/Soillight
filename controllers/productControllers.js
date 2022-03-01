@@ -28,7 +28,7 @@ const productCreate = async (req, res, next) => {
         if (shop) {
             if (req?.user?.isAdmin === true) {
                 const productCreated = await Product.create({
-                    name, category, subCategory, pack_type, serving_size, status: 'approved', quantity, price, img, user: req.user._id
+                    name, category, subCategory, pack_type, serving_size, status: 'approved', shop: shop._id, quantity, price, img, user: req.user._id
                 });
                 if (!productCreated) {
                     return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })

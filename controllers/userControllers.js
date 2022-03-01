@@ -38,7 +38,7 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'buyer', password, address });
+        const created = await User.create({ name, phone, email, role: 'buyer',status:'approved', password, address });
         if (!created) {
             return res.status(400).json({ error: { "buyer": "Buyer Registration failed!" } });
         }

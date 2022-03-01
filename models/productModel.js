@@ -41,6 +41,10 @@ const productSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please select a product Image!']
     },
+    shop:{
+        type: Schema.Types.ObjectId,
+        ref: 'Shop'
+    },
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',

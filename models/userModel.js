@@ -7,6 +7,10 @@ const userSchema = mongoose.Schema({
         lowercase: true,
         required: [true, 'Please Select your Role!']
     },
+    status: {
+        type: String,
+        default: 'pending'
+    },
     isAdmin: {
         type: Boolean,
         default: false
