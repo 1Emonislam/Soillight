@@ -8,6 +8,7 @@ const dbConnect = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const shopRoutes = require('./routes/shopRoutes');
 const productRoutes = require('./routes/productRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 const productReviewRoutes = require('./routes/productReviewRoutes');
 //middleware
 app.use(cors());
@@ -23,6 +24,7 @@ app.use('/', userRoutes);
 app.use('/', shopRoutes);
 app.use('/', productRoutes);
 app.use('/',productReviewRoutes)
+app.use('/userLists',searchRoutes)
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })
