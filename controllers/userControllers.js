@@ -38,7 +38,7 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'buyer',status:'approved', password, address });
+        const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved', password, address });
         if (!created) {
             return res.status(400).json({ error: { "buyer": "Buyer Registration failed!" } });
         }
@@ -192,4 +192,16 @@ const profileUpdate = async (req, res, next) => {
     }
 }
 
-module.exports = { login, registrationSeller, registrationBuyer, registrationRider, profileUpdate };
+const userCounter = async (req, res, next) => {
+    try {
+        const buyerCount = await User.find({ role: 'buyer' }).count();
+        const sellerCount = await User.find({ role: 'seller' }).count();
+        const riderCount = await User.find({ role: 'rider' }).count();
+        return res.status(200).json({ message: 'data successfully fetch', buyerCount, sellerCount, riderCount })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { login, registrationSeller, registrationBuyer, registrationRider, profileUpdate, userCounter };

@@ -9,3 +9,23 @@ const dbConnect = async (req, res) => {
     }
 }
 module.exports = dbConnect;
+
+  
+// const mongoose = require('mongoose')
+
+// const dbConnect = async (req, res) => {
+//     const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.mtw1t.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+//     try {
+// // const connectionDb = mongoose.connect('mongodb://localhost:27017/soilight');
+//         const connectionDb = await mongoose.connect(uri, {
+//             useNewUrlParser: true, useUnifiedTopology: true
+//         }
+//         );
+//         console.log(`MongoDB Successfully Connected`)
+//     }
+//     catch (error) {
+//         console.error(`Error: ${error.message}`);
+//         process.exit();
+//     }
+// }
+// module.exports = dbConnect;
