@@ -91,4 +91,45 @@ const riderSearch = async (req, res, next) => {
     }
 
 }
-module.exports = { buyerSearch, DashboardCounterData, sellerSearch, riderSearch }
+const sellerSearchNew = async (req, res, next) => {
+    try {
+        const data = await User.find({ role: 'seller' }).sort({ createdAt: 1, _id: -1 }).limit(5);
+        const count = await User.find({ role: 'seller' }).sort({ createdAt: 1, _id: -1 }).count();
+        return res.status(200).json({ data: data, count })
+
+    } catch (error) {
+        next(error)
+    }
+}
+const riderSearchNew = async (req, res, next) => {
+    try {
+        const data = await User.find({ role: 'rider' }).sort({ createdAt: 1, _id: -1 }).limit(5);
+        const count = await User.find({ role: 'rider' }).sort({ createdAt: 1, _id: -1 }).count();
+        return res.status(200).json({ data: data, count })
+
+    } catch (error) {
+        next(error)
+    }
+}
+const sellerSearchApproved = async (req, res, next) => {
+    try {
+        const data = await User.find({ role: 'seller',status:'approved' }).sort({ createdAt: 1, _id: -1 }).limit(5);
+        const count = await User.find({ role: 'seller',status:'approved'}).sort({ createdAt: 1, _id: -1 }).count();
+        return res.status(200).json({ data: data, count })
+
+    } catch (error) {
+        next(error)
+    }
+}
+const riderSearchApproved = async (req, res, next) => {
+    try {
+        const data = await User.find({ role: 'rider',status:'approved'}).sort({ createdAt: 1, _id: -1 }).limit(5);
+        const count = await User.find({ role: 'rider',status:'approved'}).sort({ createdAt: 1, _id: -1 }).count();
+        return res.status(200).json({ data: data, count })
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { buyerSearch,sellerSearchApproved,riderSearchApproved,riderSearchNew, DashboardCounterData, sellerSearch, riderSearch, sellerSearchNew }
