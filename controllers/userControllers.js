@@ -1,6 +1,20 @@
 const User = require('../models/userModel');
 const ProductReview = require('../models/productReviewModel');
 const { genToken } = require('../utils/genToken');
+const singleUser = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const finding = await ProductReview.find({ user: id });
+        let totalRate = finding?.length;
+        let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
+        const user = await User.findOne({ _id: id }).populate("sellerShop","-user");
+        return res.status(200).json({ totalRate, avgRating, data: user })
+    }
+    catch (error) {
+
+    }
+}
+
 const login = async (req, res, next) => {
     let { email, password } = req.body;
     email?.toLowerCase();
@@ -193,59 +207,5 @@ const profileUpdate = async (req, res, next) => {
     }
 }
 
-const DashboardCounterData = async (req, res, next) => {
-    try {
-        const buyerCount = await User.find({ role: 'buyer' }).count();
-        const sellerCount = await User.find({ role: 'seller' }).count();
-        const riderCount = await User.find({ role: 'rider' }).count();
 
-        var startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-        // creates ObjectId() from date:
-        var _id = Math.floor(startOfToday.getTime() / 1000).toString(16) + "0000000000000000";
-        const todayBuyerCount = await User.find({ _id: { $gte: _id }, role: 'buyer' }).count();
-        const todayRiderCount = await User.find({ _id: { $gte: _id }, role: 'rider' }).count();
-        const todaySellerCount = await User.find({ _id: { $gte: _id }, role: 'rider' }).count();
-        const todaySellerApprove = await User.find({ _id: { $gte: _id }, role: 'seller', status: 'approved' }).count();
-        const todayRiderApprove = await User.find({ _id: { $gte: _id }, role: 'rider', status: 'approved' }).count();
-        const todayRiderRejected = await User.find({ _id: { $gte: _id }, role: 'rider', status: 'rejected' }).count();
-        const todayBuyerRejected = await User.find({ _id: { $gte: _id }, role: 'buyer', status: 'rejected' }).count();
-        const todaySellerRejected = await User.find({ _id: { $gte: _id }, role: 'seller', status: 'rejected' }).count();
-        // last weak data 
-        var lastWeak = new Date(new Date() - 7 * 60 * 60 * 24 * 1000);
-        const lastWeekBuyerCount = await User.find({ timestamp: { $gte: lastWeak }, role: 'buyer' }).count();
-        const lastWeekRiderCount = await User.find({ timestamp: { $gte: lastWeak }, role: 'rider' }).count();
-        const lastWeekSellerCount = await User.find({ timestamp: { $gte: lastWeak }, role: 'seller' }).count();
-        const lastWeekSellerApprove = await User.find({ timestamp: { $gte: lastWeak }, role: 'seller', status: 'approved' }).count();
-        const lastWeekRiderApprove = await User.find({ timestamp: { $gte: lastWeak }, role: 'rider', status: 'approved' }).count();
-        const lastWeekRiderRejected = await User.find({ timestamp: { $gte: lastWeak }, role: 'rider', status: 'rejected' }).count();
-        const lastWeakSellerRejected = await User.find({ timestamp: { $gte: lastWeak }, role: 'seller', status: 'rejected' }).count();
-        const lastWeekBuyerRejected = await User.find({ timestamp: { $gte: lastWeak }, role: 'buyer', status: 'rejected' }).count();
-
-        return res.status(200).json({ message: 'data successfully fetch', totalCount: { buyerCount, sellerCount, riderCount }, today: { todayBuyerCount, todayRiderCount, todaySellerCount, todaySellerApprove, todayRiderApprove, todayBuyerRejected, todaySellerRejected, todayRiderRejected }, lastWeek: { lastWeekBuyerCount, lastWeekRiderCount, lastWeekSellerCount, lastWeekSellerApprove, lastWeekRiderApprove, lastWeekRiderRejected, lastWeekBuyerRejected, lastWeakSellerRejected } })
-        console.log(todayBuyer)
-    } catch (error) {
-        next(error)
-    }
-}
-
-
-const buyerSearch = async (req, res, next) => {
-    const keyword = req.query.search ? {
-        $or: [
-            { name: { $regex: req.query.search, $options: "i" } },
-            { email: { $regex: req.query.search, $options: "i" }, },
-        ], role: 'buyer'
-    } : { role: 'buyer' };
-    try {
-        const count = await User.find(keyword).count();
-        const users = await User.find(keyword).sort({ createdAt: 1, _id: -1 }).select("-password").limit(5)
-        return res.status(200).json({ data: users, count })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-
-
-module.exports = { login, registrationSeller, registrationBuyer, registrationRider, profileUpdate, DashboardCounterData, buyerSearch };
+module.exports = { login, registrationSeller, registrationBuyer, registrationRider, profileUpdate,singleUser };

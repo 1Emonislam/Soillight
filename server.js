@@ -24,7 +24,7 @@ app.use('/', userRoutes);
 app.use('/', shopRoutes);
 app.use('/', productRoutes);
 app.use('/',productReviewRoutes)
-app.use('/userLists',searchRoutes)
+app.use('/',searchRoutes)
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })

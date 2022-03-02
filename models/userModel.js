@@ -37,6 +37,9 @@ const userSchema = mongoose.Schema({
         required: [true, 'Please fillup the Password!']
     },
     valid_id: {
+        id: {
+            type: String,
+        },
         verify_id: {
             type: Boolean,
         },
@@ -48,6 +51,9 @@ const userSchema = mongoose.Schema({
         }
     },
     license_card: {
+        id: {
+            type: String
+        },
         verify_card: {
             type: Boolean,
         },
