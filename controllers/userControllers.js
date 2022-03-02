@@ -7,7 +7,7 @@ const singleUser = async (req, res, next) => {
         const finding = await ProductReview.find({ user: id });
         let totalRate = finding?.length;
         let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
-        const user = await User.findOne({ _id: id }).populate("sellerShop","-user");
+        const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
         return res.status(200).json({ totalRate, avgRating, data: user })
     }
     catch (error) {
@@ -207,5 +207,35 @@ const profileUpdate = async (req, res, next) => {
     }
 }
 
-
-module.exports = { login, registrationSeller, registrationBuyer, registrationRider, profileUpdate,singleUser };
+const userApproved = async (req, res, next) => {
+    try {
+        const data = await User.findOne({ _id: req.params.id }).populate("sellerShop").select("-password");
+        data.status = 'approved';
+        await data.save();
+        const finding = await ProductReview.find({ user: req.params.id });
+        let totalRate = finding?.length;
+        let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
+        const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
+        return res.status(200).json({ totalRate, avgRating, data: user })
+     
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const userRejected = async (req, res, next) => {
+    try {
+        const data = await User.findOne({ _id: req.params.id }).populate("sellerShop").select("-password");
+        data.status = 'rejected';
+        await data.save();
+        const finding = await ProductReview.find({ user: req.params.id });
+        let totalRate = finding?.length;
+        let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
+        const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
+        return res.status(200).json({ totalRate, avgRating, data: user })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = { login, registrationSeller, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser };
