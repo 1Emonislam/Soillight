@@ -113,6 +113,8 @@ const registrationRider = async (req, res, next) => {
     let verify_card = req?.body?.license_card?.verify_card;
     let back_side_card = req?.body?.license_card?.back_side_card;
     let front_side_card = req?.body?.license_card?.front_side_card;
+    let id1 = req?.body?.valid_id?.id;
+    let id2 = req?.body?.license_card?.id;
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -145,7 +147,7 @@ const registrationRider = async (req, res, next) => {
         return res.json({ error: { "back_side_id": "Please fillup the license card  valided back side!" } });
     }
     try {
-        const created = await User.create({ name, email, role: 'rider', phone, password, address, valid_id: { verify_id, back_side_id, front_side_id }, license_card: { verify_card, back_side_card, front_side_card } });
+        const created = await User.create({ name, email, role: 'rider', phone, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
         if (!created) {
             return res.status(400).json({ error: { "rider": "Rider Registration failed!" } });
         }
@@ -165,6 +167,8 @@ const profileUpdate = async (req, res, next) => {
     let verify_card = req?.body?.license_card?.verify_card;
     let back_side_card = req?.body?.license_card?.back_side_card;
     let front_side_card = req?.body?.license_card?.front_side_card;
+    let id1 = req?.body?.valid_id?.id;
+    let id2 = req?.body?.license_card?.id;
     try {
         if (!(req?.user?.role === 'seller' || 'buyer' || 'rider')) {
             return res.status(400).json({ error: { "role": "profile update permission denied! please switch to another role!" } })
@@ -193,7 +197,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, password, role: role || req.user.role, address, valid_id: { verify_id, back_side_id, front_side_id }, license_card: { verify_card, back_side_card, front_side_card }
+                name, email, phone, password, role: role || req.user.role, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true }).select("-password");
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
@@ -208,34 +212,73 @@ const profileUpdate = async (req, res, next) => {
 }
 
 const userApproved = async (req, res, next) => {
+    // console.log(req.user.isAdmin)
+    const { id } = req.params;
     try {
-        const data = await User.findOne({ _id: req.params.id }).populate("sellerShop").select("-password");
-        data.status = 'approved';
-        await data.save();
-        const finding = await ProductReview.find({ user: req.params.id });
-        let totalRate = finding?.length;
-        let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
-        const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
-        return res.status(200).json({ totalRate, avgRating, data: user })
-     
+        if (!(req?.user?.isAdmin === true)) {
+            return res.status(400).json({ error: "user permission denied! only perform Admin!" })
+        }
+        if (req?.user?.isAdmin === true) {
+            const data = await User.findOne({ _id: id }).populate("sellerShop").select("-password");
+            if (!data) {
+                return res.status({ error: "not found!" })
+            }
+            data.status = 'approved';
+            await data.save();
+            const finding = await ProductReview.find({ user: id });
+            let totalRate = finding?.length;
+            let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
+            const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
+            return res.status(200).json({ totalRate, avgRating, data: user })
+
+        }
     }
     catch (error) {
         next(error)
     }
 }
 const userRejected = async (req, res, next) => {
+    const { id } = req.params;
     try {
-        const data = await User.findOne({ _id: req.params.id }).populate("sellerShop").select("-password");
-        data.status = 'rejected';
-        await data.save();
-        const finding = await ProductReview.find({ user: req.params.id });
-        let totalRate = finding?.length;
-        let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
-        const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
-        return res.status(200).json({ totalRate, avgRating, data: user })
+        if (!(req?.user?.isAdmin === true)) {
+            return res.status(400).json({ error: "user permission denied! only perform Admin!" })
+        }
+        if (req?.user?.isAdmin === true) {
+            const data = await User.findOne({ _id: id }).populate("sellerShop").select("-password");
+            if (!data) {
+                return res.status({ error: "not found!" })
+            }
+            data.status = 'rejected';
+            await data.save();
+            const finding = await ProductReview.find({ user: id });
+            let totalRate = finding?.length;
+            let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
+            const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
+            return res.status(200).json({ totalRate, avgRating, data: user })
+        }
     }
     catch (error) {
         next(error)
     }
 }
-module.exports = { login, registrationSeller, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser };
+const changePassword = async (req, res, next) => {
+    const { oldPass, newPass, confirmPass } = req.body;
+    // console.log(req.user._id)
+    const user = await User.findOne({ _id: req.user?._id })
+    if (!(newPass === confirmPass)) {
+        return res.status(400).json({ error: { "password": "New password and Confirm password do not matched!" } })
+    }
+    if (!(await user.matchPassword(oldPass))) {
+        return res.status(400).json({ error: { "password": "Old password do not matched!" } })
+    } if (await user.matchPassword(oldPass)) {
+        user.password = newPass;
+        const userSave = await user.save();
+        if (!(user === userSave)) {
+            return res.status(400).json({ error: { "password": "Password Change failed!" } })
+        } if (user === userSave) {
+            return res.status(200).json({ message: "Password Change successfully!", data: userSave })
+        }
+    }
+
+}
+module.exports = { login, registrationSeller, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, changePassword };
