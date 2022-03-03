@@ -28,6 +28,7 @@ const dbConnect = async (req, res) => {
         process.exit();
     }
 }
+
 module.exports = dbConnect;
 
 
