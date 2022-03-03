@@ -11,16 +11,15 @@ const DashboardCounterData = async (req, res, next) => {
         const sellerCount = await User.find({ role: 'seller' }).count();
         const riderCount = await User.find({ role: 'rider' }).count();
         let startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-        const today = Math.floor(startOfToday.getTime() / 1000).toString(16) + "0000000000000000";
-        const todayBuyerCount = await User.find({ _id: { $gte: today }, role: 'buyer' }).count();
-        const todayRiderCount = await User.find({ _id: { $gte: today }, role: 'rider' }).count();
-        const todaySellerCount = await User.find({ _id: { $gte: today }, role: 'rider' }).count();
-        const todaySellerApprove = await User.find({ _id: { $gte: today }, role: 'seller', status: 'approved' }).count();
-        const todayRiderApprove = await User.find({ _id: { $gte: today }, role: 'rider', status: 'approved' }).count();
-        const todayRiderRejected = await User.find({ _id: { $gte: today }, role: 'rider', status: 'rejected' }).count();
-        const todayBuyerRejected = await User.find({ _id: { $gte: today }, role: 'buyer', status: 'rejected' }).count();
-        const todaySellerRejected = await User.find({ _id: { $gte: today }, role: 'seller', status: 'rejected' }).count();
+        const today = new Date();
+        const todayBuyerCount = await User.find({timestamp: { $gte: today }, role: 'buyer' }).count();
+        const todayRiderCount = await User.find({ timestamp: { $gte: today }, role: 'rider' }).count();
+        const todaySellerCount = await User.find({ timestamp: { $gte: today }, role: 'rider' }).count();
+        const todaySellerApprove = await User.find({ timestamp: { $gte: today }, role: 'seller', status: 'approved' }).count();
+        const todayRiderApprove = await User.find({ timestamp: { $gte: today }, role: 'rider', status: 'approved' }).count();
+        const todayRiderRejected = await User.find({ timestamp: { $gte: today }, role: 'rider', status: 'rejected' }).count();
+        const todayBuyerRejected = await User.find({ timestamp: { $gte: today }, role: 'buyer', status: 'rejected' }).count();
+        const todaySellerRejected = await User.find({ timestamp: { $gte: today }, role: 'seller', status: 'rejected' }).count();
         // last weak data 
         const lastWeak = new Date(new Date() - 7 * 60 * 60 * 24 * 1000);
         const lastWeekBuyerCount = await User.find({ timestamp: { $gte: lastWeak }, role: 'buyer' }).count();
@@ -39,6 +38,8 @@ const DashboardCounterData = async (req, res, next) => {
 
 
 const buyerSearch = async (req, res, next) => {
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
     const keyword = req.query.search ? {
         $or: [
             { name: { $regex: req.query.search, $options: "i" } },
@@ -47,7 +48,7 @@ const buyerSearch = async (req, res, next) => {
     } : { role: 'buyer' };
     try {
         const count = await User.find(keyword).count();
-        const users = await User.find(keyword).sort({ createdAt: 1, _id: -1 }).select("-password").select("-adminShop").limit(5)
+        const users = await User.find(keyword).sort({ createdAt: 1, _id: -1 }).select("-password").select("-adminShop").skip((page - 1) * limit)
         return res.status(200).json({ data: users, count })
     }
     catch (error) {
@@ -57,6 +58,8 @@ const buyerSearch = async (req, res, next) => {
 
 const sellerSearch = async (req, res, next) => {
     // console.log(req.query)
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
     const keyword = req.query.search ? {
         $or: [
             { name: { $regex: req.query.search, $options: "i" } },
@@ -65,7 +68,7 @@ const sellerSearch = async (req, res, next) => {
     } : { role: 'seller' };
     try {
         const count = await User.find(keyword).count();
-        const users = await User.find(keyword).sort({ createdAt: 1, _id: -1 }).select("-adminShop").select("-password").limit(5)
+        const users = await User.find(keyword).sort({ createdAt: 1, _id: -1 }).select("-adminShop").select("-password").skip((page - 1) * limit)
         return res.status(200).json({ data: users, count })
     }
     catch (error) {
@@ -75,6 +78,8 @@ const sellerSearch = async (req, res, next) => {
 }
 const riderSearch = async (req, res, next) => {
     // console.log(req.query)
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
     const keyword = req.query.search ? {
         $or: [
             { name: { $regex: req.query.search, $options: "i" } },
@@ -83,7 +88,7 @@ const riderSearch = async (req, res, next) => {
     } : { role: 'rider' };
     try {
         const count = await User.find(keyword).count();
-        const users = await User.find(keyword).sort({ createdAt: 1, _id: -1 }).select("-password").limit(5)
+        const users = await User.find(keyword).sort({ createdAt: 1, _id: -1 }).select("-password").skip((page - 1) * limit)
         return res.status(200).json({ data: users, count })
     }
     catch (error) {
@@ -92,8 +97,10 @@ const riderSearch = async (req, res, next) => {
 
 }
 const sellerSearchNew = async (req, res, next) => {
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
     try {
-        const data = await User.find({ role: 'seller' }).sort({ createdAt: 1, _id: -1 }).limit(5);
+        const data = await User.find({ role: 'seller' }).sort({ createdAt: 1, _id: -1 }).skip((page - 1) * limit)
         const count = await User.find({ role: 'seller' }).sort({ createdAt: 1, _id: -1 }).count();
         return res.status(200).json({ data: data, count })
 
@@ -102,8 +109,10 @@ const sellerSearchNew = async (req, res, next) => {
     }
 }
 const riderSearchNew = async (req, res, next) => {
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
     try {
-        const data = await User.find({ role: 'rider' }).sort({ createdAt: 1, _id: -1 }).limit(5);
+        const data = await User.find({ role: 'rider' }).sort({ createdAt: 1, _id: -1 }).skip((page - 1) * limit)
         const count = await User.find({ role: 'rider' }).sort({ createdAt: 1, _id: -1 }).count();
         return res.status(200).json({ data: data, count })
 
@@ -112,8 +121,10 @@ const riderSearchNew = async (req, res, next) => {
     }
 }
 const sellerSearchApproved = async (req, res, next) => {
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
     try {
-        const data = await User.find({ role: 'seller',status:'approved' }).sort({ createdAt: 1, _id: -1 }).limit(5);
+        const data = await User.find({ role: 'seller',status:'approved' }).sort({ createdAt: 1, _id: -1 }).skip((page - 1) * limit)
         const count = await User.find({ role: 'seller',status:'approved'}).sort({ createdAt: 1, _id: -1 }).count();
         return res.status(200).json({ data: data, count })
 
@@ -122,8 +133,10 @@ const sellerSearchApproved = async (req, res, next) => {
     }
 }
 const riderSearchApproved = async (req, res, next) => {
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
     try {
-        const data = await User.find({ role: 'rider',status:'approved'}).sort({ createdAt: 1, _id: -1 }).limit(5);
+        const data = await User.find({ role: 'rider',status:'approved'}).sort({ createdAt: 1, _id: -1 }).skip((page - 1) * limit)
         const count = await User.find({ role: 'rider',status:'approved'}).sort({ createdAt: 1, _id: -1 }).count();
         return res.status(200).json({ data: data, count })
 
