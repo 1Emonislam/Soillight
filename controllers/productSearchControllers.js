@@ -45,6 +45,9 @@ const categoriesSearch = async (req, res, next) => {
 }
 
 const latestProducts = async (req, res, next) => {
+    let {page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
+    category = category?.trim();
     try {   
         const result = await Product.find({}).populate("user","_id pic").sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find({}).sort({ createdAt: 1, _id: -1 }).count();
