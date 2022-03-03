@@ -43,6 +43,7 @@ const categoriesSearch = async (req, res, next) => {
         next(error)
     }
 }
+
 const latestProducts = async (req, res, next) => {
     try {   
         const result = await Product.find({}).sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
