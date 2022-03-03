@@ -6,14 +6,14 @@ const productSearch = async (req, res, next) => {
         search = search?.trim();
         const KeyWordRegExp = new RegExp(search, "i");
         if (!search) {
-            const result = await Product.find({}).sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
+            const result = await Product.find({}).populate("user","_id pic").sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({}).sort({ createdAt: 1, _id: -1 }).count();
           return  res.json({ count: count, data: result })
         }
         if (search) {
             const result = await Product.find({
                 $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },],
-            }).limit(limit * 1).skip((page - 1) * limit);
+            }).populate("user","_id pic").limit(limit * 1).skip((page - 1) * limit);
             const count = await Products.find({
                 $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },]
             }).count();
