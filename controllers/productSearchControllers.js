@@ -14,7 +14,7 @@ const productSearch = async (req, res, next) => {
             const result = await Product.find({
                 $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },],
             }).populate("user","_id pic").limit(limit * 1).skip((page - 1) * limit);
-            const count = await Products.find({
+            const count = await Product.find({
                 $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },]
             }).count();
             if (count === 0) {
