@@ -163,7 +163,7 @@ const profileUpdate = async (req, res, next) => {
     if (!req?.user) {
         return res.status(400).json({ error: { "email": "permission denied! Please provide valid credentials and try again!" } })
     }
-    console.log(req.body)
+    // console.log(req.body)
     let { name, email, role, phone,address } = req.body;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
