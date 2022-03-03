@@ -34,7 +34,7 @@ const categoriesSearch = async (req, res, next) => {
     const KeyWordRegExp = new RegExp(category, "i");
     try {
         const result = await Product.find({
-            $or: [{ category: KeyWordRegExp },{subCategory:KeyWordRegExp},]}).sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
+            $or: [{ category: KeyWordRegExp },{subCategory:KeyWordRegExp},]}).populate("user","_id pic").sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find({
             $or: [{ category: KeyWordRegExp },{subCategory:KeyWordRegExp},]}).sort({ createdAt: 1, _id: -1 }).count();
         return res.json({ count: count, data: result })
@@ -46,7 +46,7 @@ const categoriesSearch = async (req, res, next) => {
 
 const latestProducts = async (req, res, next) => {
     try {   
-        const result = await Product.find({}).sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
+        const result = await Product.find({}).populate("user","_id pic").sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find({}).sort({ createdAt: 1, _id: -1 }).count();
         return res.json({ count: count, data: result })
     }
