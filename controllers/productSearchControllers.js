@@ -1,6 +1,6 @@
 const Product = require('../models/productModel')
 const productSearch = async (req, res, next) => {
-    let { search, page = 1, limit = 10 } = req.query;
+    let { search,ratingMax,ratingMin,priceMax,priceMin, page = 1, limit = 10 } = req.query;
     try {
         limit = parseInt(limit);
         search = search?.trim();
