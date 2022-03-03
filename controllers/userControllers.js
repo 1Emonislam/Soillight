@@ -160,6 +160,9 @@ const registrationRider = async (req, res, next) => {
     }
 }
 const profileUpdate = async (req, res, next) => {
+    if (!req?.user) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid credentials and try again!" } })
+    }
     let { name, email, role, phone, password, address } = req.body;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
@@ -173,37 +176,49 @@ const profileUpdate = async (req, res, next) => {
         if (!(req?.user?.role === 'seller' || 'buyer' || 'rider')) {
             return res.status(400).json({ error: { "role": "profile update permission denied! please switch to another role!" } })
         }
+
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, phone, address, password
+                name, email, password, role: role || req.user.role, phone, address
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
             } if (updatedCheck) {
                 const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
-                return res.status(200).json({ message: "Buyer profile updated successfully!", data: resData })
+                return res.status(200).json({ message: "Buyer profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, phone, address, password
-            }, { new: true })
+                name, email, password, role: role || req.user.role, phone, address
+            }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
             } if (updatedCheck) {
                 const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
-                return res.status(200).json({ message: "Seller profile updated successfully!", data: resData })
+                return res.status(200).json({ message: "Seller profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, password, role: role || req.user.role, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
-            }, { new: true }).select("-password");
+                name, email, phone, role: role || req.user.role, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, password, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+            }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
             } if (updatedCheck) {
                 const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
-                return res.status(200).json({ message: "Rider profile updated successfully!", data: resData })
+                return res.status(200).json({ message: "Rider profile updated successfully!", data: resData, token: genToken(resData._id) })
+            }
+        }
+        if (req?.user?.isAdmin === true) {
+            const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
+                name, email, phone, role:'admin', address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, password, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+            }, { new: true });
+            if (!updatedCheck) {
+                return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
+            } if (updatedCheck) {
+                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
+                return res.status(200).json({ message: "Rider profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }
     } catch (error) {
@@ -263,7 +278,7 @@ const userRejected = async (req, res, next) => {
 }
 const changePassword = async (req, res, next) => {
     const { oldPass, newPass, confirmPass } = req.body;
-    console.log(req.body)
+    // console.log(req.body)
     // console.log(req.user._id)
     const user = await User.findOne({ _id: req.user?._id })
     if (!(newPass === confirmPass)) {
@@ -277,7 +292,7 @@ const changePassword = async (req, res, next) => {
         if (!(user === userSave)) {
             return res.status(400).json({ error: { "password": "Password Change failed!" } })
         } if (user === userSave) {
-            return res.status(200).json({ message: "Password Change successfully!", data: userSave })
+            return res.status(200).json({ message: "Password Change successfully!", data: userSave, token: genToken(userSave._id) })
         }
     }
 

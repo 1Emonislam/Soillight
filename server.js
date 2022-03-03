@@ -10,6 +10,7 @@ const shopRoutes = require('./routes/shopRoutes');
 const productRoutes = require('./routes/productRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const productReviewRoutes = require('./routes/productReviewRoutes');
+const productSearchRoutes = require("./routes/productSearchRoutes");
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -23,8 +24,9 @@ dbConnect();
 app.use('/', userRoutes);
 app.use('/', shopRoutes);
 app.use('/', productRoutes);
-app.use('/',productReviewRoutes)
-app.use('/',searchRoutes)
+app.use('/',productReviewRoutes);
+app.use('/',searchRoutes);
+app.use('/',productSearchRoutes)
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })
