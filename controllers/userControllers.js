@@ -163,7 +163,7 @@ const profileUpdate = async (req, res, next) => {
     if (!req?.user) {
         return res.status(400).json({ error: { "email": "permission denied! Please provide valid credentials and try again!" } })
     }
-    let { name, email, role, phone, password, address } = req.body;
+    let { name, email, role, phone,address } = req.body;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -179,7 +179,7 @@ const profileUpdate = async (req, res, next) => {
 
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, password, role: role || req.user.role, phone, address
+                name, email, role: role || req.user.role, phone, address
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
@@ -190,7 +190,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, password, role: role || req.user.role, phone, address
+                name, email, role: role || req.user.role, phone, address
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
@@ -201,7 +201,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, role: role || req.user.role, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, password, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, email, phone, role: role || req.user.role, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id },license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
@@ -212,7 +212,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.isAdmin === true) {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, role:'admin', address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, password, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, email, phone, role:'admin', address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
