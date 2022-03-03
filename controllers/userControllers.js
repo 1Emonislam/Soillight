@@ -263,12 +263,13 @@ const userRejected = async (req, res, next) => {
 }
 const changePassword = async (req, res, next) => {
     const { oldPass, newPass, confirmPass } = req.body;
+    console.log(req.body)
     // console.log(req.user._id)
     const user = await User.findOne({ _id: req.user?._id })
     if (!(newPass === confirmPass)) {
         return res.status(400).json({ error: { "password": "New password and Confirm password do not matched!" } })
     }
-    if (!(await user.matchPassword(oldPass))) {
+    if (!(await user?.matchPassword(oldPass))) {
         return res.status(400).json({ error: { "password": "Old password do not matched!" } })
     } if (await user.matchPassword(oldPass)) {
         user.password = newPass;
