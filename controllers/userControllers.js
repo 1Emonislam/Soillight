@@ -304,7 +304,7 @@ const profileView = async (req, res, next) => {
         return res.status(200).json({ data: user })
     }
     catch (error) {
-
+        next(error)
     }
 }
 module.exports = { login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, changePassword };
