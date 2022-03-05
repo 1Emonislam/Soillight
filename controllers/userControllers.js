@@ -164,7 +164,7 @@ const profileUpdate = async (req, res, next) => {
         return res.status(400).json({ error: { "email": "permission denied! Please provide valid credentials and try again!" } })
     }
     // console.log(req.body)
-    let { name, email, role, phone,pic,address } = req.body;
+    let { name, email, role, phone, pic, address } = req.body;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -179,8 +179,8 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, phone,pic, address
-            },{new:true});
+                name, email, role: role || req.user.role, phone, pic, address
+            }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
             } if (updatedCheck) {
@@ -190,8 +190,8 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role,pic, phone, address
-            },{new:true});
+                name, email, role: role || req.user.role, pic, phone, address
+            }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
             } if (updatedCheck) {
@@ -201,8 +201,8 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, role: role || req.user.role,pic, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id },license_card: { id: id2, verify_card, back_side_card, front_side_card }
-            },{new:true});
+                name, email, phone, role: role || req.user.role, pic, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+            }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
             } if (updatedCheck) {
@@ -212,8 +212,8 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.isAdmin === true) {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, role:'admin',pic, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
-            },{new:true});
+                name, email, phone, role: 'admin', pic, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+            }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
             } if (updatedCheck) {
@@ -297,4 +297,14 @@ const changePassword = async (req, res, next) => {
     }
 
 }
-module.exports = { login, registrationSeller, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, changePassword };
+const profileView = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if(!user) return res.status(400).json({ error:{email:"bad request! please try again!"}})
+        return res.status(200).json({ data: user })
+    }
+    catch (error) {
+
+    }
+}
+module.exports = { login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, changePassword };
