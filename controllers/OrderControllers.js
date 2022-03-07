@@ -1,16 +1,12 @@
 const Order = require("../models/ordersModel")
 const orderAdd = async (req, res, next) => {
-    const { productId, quantity, transaction_id, tx_ref, price } = req.body;
+    const { products,transaction_id, tx_ref} = req.body;
   try{
     const created = await Order.create({
         user: req.user._id,
         transaction_id,
         tx_ref,
-        products: [{
-            productId,
-            quantity,
-            price
-        }]
+        products
     })
     if (!created) {
         return res.status(400).json({ error: { order: "something wrong data sving!" } })
