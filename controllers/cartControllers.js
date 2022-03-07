@@ -15,7 +15,7 @@ const addProductToCart = async (req, res, next) => {
         //-- Check if cart Exists and Check the quantity if items -------
         if (cart) {
             let indexFound = cart.items.findIndex(p => p.productId == productId);
-            console.log("Index", indexFound)
+            // console.log("Index", indexFound)
             //----------check if product exist,just add the previous quantity with the new quantity and update the total price-------
             if (indexFound != -1) {
                 cart.items[indexFound].quantity = cart.items[indexFound].quantity + quantity;
