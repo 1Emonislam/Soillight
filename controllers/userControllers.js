@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const ProductReview = require('../models/productReviewModel');
+const MyBlance = require('../models/myBalance');
 const { genToken } = require('../utils/genToken');
 const singleUser = async (req, res, next) => {
     const { id } = req.params;
@@ -58,6 +59,11 @@ const registrationBuyer = async (req, res, next) => {
             return res.status(400).json({ error: { "buyer": "Buyer Registration failed!" } });
         }
         if (created) {
+            const balance = await MyBlance.create({
+                user: created._id,
+            })
+            created.my_balance = balance._id;
+            await created.save();
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             return res.status(200).json({ message: "Buyer Registration successfully!", data: userRes, token: genToken(created._id) })
         }
@@ -95,6 +101,11 @@ const registrationSeller = async (req, res, next) => {
             return res.status(400).json({ error: { "seller": "Seller Registration failed!" } });
         }
         if (created) {
+            const balance = await MyBlance.create({
+                user: created._id,
+            })
+            created.my_balance = balance._id;
+            await created.save();
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             return res.status(200).json({ message: "Seller Registration successfully!", data: userRes, token: genToken(created._id) })
         }
@@ -152,6 +163,11 @@ const registrationRider = async (req, res, next) => {
             return res.status(400).json({ error: { "rider": "Rider Registration failed!" } });
         }
         if (created) {
+            const balance = await MyBlance.create({
+                user: created._id,
+            })
+            created.my_balance = balance._id;
+            await created.save();
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             return res.status(200).json({ message: "Rider Registration successfully!", data: userRes, token: genToken(created._id) })
         }
@@ -300,7 +316,7 @@ const changePassword = async (req, res, next) => {
 const profileView = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
-        if(!user) return res.status(400).json({ error:{email:"bad request! please try again!"}})
+        if (!user) return res.status(400).json({ error: { email: "bad request! please try again!" } })
         return res.status(200).json({ data: user })
     }
     catch (error) {

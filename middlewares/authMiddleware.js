@@ -11,6 +11,7 @@ const protect = async (req, res, next) => {
             // console.log(token)
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const user = await User.findOne({ _id: decoded.id }).select("-password");
+            // console.log(user)
             req.user = user;
             next();
         }

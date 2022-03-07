@@ -2,6 +2,7 @@ const Shop = require('../models/shopModel');
 const User = require('../models/userModel')
 const shopRegister = async (req, res, next) => {
     const { name, phone, address, openDate, closeDate, email } = req.body;
+    // console.log(req.user)
     try {
         if (req?.user?.isAdmin === true) {
             const created = await Shop.create({

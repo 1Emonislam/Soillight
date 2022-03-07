@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = require('mongoose').Schema;
 const MyBalanceSchema = mongoose.Schema({
-    prevBlance: {
+    prevBalance: {
         type: Number,
         default: 0,
     },
@@ -13,9 +13,6 @@ const MyBalanceSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     },
-    clearance: {
-        type: String,
-    }
 }, { timestamps: true })
 const MyBalance = mongoose.model('MyBalance', MyBalanceSchema)
 module.exports = MyBalance;
