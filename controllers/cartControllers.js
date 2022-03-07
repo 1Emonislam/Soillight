@@ -65,7 +65,7 @@ const addProductToCart = async (req, res, next) => {
             message: "Add to Cart successfully!",
             data: data
         });
-    } catch (errr) {
+    } catch (error) {
         next(error)
     }
 }
