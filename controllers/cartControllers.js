@@ -10,7 +10,7 @@ const addProductToCart = async (req, res, next) => {
         if(!product){
             return res.status(404).json({error:{product:'Product Not Founds! 404'}})
         }
-        console.log("product", product)
+        // console.log("product", product)
 
         //-- Check if cart Exists and Check the quantity if items -------
         if (cart) {
