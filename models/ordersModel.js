@@ -12,11 +12,16 @@ const orderSchema = mongoose.Schema({
     tx_ref: {
         type: String,
     },
-    status:{
-        type:String,
-        default:'pending',
+    status: {
+        type: String,
+        default: 'pending',
     },
     products: [{
+        productWoner: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: [true, "Please provide user ID"]
+        },
         productId: {
             type: Schema.Types.ObjectId,
             ref: 'Product',
