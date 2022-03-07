@@ -17,7 +17,7 @@ const orderSchema = mongoose.Schema({
         default: 'pending',
     },
     products: [{
-        productWoner: {
+        productOwner: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: [true, "Please provide user ID"]
