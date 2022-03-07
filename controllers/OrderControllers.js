@@ -1,5 +1,5 @@
 const Order = require("../models/ordersModel")
-const Order = async (req, res, next) => {
+const orderAdd = async (req, res, next) => {
     const { productId, quantity, transaction_id, tx_ref, price } = req.body;
   try{
     const created = await Order.create({
@@ -23,4 +23,4 @@ const Order = async (req, res, next) => {
     next(error)
   }
 }
-module.exports = { Order }
+module.exports = { orderAdd }
