@@ -48,7 +48,7 @@ const orderSearch = async (req, res, next) => {
     }
 }
 const adminSeenOrdersSearch = async (req, res, next) => {
-    if (req.user?.isAdmin === true) {
+    if (req?.user?.isAdmin === true) {
         let { search, status, page = 1, limit = 10 } = req.query;
         limit = parseInt(limit);
         try {
@@ -80,7 +80,7 @@ const orderGet = async (req, res, next) => {
 }
 
 const singleOrder = async (req, res, next) => {
-    if (req.user.isAdmin === true) {
+    if (req?.user?.isAdmin === true) {
         const order = await Order.findOne({ _id: req.params.id }).populate({
             path: 'user',
             select: "_id name address"
