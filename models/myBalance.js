@@ -1,13 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = require('mongoose').Schema;
 const MyBalanceSchema = mongoose.Schema({
-    prevBalance: {
+    balance: {
         type: Number,
         default: 0,
-    },
-    currBalance: {
-        type: Number,
-        default: 0
     },
     user: {
         type: Schema.Types.ObjectId,
