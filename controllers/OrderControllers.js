@@ -41,7 +41,7 @@ const orderSearch = async (req, res, next) => {
     try {
         const order = await Order.find({ user: req.user._id, status: status }).populate({
             path: 'user',
-            select: "_id name address"
+            select: "_id name address pic"
         }).populate("products.productId","_id name img pack_type serving_size numReviews rating").populate({
             path: 'products.productOwner',
             select: "_id name address sellerShop",
