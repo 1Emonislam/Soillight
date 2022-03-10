@@ -39,7 +39,17 @@ const orderSearch = async (req, res, next) => {
     let { status, page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     try {
-        const order = await Order.find({ user: req.user._id, status: status }).sort({ createdAt: -1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
+        const order = await Order.find({ user: req.user._id, status: status }).populate({
+            path: 'user',
+            select: "_id name address"
+        }).populate("products.productId","_id name img pack_type serving_size numReviews rating").populate({
+            path: 'products.productOwner',
+            select: "_id name address sellerShop",
+            populate: [{
+                path: "sellerShop",
+                select: "_id address"
+            }]
+        }).sort({ createdAt: -1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
         const count = await Order.find({ user: req.user._id, status: status }).sort({ createdAt: -1, _id: -1 }).count();
         return res.status(200).json({ count, data: order })
     }
