@@ -112,7 +112,7 @@ const singleOrder = async (req, res, next) => {
 const orderCompeleteToBlanceAdd = async (req, res, next) => {
     // console.log(req.user)
     try {
-        const permission = MyBalance.findOne({ _id: req.user._id }).populate({
+        const permission = MyBalance.findOne({ user: req.user._id }).populate({
             path: 'user',
             select: "_id name address"
         }).populate("products.productId", "_id name img pack_type serving_size numReviews rating").populate({
@@ -166,7 +166,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 }
 const orderPendingToBalanceSub = async (req, res, next) => {
     try {
-        const permission = MyBalance.findOne({ _id: req.user._id });
+        const permission = MyBalance.findOne({ user: req.user._id });
         if (!((req?.user?.isAdmin === true) && permission)) {
             return res.status(401).json({ error: { "admin": "admin permission required!" } })
         }
