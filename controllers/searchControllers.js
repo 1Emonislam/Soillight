@@ -37,7 +37,7 @@ const DashboardCounterData = async (req, res, next) => {
         const lastWeekOrderRejected = await User.find({ timestamp: { $gte: lastWeak }, status: 'cancel' }).count();
         const lastWeakSellerRejected = await User.find({ timestamp: { $gte: lastWeak }, role: 'seller', status: 'rejected' }).count();
         const lastWeekBuyerRejected = await User.find({ timestamp: { $gte: lastWeak }, role: 'buyer', status: 'rejected' }).count();
-        return res.status(200).json({ message: 'data successfully fetch', lastWeekDate, todayDate, totalCount: { buyerCount, sellerCount, riderCount,orderCount }, today: {todayOrderCount,todayOrderRejected,todayOrderApprove, todayBuyerCount, todayRiderCount, todaySellerCount, todaySellerApprove, todayRiderApprove, todayBuyerRejected, todaySellerRejected, todayRiderRejected }, lastWeek: {lastWeakOrderCount,lastWeekOrderApprove,lastWeakOrderRejected, lastWeekBuyerCount, lastWeekRiderCount, lastWeekSellerCount, lastWeekSellerApprove, lastWeekRiderApprove, lastWeekRiderRejected, lastWeekBuyerRejected, lastWeakSellerRejected } })
+        return res.status(200).json({ message: 'data successfully fetch', lastWeekDate, todayDate, totalCount: { buyerCount, sellerCount, riderCount,orderCount }, today: {todayOrderCount,todayOrderRejected,todayOrderApprove, todayBuyerCount, todayRiderCount, todaySellerCount, todaySellerApprove, todayRiderApprove, todayBuyerRejected, todaySellerRejected, todayRiderRejected }, lastWeek: {lastWeekOrderCount,lastWeekOrderApprove,lastWeekOrderRejected, lastWeekBuyerCount, lastWeekRiderCount, lastWeekSellerCount, lastWeekSellerApprove, lastWeekRiderApprove, lastWeekRiderRejected, lastWeekBuyerRejected, lastWeakSellerRejected } })
     } catch (error) {
         next(error)
     }
