@@ -155,7 +155,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
             //     message: `Congratulations! Your product has been delivered! Balance added . ${order?.name}`,
             // }
             // await Notification.create(NotificationSendObj);
-            order.status = 'compelete';
+            order.status = 'complete';
             await order.save();
             return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: order })
         }
