@@ -182,7 +182,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 		next(error);
 	}
 };
-const orderPendingToBalanceSub = async (req, res, next) => {
+const orderCancelToBalanceSub = async (req, res, next) => {
 	try {
 		const permission = MyBalance.findOne({ user: req.user._id });
 		if (!(req?.user?.isAdmin === true && permission)) {
@@ -248,4 +248,4 @@ const myOrders = async (req, res, next) => {
 	//     next(error)
 	// }
 };
-module.exports = { orderAdd, myOrders, orderGet, orderSearch, singleOrder, orderCompeleteToBlanceAdd, orderPendingToBalanceSub, adminSeenOrdersSearch };
+module.exports = { orderAdd, myOrders, orderGet, orderSearch, singleOrder, orderCompeleteToBlanceAdd, orderCancelToBalanceSub, adminSeenOrdersSearch };
