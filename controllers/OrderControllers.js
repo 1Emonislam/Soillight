@@ -66,17 +66,31 @@ const orderSearch = async (req, res, next) => {
 const adminSeenOrdersSearch = async (req, res, next) => {
 	// console.log(req.query)
 	if (req?.user?.isAdmin === true) {
-		let { search, status, page = 1, limit = 10 } = req.query;
+		let { status, page = 1, limit = 10 } = req.query;
 		// console.log(status)
+		const keyword = {status: status};
+		const keyword2 = req.query?.search ? {
+			$or: [
+				{ name: { $regex: req.query.search?.toLowerCase(), $options: "i" } },
+				{ email: { $regex: req.query.search?.toLowerCase(), $options: "i" }, },
+			],
+		} : {};
 		limit = parseInt(limit);
 		try {
-			const order = await Order.find({ status: status })
-				.populate("user", "name pic")
-				.populate("products.productOwner", "name")
+			const order = await Order.find(keyword)
+				.populate({
+					path: 'user',
+					match: keyword2,
+					select: "_id name email"
+				})
+				.populate({
+					path: "products.productOwner",
+					select: "_id name email"
+				})
 				.sort({ createdAt: -1, _id: -1 })
 				.limit(limit * 1)
 				.skip((page - 1) * limit);
-			const count = await Order.find({ status: status }).sort({ createdAt: -1, _id: -1 }).count();
+			const count = await Order.find(keyword).sort({ createdAt: -1, _id: -1 }).count();
 			return res.status(200).json({ count, data: order });
 		} catch (error) {
 			next(error);
@@ -165,13 +179,13 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 			}
 			let productOwnerNotify = [];
 			for (let owner = 0; owner < order?.products.length; owner++) {
-			    productOwnerNotify.unshift(order?.products[owner].productOwner)
+				productOwnerNotify.unshift(order?.products[owner].productOwner)
 			}
 			const NotificationSendObj = {
-			    sender: req.user._id,
-			    product: [...order?.products],
-			    receiver: [...productOwnerNotify],
-			    message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
+				sender: req.user._id,
+				product: [...order?.products],
+				receiver: [...productOwnerNotify],
+				message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
 			}
 			await Notification.create(NotificationSendObj);
 			order.status = "complete";
@@ -223,13 +237,13 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 			}
 			let productOwnerNotify = [];
 			for (let owner = 0; owner < order?.products.length; owner++) {
-			    productOwnerNotify.unshift(order?.products[owner].productOwner)
+				productOwnerNotify.unshift(order?.products[owner].productOwner)
 			}
 			const NotificationSendObj = {
-			    sender: req.user._id,
-			    product: [...order?.products],
-			    receiver: [...productOwnerNotify],
-			    message: `Cancelled Order: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. ${order?.name}`,
+				sender: req.user._id,
+				product: [...order?.products],
+				receiver: [...productOwnerNotify],
+				message: `Cancelled Order: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. ${order?.name}`,
 			}
 			await Notification.create(NotificationSendObj);
 			order.status = "cancel";
