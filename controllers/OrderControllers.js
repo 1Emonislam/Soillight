@@ -81,11 +81,11 @@ const adminSeenOrdersSearch = async (req, res, next) => {
 				.populate({
 					path: 'user',
 					match: keyword2,
-					select: "_id name email"
+					select: "_id name email pic"
 				})
 				.populate({
 					path: "products.productOwner",
-					select: "_id name email"
+					select: "_id name email pic"
 				})
 				.sort({ createdAt: -1, _id: -1 })
 				.limit(limit * 1)
