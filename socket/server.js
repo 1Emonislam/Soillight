@@ -7,7 +7,6 @@ const socketServer = async () => {
 	io.use(async (socket, next) => {
 		const req = socket.request;
 		const token = socket.handshake.auth.token;
-
 		if (token) {
 			try {
 				const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -45,12 +44,9 @@ const socketServer = async () => {
 
 		socket.on("disconnect", async () => {
 			const user = socket.request.user;
-
 			const currentEpochTime = Date.now();
-
 			user.socketId = null;
 			user.lastOnline = currentEpochTime;
-
 			await user.save();
 		});
 	});

@@ -41,12 +41,12 @@ const orderSearch = async (req, res, next) => {
 		const order = await Order.find({ user: req.user._id, status: status })
 			.populate({
 				path: "user",
-				select: "_id name address pic",
+				select: "_id name address phone pic",
 			})
 			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address sellerShop",
+				select: "_id name address phone sellerShop",
 				populate: [
 					{
 						path: "sellerShop",
@@ -64,8 +64,10 @@ const orderSearch = async (req, res, next) => {
 	}
 };
 const adminSeenOrdersSearch = async (req, res, next) => {
+	// console.log(req.query)
 	if (req?.user?.isAdmin === true) {
 		let { search, status, page = 1, limit = 10 } = req.query;
+		// console.log(status)
 		limit = parseInt(limit);
 		try {
 			const order = await Order.find({ status: status })
@@ -102,12 +104,12 @@ const singleOrder = async (req, res, next) => {
 		const order = await Order.findOne({ _id: req.params.id })
 			.populate({
 				path: "user",
-				select: "_id name address",
+				select: "_id name address phone",
 			})
 			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address sellerShop",
+				select: "_id name address phone sellerShop",
 				populate: [
 					{
 						path: "sellerShop",
@@ -127,12 +129,12 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 		const permission = MyBalance.findOne({ user: req.user._id })
 			.populate({
 				path: "user",
-				select: "_id name address",
+				select: "_id name address phone",
 			})
 			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address sellerShop",
+				select: "_id name address phone sellerShop",
 				populate: [
 					{
 						path: "sellerShop",
@@ -190,12 +192,12 @@ const orderPendingToBalanceSub = async (req, res, next) => {
 			const order = await Order.findOne({ _id: req?.params?.id })
 				.populate({
 					path: "user",
-					select: "_id name address",
+					select: "_id name address phone",
 				})
 				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 				.populate({
 					path: "products.productOwner",
-					select: "_id name address sellerShop",
+					select: "_id name address phone sellerShop",
 					populate: [
 						{
 							path: "sellerShop",
