@@ -163,17 +163,17 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 					{ new: true }
 				);
 			}
-			// let productOwnerNotify = [];
-			// for (let owner = 0; owner < order?.products.length; owner++) {
-			//     productOwnerNotify.unshift(order?.products[owner].productOwner)
-			// }
-			// const NotificationSendObj = {
-			//     sender: req.user._id,
-			//     product: [...order?.products],
-			//     receiver: [...productOwnerNotify],
-			//     message: `Congratulations! Your product has been delivered! Balance added . ${order?.name}`,
-			// }
-			// await Notification.create(NotificationSendObj);
+			let productOwnerNotify = [];
+			for (let owner = 0; owner < order?.products.length; owner++) {
+			    productOwnerNotify.unshift(order?.products[owner].productOwner)
+			}
+			const NotificationSendObj = {
+			    sender: req.user._id,
+			    product: [...order?.products],
+			    receiver: [...productOwnerNotify],
+			    message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
+			}
+			await Notification.create(NotificationSendObj);
 			order.status = "complete";
 			await order.save();
 			return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: order });
@@ -221,17 +221,17 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 					{ new: true }
 				);
 			}
-			// let productOwnerNotify = [];
-			// for (let owner = 0; owner < order?.products.length; owner++) {
-			//     productOwnerNotify.unshift(order?.products[owner].productOwner)
-			// }
-			// const NotificationSendObj = {
-			//     sender: req.user._id,
-			//     product: [...order?.products],
-			//     receiver: [...productOwnerNotify],
-			//     message: `Congratulations! Your product has been delivered! Balance added . ${order?.name}`,
-			// }
-			// await Notification.create(NotificationSendObj);
+			let productOwnerNotify = [];
+			for (let owner = 0; owner < order?.products.length; owner++) {
+			    productOwnerNotify.unshift(order?.products[owner].productOwner)
+			}
+			const NotificationSendObj = {
+			    sender: req.user._id,
+			    product: [...order?.products],
+			    receiver: [...productOwnerNotify],
+			    message: `Cancelled Order: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. ${order?.name}`,
+			}
+			await Notification.create(NotificationSendObj);
 			order.status = "cancel";
 			await order.save();
 			return res.status(200).json({ message: "order Successfully Cancel! automatic subtract seller balance Transaction Complete!", data: order });
@@ -240,12 +240,5 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 		next(error);
 	}
 };
-const myOrders = async (req, res, next) => {
-	// try {
-	//     const order = await Order
-	// }
-	// catch (error) {
-	//     next(error)
-	// }
-};
-module.exports = { orderAdd, myOrders, orderGet, orderSearch, singleOrder, orderCompeleteToBlanceAdd, orderCancelToBalanceSub, adminSeenOrdersSearch };
+
+module.exports = { orderAdd, orderGet, orderSearch, singleOrder, orderCompeleteToBlanceAdd, orderCancelToBalanceSub, adminSeenOrdersSearch };
