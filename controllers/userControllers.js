@@ -37,6 +37,7 @@ const login = async (req, res, next) => {
 }
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
+    const { latitude, longitude } = req?.body?.location;
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -54,7 +55,7 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved', password, address });
+        const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved', location: { latitude, longitude }, password, address });
         if (!created) {
             return res.status(400).json({ error: { "buyer": "Buyer Registration failed!" } });
         }
@@ -118,6 +119,7 @@ const registrationSeller = async (req, res, next) => {
 
 const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
+    const { latitude, longitude } = req?.body?.location;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -158,7 +160,7 @@ const registrationRider = async (req, res, next) => {
         return res.json({ error: { "back_side_id": "Please fillup the license card  valided back side!" } });
     }
     try {
-        const created = await User.create({ name, email, role: 'rider', phone, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
+        const created = await User.create({ name, email, role: 'rider', phone, location: { latitude, longitude }, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
         if (!created) {
             return res.status(400).json({ error: { "rider": "Rider Registration failed!" } });
         }
@@ -181,6 +183,7 @@ const profileUpdate = async (req, res, next) => {
     }
     // console.log(req.body)
     let { name, email, role, phone, pic, address } = req.body;
+    const { latitude, longitude } = req?.body?.location;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -206,7 +209,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, pic, phone, address
+                name, email, role: role || req.user.role, pic, phone, address,location:{latitude,longitude},
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
@@ -217,7 +220,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, role: role || req.user.role, pic, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, email, phone, role: role || req.user.role, pic,location:{latitude,longitude}, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })

@@ -18,6 +18,14 @@ const shopSchema = mongoose.Schema({
         type: String,
         lowercase: true
     },
+    location: {
+        latitude: {
+            type: String,
+        },
+        longitude: {
+            type: String,
+        }
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         required: [true, "Please provide user ID"],

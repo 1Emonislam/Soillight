@@ -2,6 +2,7 @@ const Shop = require('../models/shopModel');
 const User = require('../models/userModel')
 const shopRegister = async (req, res, next) => {
     const { name, phone, address, openDate, closeDate, email } = req.body;
+    const { latitude, longitude } = req?.body?.location;
     // console.log(req.user)
     try {
         if (req?.user?.isAdmin === true) {
@@ -27,7 +28,7 @@ const shopRegister = async (req, res, next) => {
                 return res.status(400).json({ error: { "shop": "You have already created a seller Shop!" } })
             } if (!seller) {
                 const created = await Shop.create({
-                    name, phone, address, openDate, closeDate, email, user: req.user._id
+                    name, phone, address, openDate, location: { latitude, longitude }, closeDate, email, user: req.user._id
                 })
                 if (!created) {
                     return res.status(400).json({ error: { "shop": "Shop Registration failed!" } })
@@ -52,6 +53,7 @@ const shopRegister = async (req, res, next) => {
 }
 const updateShop = async (req, res, next) => {
     const { name, phone, address, openDate, closeDate, email } = req.body;
+    const { latitude, longitude } = req?.body?.location;
     try {
         if (!(req?.user?.role === 'seller' || req?.user?.isAdmin === true)) {
             return res.status(400).json({ error: { "shop": "Permission denied! Buyers do not update the store." } })
@@ -60,7 +62,7 @@ const updateShop = async (req, res, next) => {
             if (!shop) return res.status(404).json({ error: { "shop": "shop not founds!" } })
             if (shop) {
                 const shopUpdated = await Shop.findByIdAndUpdate(req.params.id, {
-                    name, phone, address, openDate, closeDate, email
+                    name, phone, address, openDate, closeDate, email, location: { latitude, longitude },
                 }, { new: true });
                 if (!shopUpdated) {
                     return res.status(400).json({ error: { "shop": "shop not founds!" } })

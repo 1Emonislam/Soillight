@@ -27,6 +27,14 @@ const userSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
+		location: {
+			latitude: {
+				type: String,
+			},
+			longitude: {
+				type: String,
+			}
+		},
 		email: {
 			type: String,
 			required: [true, "Please fillup the Email!"],
