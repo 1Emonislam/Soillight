@@ -232,7 +232,7 @@ const orderPendingToBalanceSub = async (req, res, next) => {
 			//     message: `Congratulations! Your product has been delivered! Balance added . ${order?.name}`,
 			// }
 			// await Notification.create(NotificationSendObj);
-			order.status = "pending";
+			order.status = "cancel";
 			await order.save();
 			return res.status(200).json({ message: "order Successfully Cancel! automatic subtract seller balance Transaction Complete!", data: order });
 		}
