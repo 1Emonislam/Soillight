@@ -185,7 +185,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 				sender: req.user._id,
 				product: [...order?.products],
 				receiver: [...productOwnerNotify],
-				message: `Cancelled Order: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. ${order?.name}`,
+				message:`Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
 			}
 			await Notification.create(NotificationSendObj);
 			order.status = "complete";
