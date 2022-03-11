@@ -68,7 +68,7 @@ const adminSeenOrdersSearch = async (req, res, next) => {
 	if (req?.user?.isAdmin === true) {
 		let { status, page = 1, limit = 10 } = req.query;
 		// console.log(status)
-		const keyword = {status: status};
+		const keyword = { status: status };
 		const keyword2 = req.query?.search ? {
 			$or: [
 				{ name: { $regex: req.query.search?.toLowerCase(), $options: "i" } },
@@ -140,27 +140,27 @@ const singleOrder = async (req, res, next) => {
 const orderCompeleteToBlanceAdd = async (req, res, next) => {
 	// console.log(req.user)
 	try {
-		const permission = MyBalance.findOne({ user: req.user._id })
-			.populate({
-				path: "user",
-				select: "_id name address phone email",
-			})
-			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
-			.populate({
-				path: "products.productOwner",
-				select: "_id name address phone email sellerShop",
-				populate: [
-					{
-						path: "sellerShop",
-						select: "_id address",
-					},
-				],
-			});
+		const permission = MyBalance.findOne({ user: req.user._id });
 		if (!(req?.user?.isAdmin === true && permission)) {
 			return res.status(401).json({ error: { admin: "admin permission required!" } });
 		}
 		if (req?.user?.isAdmin === true && permission) {
-			const order = await Order.findOne({ _id: req?.params?.id });
+			const order = await Order.findOne({ _id: req?.params?.id })
+				.populate({
+					path: "user",
+					select: "_id name address phone email",
+				})
+				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate({
+					path: "products.productOwner",
+					select: "_id name address phone email sellerShop",
+					populate: [
+						{
+							path: "sellerShop",
+							select: "_id address",
+						},
+					],
+				});
 			// console.log(order)
 			if (!order) {
 				return res.status(404).json({ error: { order: "order not founds please provide valid order credentials" } });
@@ -185,7 +185,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 				sender: req.user._id,
 				product: [...order?.products],
 				receiver: [...productOwnerNotify],
-				message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
+				message: `Cancelled Order: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. ${order?.name}`,
 			}
 			await Notification.create(NotificationSendObj);
 			order.status = "complete";
@@ -196,6 +196,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 		next(error);
 	}
 };
+
 const orderCancelToBalanceSub = async (req, res, next) => {
 	try {
 		const permission = MyBalance.findOne({ user: req.user._id });
