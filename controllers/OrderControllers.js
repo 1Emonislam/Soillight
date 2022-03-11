@@ -41,12 +41,12 @@ const orderSearch = async (req, res, next) => {
 		const order = await Order.find({ user: req.user._id, status: status })
 			.populate({
 				path: "user",
-				select: "_id name address phone pic",
+				select: "_id name address phone email pic",
 			})
 			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone sellerShop",
+				select: "_id name address phone email sellerShop",
 				populate: [
 					{
 						path: "sellerShop",
@@ -104,12 +104,12 @@ const singleOrder = async (req, res, next) => {
 		const order = await Order.findOne({ _id: req.params.id })
 			.populate({
 				path: "user",
-				select: "_id name address phone",
+				select: "_id name address phone email",
 			})
 			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone sellerShop",
+				select: "_id name address phone email sellerShop",
 				populate: [
 					{
 						path: "sellerShop",
@@ -129,12 +129,12 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 		const permission = MyBalance.findOne({ user: req.user._id })
 			.populate({
 				path: "user",
-				select: "_id name address phone",
+				select: "_id name address phone email",
 			})
 			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone sellerShop",
+				select: "_id name address phone email sellerShop",
 				populate: [
 					{
 						path: "sellerShop",
@@ -192,12 +192,12 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 			const order = await Order.findOne({ _id: req?.params?.id })
 				.populate({
 					path: "user",
-					select: "_id name address phone",
+					select: "_id name address phone email",
 				})
 				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 				.populate({
 					path: "products.productOwner",
-					select: "_id name address phone sellerShop",
+					select: "_id name address phone email sellerShop",
 					populate: [
 						{
 							path: "sellerShop",
