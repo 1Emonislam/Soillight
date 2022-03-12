@@ -8,7 +8,7 @@ const shopRegister = async (req, res, next) => {
     try {
         if (req?.user?.isAdmin === true) {
             if (seller) {
-                const shopUpdated = await Shop.findByIdAndUpdate({ user: req.user._id }, {
+                const shopUpdated = await Shop.findOneAndUpdate({ user: req.user._id }, {
                     name, phone, address, openDate, closeDate, email, location: { latitude, longitude },
                 }, { new: true });
                 return res.status(200).json({ message: "shop update successfully!", shopUpdated })
@@ -28,7 +28,7 @@ const shopRegister = async (req, res, next) => {
         }
         if ((req?.user?.role === 'seller')) {
             if (seller) {
-                const shopUpdated = await Shop.findByIdAndUpdate({ user: req.user._id }, {
+                const shopUpdated = await Shop.findOneAndUpdate({ user: req.user._id }, {
                     name, phone, address, openDate, closeDate, email, location: { latitude, longitude },
                 }, { new: true });
                 return res.status(200).json({ message: "shop update successfully!", shopUpdated })
