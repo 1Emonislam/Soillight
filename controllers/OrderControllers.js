@@ -27,6 +27,13 @@ const orderAdd = async (req, res, next) => {
 				message: `You Have Received New Order From ${buyer.name}`,
 			};
 			await Notification.create(NotificationSendObj);
+			const NotificationSendBuyer = {
+				sender: req.user._id,
+				product: [...products],
+				receiver: [...req.user._id],
+				message: `Congratulations! your order has been placed successfully!`,
+			};
+			await Notification.create(NotificationSendBuyer);
 		}
 		return res.status(200).json({ message: "order successfully!", data: created });
 	} catch (error) {
@@ -140,7 +147,7 @@ const singleOrder = async (req, res, next) => {
 const orderCompeleteToBlanceAdd = async (req, res, next) => {
 	// console.log(req.user)
 	try {
-		const permission = MyBalance.findOne({ user: req.user._id });
+		const permission = await MyBalance.findOne({ user: req.user._id });
 		if (!(req?.user?.isAdmin === true && permission)) {
 			return res.status(401).json({ error: { admin: "admin permission required!" } });
 		}
@@ -185,7 +192,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 				sender: req.user._id,
 				product: [...order?.products],
 				receiver: [...productOwnerNotify],
-				message:`Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
+				message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
 			}
 			await Notification.create(NotificationSendObj);
 			order.status = "complete";
@@ -199,7 +206,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 
 const orderCancelToBalanceSub = async (req, res, next) => {
 	try {
-		const permission = MyBalance.findOne({ user: req.user._id });
+		const permission = await MyBalance.findOne({ user: req.user._id });
 		if (!(req?.user?.isAdmin === true && permission)) {
 			return res.status(401).json({ error: { admin: "admin permission required!" } });
 		}
@@ -224,6 +231,7 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 			if (!order) {
 				return res.status(404).json({ error: { order: "order not founds please provide valid order credentials" } });
 			}
+			const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
 			for (let i = 0; i < order?.products.length; i++) {
 				let updatedBalance;
 				updatedBalance = order?.products[i].price;
@@ -233,6 +241,13 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 						user: order?.products[i].productOwner,
 					},
 					{ $inc: { balance: -updatedBalance } },
+					{ new: true }
+				);
+				const buyerBalance = await MyBalance.findOneAndUpdate(
+					{
+						user: order?.user,
+					},
+					{ $inc: { balance: buyerAmountPay } },
 					{ new: true }
 				);
 			}
@@ -246,10 +261,17 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 				receiver: [...productOwnerNotify],
 				message: `Cancelled Order: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. ${order?.name}`,
 			}
+			const NotificationSendBuyer = {
+				sender: req.user._id,
+				product: [...order?.products],
+				receiver: [...order?.user],
+				message: `Cancelled Order: Refund Balance to Buyer account. you have received money ${order?.name}. ${order?.name}`,
+			}
 			await Notification.create(NotificationSendObj);
+			await Notification.create(NotificationSendBuyer);
 			order.status = "cancel";
 			await order.save();
-			return res.status(200).json({ message: "order Successfully Cancel! automatic subtract seller balance Transaction Complete!", data: order });
+			return res.status(200).json({ message: "order Successfully Cancel ! automatic subtract seller balance Transaction Complete!", data: order });
 		}
 	} catch (error) {
 		next(error);

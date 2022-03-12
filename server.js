@@ -30,6 +30,7 @@ const productReviewRoutes = require("./routes/productReviewRoutes");
 const productSearchRoutes = require("./routes/productSearchRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/OrderRoutes");
+const balanceWithdrawRoutes = require('./routes/balanceWithdrawRoutes');
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -50,6 +51,7 @@ app.use("/", searchRoutes);
 app.use("/", productSearchRoutes);
 app.use("/", cartRoutes);
 app.use("/", orderRoutes);
+app.use('/',balanceWithdrawRoutes)
 server.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });
