@@ -109,4 +109,16 @@ const shopRemove = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { shopRegister, updateShop, shopRemove };
+
+const myShop = async (req, res, next) => {
+    // console.log(req.user)
+    try {
+        const shop = await Shop.findOne({ user: req.user._id });
+        if (shop) return res.status(400).json({ error: { "shop": "shop not founds!" } });
+        if (shop) return res.status(200).json({ data: shop });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = { shopRegister, updateShop, shopRemove, myShop };
