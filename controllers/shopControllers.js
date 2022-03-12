@@ -121,7 +121,7 @@ const myShop = async (req, res, next) => {
     // console.log(req.user)
     try {
         const shop = await Shop.findOne({ user: req.user._id });
-        if (shop) return res.status(400).json({ error: { "shop": "shop not founds!" } });
+        if (!shop) return res.status(400).json({ error: { "shop": "shop not founds!" } });
         if (shop) return res.status(200).json({ data: shop });
     }
     catch (error) {
