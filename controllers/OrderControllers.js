@@ -4,6 +4,7 @@ const Notification = require("../models/notificationMdels");
 const User = require("../models/userModel");
 const orderAdd = async (req, res, next) => {
 	const { products, transaction_id, tx_ref } = req.body;
+	const { latitude, longitude } = req?.body?.location;
 	const buyer = await User.findOne({ _id: req.user._id });
 	try {
 		const created = await Order.create({
@@ -11,6 +12,7 @@ const orderAdd = async (req, res, next) => {
 			transaction_id,
 			tx_ref,
 			products,
+			location: { latitude, longitude }
 		});
 		if (!created) {
 			return res.status(400).json({ error: { order: "something wrong!" } });

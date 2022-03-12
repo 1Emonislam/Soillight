@@ -6,6 +6,14 @@ const orderSchema = mongoose.Schema({
         ref: 'User',
         required: [true, "Please provide user ID"]
     },
+    location: {
+        latitude: {
+            type: String,
+        },
+        longitude: {
+            type: String,
+        }
+    },
     transaction_id: {
         type: String,
     },
