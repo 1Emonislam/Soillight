@@ -184,6 +184,7 @@ const profileUpdate = async (req, res, next) => {
     // console.log(req.body)
     let { name, email, role, phone, pic, address } = req.body;
     const { latitude, longitude } = req?.body?.location;
+    // console.log(latitude,longitude)
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -198,7 +199,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, phone, pic, address
+                name, email, role: role || req.user.role, phone, pic, address,location:{latitude,longitude}
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
