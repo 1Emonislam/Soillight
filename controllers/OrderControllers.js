@@ -329,9 +329,9 @@ const orderStatusUpdate = async (req, res, next) => {
 
 const allCompletedOrder = async (req, res, next) => {
 	try {
-		let { page = 1, limit = 10 } = req.query;
+		let {status, page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
-		const order = await Order.find({ status: 'completed' }).populate({
+		const order = await Order.find({ status: status}).populate({
 			path: "user",
 			select: "_id name address phone email",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -347,7 +347,7 @@ const allCompletedOrder = async (req, res, next) => {
 			}).sort({ createdAt: -1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ status: 'completed' }).populate({
+		const count = await Order.find({ status: status}).populate({
 			path: "user",
 			select: "_id name address phone email",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
