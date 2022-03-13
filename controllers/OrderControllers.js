@@ -333,15 +333,15 @@ const allStatusOrder = async (req, res, next) => {
 		limit = parseInt(limit);
 		const order = await Order.find({ status: status}).populate({
 			path: "user",
-			select: "_id name address phone email",
+			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone email sellerShop",
+				select: "_id name address phone email sellerShop pic",
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address",
+						select: "_id address location",
 					},
 				],
 			}).sort({ createdAt: -1, _id: -1 })
@@ -349,15 +349,15 @@ const allStatusOrder = async (req, res, next) => {
 			.skip((page - 1) * limit);
 		const count = await Order.find({ status: status}).populate({
 			path: "user",
-			select: "_id name address phone email",
+			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone email sellerShop",
+				select: "_id name address phone email sellerShop pic",
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address",
+						select: "_id address location",
 					},
 				],
 			}).count();
@@ -374,15 +374,15 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 		limit = parseInt(limit);
 		const order = await Order.find({ statusUpdatedBy: req.user._id }).populate({
 			path: "user",
-			select: "_id name address phone email",
+			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone email sellerShop",
+				select: "_id name address phone email sellerShop pic",
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address",
+						select: "_id address location",
 					},
 				],
 			}).sort({ createdAt: -1, _id: -1 })
@@ -390,15 +390,15 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			.skip((page - 1) * limit);
 		const count = await Order.find({ statusUpdatedBy: req.user._id}).populate({
 			path: "user",
-			select: "_id name address phone email",
+			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone email sellerShop",
+				select: "_id name address phone email sellerShop pic",
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address",
+						select: "_id address location",
 					},
 				],
 			}).sort({ createdAt: -1, _id: -1 }).count();
