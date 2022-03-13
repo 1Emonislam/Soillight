@@ -22,7 +22,17 @@ const orderSchema = mongoose.Schema({
     },
     status: {
         type: String,
+        enum: ['pending', 'approved', 'cancelled', 'completed', 'progress', 'delivered'],
         default: 'pending',
+    },
+    userType: {
+        type: String,
+        enum: ['admin', 'rider', 'seller', 'buyer'],
+        default: 'user',
+    },
+    statusUpdatedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
     },
     products: [{
         productOwner: {

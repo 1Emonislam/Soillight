@@ -266,7 +266,7 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 			const NotificationSendBuyer = {
 				sender: req.user._id,
 				product: [...order?.products],
-				receiver: [...order?.user],
+				receiver: [order?.user],
 				message: `Cancelled Order: Refund Balance to Buyer account. you have received money ${order?.name}. ${order?.name}`,
 			}
 			await Notification.create(NotificationSendObj);
@@ -279,5 +279,139 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 		next(error);
 	}
 };
+const orderStatusUpdate = async (req, res, next) => {
+	let { status } = req.body;
+	// console.log(req.user._id)
+	const statusArr = ['pending', 'approved', 'cancelled', 'completed', 'progress', 'delivered'];
+	const valided = statusArr.includes(status);
+	if (!valided) return res.status(400).json({ error: { status: "please provide valid status credentials!" } })
+	try {
+		if (req?.user?.role === 'rider' || req?.user?.isAdmin === true) {
+			const order = await Order.findOne({ _id: req.params.id });
+			if (!order) return res.status(400).json({ error: { "order": "bad request please provide valid credentials!" } });
+			if (order) {
+				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
+					status: status,
+					userType: req.user.role,
+					statusUpdatedBy: req.user._id,
+				}, { new: true });
+				if (!updated) return res.status(400).json({ error: { "order": "order status update failed!" } });
+				if (updated) {
+					let productOwnerNotify = [];
+					for (let owner = 0; owner < order?.products.length; owner++) {
+						productOwnerNotify.unshift(order?.products[owner].productOwner)
+					}
+					const NotificationSendObj = {
+						sender: req.user._id,
+						product: [...order?.products],
+						receiver: [...productOwnerNotify],
+						message: `order status ${status}`,
+					}
+					const NotificationSendBuyer = {
+						sender: req.user._id,
+						product: [...order?.products],
+						receiver: [order?.user],
+						message: `your order status is ${status}`,
+					}
+					await Notification.create(NotificationSendBuyer);
+					await Notification.create(NotificationSendObj);
+					return res.status(200).json({ message: "order status successfully updated!", data: updated })
+				}
+			}
+		} else {
+			return res.status(400).json({ error: { order: "you can perform only rider and admin permission required!" } })
+		}
+	}
+	catch (error) {
+		next(error)
+	}
+}
 
-module.exports = { orderAdd, orderGet, orderSearch, singleOrder, orderCompeleteToBlanceAdd, orderCancelToBalanceSub, adminSeenOrdersSearch };
+const allCompletedOrder = async (req, res, next) => {
+	try {
+		let { page = 1, limit = 10 } = req.query;
+		limit = parseInt(limit);
+		const order = await Order.find({ status: 'completed' }).populate({
+			path: "user",
+			select: "_id name address phone email",
+		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			.populate({
+				path: "products.productOwner",
+				select: "_id name address phone email sellerShop",
+				populate: [
+					{
+						path: "sellerShop",
+						select: "_id address",
+					},
+				],
+			}).sort({ createdAt: -1, _id: -1 })
+			.limit(limit * 1)
+			.skip((page - 1) * limit);
+		const count = await Order.find({ status: 'completed' }).populate({
+			path: "user",
+			select: "_id name address phone email",
+		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			.populate({
+				path: "products.productOwner",
+				select: "_id name address phone email sellerShop",
+				populate: [
+					{
+						path: "sellerShop",
+						select: "_id address",
+					},
+				],
+			}).count();
+		return res.status(200).json({ count, data: order })
+	}
+	catch (error) {
+		next(error)
+	}
+}
+
+const orderStatusUpdatedMyHistory = async (req, res, next) => {
+	try {
+		let { page = 1, limit = 10 } = req.query;
+		limit = parseInt(limit);
+		const order = await Order.find({ statusUpdatedBy: req.user._id }).populate({
+			path: "user",
+			select: "_id name address phone email",
+		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			.populate({
+				path: "products.productOwner",
+				select: "_id name address phone email sellerShop",
+				populate: [
+					{
+						path: "sellerShop",
+						select: "_id address",
+					},
+				],
+			}).sort({ createdAt: -1, _id: -1 })
+			.limit(limit * 1)
+			.skip((page - 1) * limit);
+		const count = await Order.find({ statusUpdatedBy: req.user._id}).populate({
+			path: "user",
+			select: "_id name address phone email",
+		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			.populate({
+				path: "products.productOwner",
+				select: "_id name address phone email sellerShop",
+				populate: [
+					{
+						path: "sellerShop",
+						select: "_id address",
+					},
+				],
+			}).sort({ createdAt: -1, _id: -1 });
+		if (!order) {
+			return res.status(404).json({ error: [] })
+		} if (order) {
+			return res.status(200).json({ message: "your updated history successfully fetch!", count, data: order })
+		}
+	}
+	catch (error) {
+		next(error)
+	}
+}
+
+
+module.exports = { orderAdd, allCompletedOrder, orderGet, orderStatusUpdate, orderSearch, singleOrder, orderCompeleteToBlanceAdd, orderCancelToBalanceSub, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
