@@ -401,7 +401,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 						select: "_id address",
 					},
 				],
-			}).sort({ createdAt: -1, _id: -1 });
+			}).sort({ createdAt: -1, _id: -1 }).count();
 		if (!order) {
 			return res.status(404).json({ error: [] })
 		} if (order) {
