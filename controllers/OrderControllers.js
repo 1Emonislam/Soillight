@@ -327,7 +327,7 @@ const orderStatusUpdate = async (req, res, next) => {
 	}
 }
 
-const allCompletedOrder = async (req, res, next) => {
+const allStatusOrder = async (req, res, next) => {
 	try {
 		let {status, page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
@@ -414,4 +414,4 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 }
 
 
-module.exports = { orderAdd, allCompletedOrder, orderGet, orderStatusUpdate, orderSearch, singleOrder, orderCompeleteToBlanceAdd, orderCancelToBalanceSub, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
+module.exports = { orderAdd, allStatusOrder, orderGet, orderStatusUpdate, orderSearch, singleOrder, orderCompeleteToBlanceAdd, orderCancelToBalanceSub, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
