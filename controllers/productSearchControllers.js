@@ -75,6 +75,7 @@ const myProducts = async (req, res, next) => {
 const allProductGet = async (req, res, next) => {
     try {
         let { status, page = 1, limit = 10 } = req.query;
+        // console.log(status)
         limit = parseInt(limit);
         const keyword = req.query.search ? {
             $or: [
@@ -82,17 +83,17 @@ const allProductGet = async (req, res, next) => {
                 { category: { $regex: req.query.search, $options: "i" }, },
                 { subCategory: { $regex: req.query.search, $options: "i" }, },
             ], status: status
-        } : { status: 'pending' };
+        } : { status: status };
         const product = await Product.find(keyword).populate({
             path: "user",
             select: "_id name sellerShop",
             populate: [
                 {
                     path: "sellerShop",
-                    select: "_id address location name name",
+                    select: "_id address location name",
                 },
             ],
-        }).limit(limit * 1).skip((page - 1) * limit);
+        }).sort({ "createdAt": 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find(keyword).count();
         return res.status(200).json({ "message": "product data successfully fetch!", count, data: product })
 
@@ -101,4 +102,5 @@ const allProductGet = async (req, res, next) => {
         next(error)
     }
 }
+
 module.exports = { productSearch, categoriesSearch, latestProducts, myProducts, allProductGet };

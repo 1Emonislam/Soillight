@@ -96,5 +96,46 @@ const productRemove = async (req, res, next) => {
     }
 }
 
+const getSignleProduct = async (req, res, next) => {
+    try {
+        const product = await Product.findOne({ _id: req.params.id }).populate({
+            path: "user",
+            select: "_id name sellerShop",
+            populate: [
+                {
+                    path: "sellerShop",
+                    select: "_id address location name name",
+                },
+            ],
+        });
+        return res.status(200).json({ data: product })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const productStatusUpdate = async (req, res, next) => {
+    const checkStatus = ['approved', 'cancelled', 'pending'];
+    const { status } = req.body;
+    // console.log(status)
+    // console.log(req.user)
+    if (!(req?.user?.isAdmin === true)) {
+        return res.status(400).json({ error: { admin: "you can perform only admin!" } })
+    }
 
-module.exports = { productCreate, productUpdate, productRemove }
+    if (!(checkStatus.includes(status))) return res.status(400).json({ error: { "status": "please provide valid status credentials!" } })
+    const product = await Product.findOneAndUpdate({ _id: req.params.id }, {
+        status: status
+    }, { new: true }).populate({
+        path: "user",
+        select: "_id name sellerShop",
+        populate: [
+            {
+                path: "sellerShop",
+                select: "_id address location name name",
+            },
+        ],
+    });
+    return res.status(200).json({ message: "product status has been successfully updated!", data: product })
+}
+module.exports = { productCreate, productUpdate, productRemove, getSignleProduct, productStatusUpdate }
