@@ -22,7 +22,7 @@ const orderSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'cancelled', 'completed', 'progress', 'delivered'],
+        enum: ['pending', 'approved', 'cancelled','shipped', 'completed', 'progress', 'delivered'],
         default: 'pending',
     },
     userType: {
@@ -31,6 +31,10 @@ const orderSchema = mongoose.Schema({
         default: 'user',
     },
     statusUpdatedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    },
+    statusUpdatedByAdmin: {
         type: Schema.Types.ObjectId,
         ref: 'User',
     },

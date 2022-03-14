@@ -55,11 +55,11 @@ const orderSearch = async (req, res, next) => {
 			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone email sellerShop",
+				select: "_id name address phone email sellerShop pic",
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address",
+						select: "_id address location",
 					},
 				],
 			})
@@ -127,16 +127,16 @@ const singleOrder = async (req, res, next) => {
 		const order = await Order.findOne({ _id: req.params.id })
 			.populate({
 				path: "user",
-				select: "_id name address phone email",
+				select: "_id name address phone email pic",
 			})
 			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 			.populate({
 				path: "products.productOwner",
-				select: "_id name address phone email sellerShop",
+				select: "_id name address phone email sellerShop pic",
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address",
+						select: "_id address location",
 					},
 				],
 			});
@@ -157,16 +157,16 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 			const order = await Order.findOne({ _id: req?.params?.id })
 				.populate({
 					path: "user",
-					select: "_id name address phone email",
+					select: "_id name address phone email pic",
 				})
 				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 				.populate({
 					path: "products.productOwner",
-					select: "_id name address phone email sellerShop",
+					select: "_id name address phone email sellerShop pic",
 					populate: [
 						{
 							path: "sellerShop",
-							select: "_id address",
+							select: "_id address location",
 						},
 					],
 				});
@@ -197,7 +197,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 				message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
 			}
 			await Notification.create(NotificationSendObj);
-			order.status = "complete";
+			order.status = "completed";
 			await order.save();
 			return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: order });
 		}
@@ -216,16 +216,16 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 			const order = await Order.findOne({ _id: req?.params?.id })
 				.populate({
 					path: "user",
-					select: "_id name address phone email",
+					select: "_id name address phone email pic",
 				})
 				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
 				.populate({
 					path: "products.productOwner",
-					select: "_id name address phone email sellerShop",
+					select: "_id name address phone email sellerShop pic",
 					populate: [
 						{
 							path: "sellerShop",
-							select: "_id address",
+							select: "_id address location",
 						},
 					],
 				});
@@ -271,7 +271,7 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 			}
 			await Notification.create(NotificationSendObj);
 			await Notification.create(NotificationSendBuyer);
-			order.status = "cancel";
+			order.status = "cancelled";
 			await order.save();
 			return res.status(200).json({ message: "order Successfully Cancel ! automatic subtract seller balance Transaction Complete!", data: order });
 		}
@@ -282,11 +282,44 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 const orderStatusUpdate = async (req, res, next) => {
 	let { status } = req.body;
 	// console.log(req.user._id)
-	const statusArr = ['pending', 'approved', 'cancelled', 'completed', 'progress', 'delivered'];
+	const statusArr = ['pending', 'approved', 'cancelled', 'completed', 'shipped', 'progress', 'delivered'];
 	const valided = statusArr.includes(status);
 	if (!valided) return res.status(400).json({ error: { status: "please provide valid status credentials!" } })
 	try {
-		if (req?.user?.role === 'rider' || req?.user?.isAdmin === true) {
+		if (req?.user?.isAdmin === true) {
+			const order = await Order.findOne({ _id: req.params.id });
+			if (!order) return res.status(400).json({ error: { "order": "bad request please provide valid credentials!" } });
+			if (order) {
+				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
+					status: status,
+					userType: req.user.role,
+					statusUpdatedByAdmin: req.user._id,
+				}, { new: true });
+				if (!updated) return res.status(400).json({ error: { "order": "order status update failed!" } });
+				if (updated) {
+					let productOwnerNotify = [];
+					for (let owner = 0; owner < order?.products.length; owner++) {
+						productOwnerNotify.unshift(order?.products[owner].productOwner)
+					}
+					const NotificationSendObj = {
+						sender: req.user._id,
+						product: [...order?.products],
+						receiver: [...productOwnerNotify],
+						message: `order status ${status}`,
+					}
+					const NotificationSendBuyer = {
+						sender: req.user._id,
+						product: [...order?.products],
+						receiver: [order?.user],
+						message: `your order status is ${status}`,
+					}
+					await Notification.create(NotificationSendBuyer);
+					await Notification.create(NotificationSendObj);
+					return res.status(200).json({ message: "order status successfully updated!", data: updated })
+				}
+			}
+		}
+		if (req?.user?.role === 'rider') {
 			const order = await Order.findOne({ _id: req.params.id });
 			if (!order) return res.status(400).json({ error: { "order": "bad request please provide valid credentials!" } });
 			if (order) {
@@ -329,9 +362,9 @@ const orderStatusUpdate = async (req, res, next) => {
 
 const allStatusOrder = async (req, res, next) => {
 	try {
-		let {status, page = 1, limit = 10 } = req.query;
+		let { status, page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
-		const order = await Order.find({ status: status}).populate({
+		const order = await Order.find({ status: status }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -347,7 +380,7 @@ const allStatusOrder = async (req, res, next) => {
 			}).sort({ createdAt: -1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ status: status}).populate({
+		const count = await Order.find({ status: status }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -388,7 +421,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			}).sort({ createdAt: -1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ statusUpdatedBy: req.user._id}).populate({
+		const count = await Order.find({ statusUpdatedBy: req.user._id }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
