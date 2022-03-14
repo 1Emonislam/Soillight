@@ -267,7 +267,7 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 				sender: req.user._id,
 				product: [...order?.products],
 				receiver: [order?.user],
-				message: `Cancelled Order: Refund Balance to Buyer account. you have received money ${order?.name}. ${order?.name}`,
+				message: `Order delivered faild! Refund Balance. you have received money ${order?.name}. ${order?.name}`,
 			}
 			await Notification.create(NotificationSendObj);
 			await Notification.create(NotificationSendBuyer);
