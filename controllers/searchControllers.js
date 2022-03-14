@@ -98,7 +98,7 @@ const riderSearch = async (req, res, next) => {
     } : { role: 'rider' };
     try {
         const count = await User.find(keyword).count();
-        const users = await User.find(keyword).limit(limit * 1).limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: 1, _id: -1 }).select("-password")
+        const users = await User.find(keyword).limit(limit * 1).skip((page - 1) * limit).sort({ createdAt: 1, _id: -1 }).select("-password")
         return res.status(200).json({ data: users, count })
     }
     catch (error) {

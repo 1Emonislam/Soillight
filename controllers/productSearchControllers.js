@@ -70,4 +70,35 @@ const myProducts = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { productSearch, categoriesSearch, latestProducts, myProducts };
+
+
+const allProductGet = async (req, res, next) => {
+    try {
+        let { status, page = 1, limit = 10 } = req.query;
+        limit = parseInt(limit);
+        const keyword = req.query.search ? {
+            $or: [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { category: { $regex: req.query.search, $options: "i" }, },
+                { subCategory: { $regex: req.query.search, $options: "i" }, },
+            ], status: status
+        } : { status: 'pending' };
+        const product = await Product.find(keyword).populate({
+            path: "user",
+            select: "_id name sellerShop",
+            populate: [
+                {
+                    path: "sellerShop",
+                    select: "_id address location name name",
+                },
+            ],
+        }).limit(limit * 1).skip((page - 1) * limit);
+        const count = await Product.find(keyword).count();
+        return res.status(200).json({ "message": "product data successfully fetch!", count, data: product })
+
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = { productSearch, categoriesSearch, latestProducts, myProducts, allProductGet };

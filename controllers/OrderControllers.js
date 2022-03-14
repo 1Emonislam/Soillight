@@ -59,7 +59,7 @@ const orderSearch = async (req, res, next) => {
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address location",
+						select: "_id address location name",
 					},
 				],
 			})
@@ -136,7 +136,7 @@ const singleOrder = async (req, res, next) => {
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address location",
+						select: "_id address location name",
 					},
 				],
 			});
@@ -166,7 +166,7 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 					populate: [
 						{
 							path: "sellerShop",
-							select: "_id address location",
+							select: "_id address location name",
 						},
 					],
 				});
@@ -225,7 +225,7 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 					populate: [
 						{
 							path: "sellerShop",
-							select: "_id address location",
+							select: "_id address location name",
 						},
 					],
 				});
@@ -374,7 +374,7 @@ const allStatusOrder = async (req, res, next) => {
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address location",
+						select: "_id address location name",
 					},
 				],
 			}).sort({ createdAt: -1, _id: -1 })
@@ -390,7 +390,7 @@ const allStatusOrder = async (req, res, next) => {
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address location",
+						select: "_id address location name",
 					},
 				],
 			}).count();
@@ -415,7 +415,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address location",
+						select: "_id address location name",
 					},
 				],
 			}).sort({ createdAt: -1, _id: -1 })
@@ -431,7 +431,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				populate: [
 					{
 						path: "sellerShop",
-						select: "_id address location",
+						select: "_id address location name",
 					},
 				],
 			}).sort({ createdAt: -1, _id: -1 }).count();

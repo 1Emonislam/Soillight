@@ -95,4 +95,6 @@ const productRemove = async (req, res, next) => {
         next(error)
     }
 }
+
+
 module.exports = { productCreate, productUpdate, productRemove }
