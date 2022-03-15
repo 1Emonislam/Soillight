@@ -95,6 +95,7 @@ const allProductGet = async (req, res, next) => {
             ],
         }).sort({ "createdAt": 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find(keyword).count();
+        
         return res.status(200).json({ "message": "product data successfully fetch!", count, data: product })
 
     }

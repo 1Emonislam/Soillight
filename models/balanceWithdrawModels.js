@@ -4,16 +4,16 @@ const balanceWithdrawSchema = mongoose.Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: [true, "Please provide user ID"]
     },
-    amount:{
-        type:String,
+    amount: {
+        type: Number,
+        required: [true, 'please provide withdraw amount!']
     },
     transaction_id: {
         type: String,
     },
-    tx_ref: {
-        type: String,
+    tax: {
+        type: Number,
     },
     status: {
         type: String,

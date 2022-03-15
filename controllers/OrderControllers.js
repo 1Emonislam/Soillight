@@ -32,7 +32,7 @@ const orderAdd = async (req, res, next) => {
 			const NotificationSendBuyer = {
 				sender: req.user._id,
 				product: [...products],
-				receiver: [...req.user._id],
+				receiver: [req.user._id],
 				message: `Congratulations! your order has been placed successfully!`,
 			};
 			await Notification.create(NotificationSendBuyer);

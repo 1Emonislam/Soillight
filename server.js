@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const io = socketIO(server, {
 	cors: {
 		origin: "*",
-		methods: ["GET", "POST","PUT"],
+		methods: ["GET", "POST", "PUT"],
 	},
 });
 global.io = io;
@@ -30,6 +30,7 @@ const productReviewRoutes = require("./routes/productReviewRoutes");
 const productSearchRoutes = require("./routes/productSearchRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/OrderRoutes");
+const bankLinkedRoutes = require('./routes/bankLinkedRoutes');
 const balanceWithdrawRoutes = require('./routes/balanceWithdrawRoutes');
 //middleware
 app.use(cors());
@@ -51,7 +52,8 @@ app.use("/", searchRoutes);
 app.use("/", productSearchRoutes);
 app.use("/", cartRoutes);
 app.use("/", orderRoutes);
-app.use('/',balanceWithdrawRoutes)
+app.use('/', bankLinkedRoutes)
+app.use('/', balanceWithdrawRoutes)
 server.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });

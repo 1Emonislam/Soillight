@@ -1,40 +1,121 @@
 const BalanceWithdraw = require('../models/balanceWithdrawModels');
+const BankLinked = require('../models/bankLinkedModel');
 const MyBalance = require('../models/myBalance');
 const Notification = require('../models/notificationMdels');
 const balanceWithdraw = async (req, res, next) => {
-    const { amount, transaction_id, tx_ref } = req.body;
+    const { amount, tax } = req.body;
     try {
-        const withdraw = await BalanceWithdraw.create({
-            amount, transaction_id, tx_ref, user: req.user._id,
-        })
-        if (withdraw) {
         const myBalance = await MyBalance.findOne({ user: req.user._id }).populate("user", "name");
-        if(myBalance?.balance === 0){
-            return res.status(406).json({ error: { "withdraw": `You dont'n have enough balance to Insufficient Balance Withdraw incomplete! your account balance is ${myBalance?.balance} `},status:"incomplete" });
+        const bankLinked = await BankLinked.findOne({ bank_owner: req.user._id });
+        if (!bankLinked) {
+            return res.status(400).json({ error: { "withdraw": "please bank linked before withdrawing your balance" } })
+        }
+        // console.log(myBalance)
+        if (!myBalance) {
+            return res.status(400).json({ error: { "withdraw": "bad request please try again! provide valid credentials" } })
+        }
+        if (myBalance?.balance === 0) {
+            return res.status(406).json({ error: { "withdraw": `You dont'n have enough balance to Insufficient Balance Withdraw incomplete! your account balance is ${myBalance?.balance} ` }, status: "incomplete" });
         }
         if (myBalance?.balance < Number(amount)) {
-            return res.status(406).json({ error: { "withdraw": `You don't have enough balance to Insufficient Balance Withdraw incomplete! your account balance is ${myBalance?.balance} `},status:"incomplete" });
-            }
-            const updateTransaction = await MyBalance.findOneAndUpdate(
-                {
-                    user: req.user._id
-                },
-                { $inc: { balance: -myBalance?.balance } },
-                { new: true }
-            );
-            const NotificationSendObj = {
-                sender: req.user._id,
-                receiver: [...req.user._id],
-                message: `Congratulations!  ${myBalance?.name}  Withdraw Balance Transaction Complete. Manualy approve your Transaction!`,
-            }
+            return res.status(406).json({ error: { "withdraw": `You don't have enough balance to Insufficient Balance Withdraw incomplete! your account balance is ${myBalance?.balance} ` }, status: "incomplete" });
+        }
+        const updateTransaction = await MyBalance.findOneAndUpdate(
+            {
+                user: req.user._id
+            },
+            { $inc: { balance: -Number(amount) } },
+            { new: true }
+        );
+        const NotificationSendObj = {
+            sender: req.user._id,
+            receiver: [req.user._id],
+            message: `Congratulations!  ${myBalance?.user?.name}  Your withdrawal balance transaction is complete. Manualy approve your Transaction!`,
+        }
+        const withdraw = await BalanceWithdraw.create({
+            amount, user: req.user._id,
+        })
+        function withdrawTrans(length, id) {
+            for (var s = ''; s.length < length; s += `${id}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01`.charAt(Math.random() * 62 | 0));
+            return s;
+        }
+        if (withdraw) {
+            withdraw.transaction_id = withdrawTrans(18, withdraw?._id);
+            await withdraw.save();
             await Notification.create(NotificationSendObj);
-            myBalance.status = "pending";
-            await myBalance.save();
-            return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: order });
+            return res.status(200).json({ message: `Congratulations! ${myBalance?.user?.name} Your withdrawal balance transaction is complete. Manualy approve your Transaction!`, data: withdraw });
         }
     }
     catch (error) {
         next(error)
     }
 }
-module.exports = { balanceWithdraw };
+const withdrawTransAcction = async (req, res, next) => {
+    try {
+        if (!(req?.user?.isAdmin === true)) {
+            return res.status(400).json({ error: { "status": "permission denied! please provide admin credentials!" } })
+        }
+        const { status } = req.body;
+        const arrCheck = ['approved', 'cancelled', 'pending'];
+        if (!(arrCheck.includes(status))) {
+            return res.status(400).json({ error: { status: "please provide valid status credentials!" } })
+        }
+        if (req?.user?.isAdmin === true) {
+            const statusUpdated = await BalanceWithdraw.findOneAndUpdate({ _id: req.params.id }, {
+                status: status
+            }, { new: true });
+            if (status === 'approved') {
+                const NotificationSend = {
+                    sender: req.user._id,
+                    receiver: [statusUpdated.user],
+                    message: `Congratulations! Your Withdrawal Transaction is Approved!`,
+                };
+                await Notification.create(NotificationSend);
+            }
+            if (status === 'cancelled') {
+                const NotificationSend = {
+                    sender: req.user._id,
+                    receiver: [statusUpdated.user],
+                    message: `Ops! Your Withdrawal Transaction is Cancelled!`,
+                };
+                await Notification.create(NotificationSend);
+            }
+            return res.status(200).json({ message: `Withdraw Transaction is ${status}!`, data: statusUpdated })
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const withdrawStatusByHistory = async (req, res, next) => {
+    try {
+        let { status, page = 1, limit = 10 } = req.query;
+        limit = parseInt(limit);
+        const keyword = req.query.search ? {
+            $or: [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { category: { $regex: req.query.search, $options: "i" }, },
+                { subCategory: { $regex: req.query.search, $options: "i" }, },
+            ], status: status
+        } : { status: status };
+        const withdraw = await BalanceWithdraw.find(keyword).populate({
+            path: "user",
+            select: "_id name sellerShop",
+            populate: [
+                {
+                    path: "sellerShop",
+                    select: "_id address location name",
+                },
+            ],
+        }).sort({ "createdAt": 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
+        const count = await Product.find(keyword).count();
+
+        return res.status(200).json({ "message": "product data successfully fetch!", count, data: product })
+
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = { balanceWithdraw, withdrawTransAcction, withdrawStatusByHistory };
