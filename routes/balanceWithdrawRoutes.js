@@ -1,7 +1,9 @@
 const express = require('express');
-const { balanceWithdraw, withdrawTransAcction } = require('../controllers/balanceWithdrawControllers');
+const { balanceWithdraw, withdrawTransAcction, withdrawStatusByHistory, getWithdrawSingle } = require('../controllers/balanceWithdrawControllers');
 const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.route('/balance/withdraw').post(protect, balanceWithdraw);
-router.route('/balance/withdraw/status').put(protect, withdrawTransAcction);
+router.route('/balance/withdraw/:id').get(protect,getWithdrawSingle)
+router.route('/balance/withdraw/status/:id').put(protect, withdrawTransAcction);
+router.route('/balance/withdraw/status/history').get(protect,withdrawStatusByHistory)
 module.exports = router;

@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = require('mongoose').Schema;
 const bankLinkedSchema = mongoose.Schema({
+    bank_acc_name: {
+        type: String,
+        required: [true, 'please provide bank account name!']
+    },
     bank_acc_num: {
         type: Number,
         required: [true, 'please provide bank account number!']
     },
     routing_num: {
         type: String,
-        required: [true, 'please provide bank account name!']
-    },
-    bank_acc_name: {
-        type: String,
-        required: [true, 'please provide bank account name!']
+        required: [true, 'please provide bank Routing Number!']
     },
     bank_location: {
         type: String,
@@ -21,6 +21,10 @@ const bankLinkedSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "User",
     },
-}, { timestams: true });
+    status: {
+        type: String,
+        default: 'pending'
+    }
+}, { timestamps: true });
 const BankLinked = mongoose.model("BankLinked", bankLinkedSchema);
 module.exports = BankLinked;

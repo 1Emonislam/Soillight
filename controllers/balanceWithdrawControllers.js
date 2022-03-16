@@ -17,30 +17,34 @@ const balanceWithdraw = async (req, res, next) => {
         if (myBalance?.balance === 0) {
             return res.status(406).json({ error: { "withdraw": `You dont'n have enough balance to Insufficient Balance Withdraw incomplete! your account balance is ${myBalance?.balance} ` }, status: "incomplete" });
         }
-        if (myBalance?.balance < Number(amount)) {
+        if (myBalance?.balance < (Number(amount) + Number(tax))) {
             return res.status(406).json({ error: { "withdraw": `You don't have enough balance to Insufficient Balance Withdraw incomplete! your account balance is ${myBalance?.balance} ` }, status: "incomplete" });
         }
         const updateTransaction = await MyBalance.findOneAndUpdate(
             {
                 user: req.user._id
             },
-            { $inc: { balance: -Number(amount) } },
+            { $inc: { balance: -(Number(amount) + Number(tax)) } },
             { new: true }
         );
+
         const NotificationSendObj = {
             sender: req.user._id,
             receiver: [req.user._id],
             message: `Congratulations!  ${myBalance?.user?.name}  Your withdrawal balance transaction is complete. Manualy approve your Transaction!`,
         }
         const withdraw = await BalanceWithdraw.create({
-            amount, user: req.user._id,
+            amount,
+            tax,
+            user: req.user._id,
+            bank_pay: bankLinked._id,
         })
         function withdrawTrans(length, id) {
             for (var s = ''; s.length < length; s += `${id}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01`.charAt(Math.random() * 62 | 0));
             return s;
         }
         if (withdraw) {
-            withdraw.transaction_id = withdrawTrans(18, withdraw?._id);
+            withdraw.transaction_id = withdrawTrans(10, withdraw?._id);
             await withdraw.save();
             await Notification.create(NotificationSendObj);
             return res.status(200).json({ message: `Congratulations! ${myBalance?.user?.name} Your withdrawal balance transaction is complete. Manualy approve your Transaction!`, data: withdraw });
@@ -63,7 +67,16 @@ const withdrawTransAcction = async (req, res, next) => {
         if (req?.user?.isAdmin === true) {
             const statusUpdated = await BalanceWithdraw.findOneAndUpdate({ _id: req.params.id }, {
                 status: status
-            }, { new: true });
+            }, { new: true }).populate("bank_pay").populate({
+                path: "user",
+                select: "_id name sellerShop pic",
+                populate: [
+                    {
+                        path: "sellerShop",
+                        select: "_id address location name",
+                    },
+                ],
+            });
             if (status === 'approved') {
                 const NotificationSend = {
                     sender: req.user._id,
@@ -76,7 +89,7 @@ const withdrawTransAcction = async (req, res, next) => {
                 const NotificationSend = {
                     sender: req.user._id,
                     receiver: [statusUpdated.user],
-                    message: `Ops! Your Withdrawal Transaction is Cancelled!`,
+                    message: `Unfortunately! Your Withdrawal Transaction is Cancelled!`,
                 };
                 await Notification.create(NotificationSend);
             }
@@ -89,19 +102,22 @@ const withdrawTransAcction = async (req, res, next) => {
 }
 
 const withdrawStatusByHistory = async (req, res, next) => {
+    let { status, page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
+    // console.log(status)
     try {
-        let { status, page = 1, limit = 10 } = req.query;
-        limit = parseInt(limit);
-        const keyword = req.query.search ? {
+        if (!(req?.user?.isAdmin === true)) {
+            return res.status(400).json({ error: { "status": "permission denied! you can perform only admin!" } })
+        }
+
+        const keyword = req.query.search?.trim() ? {
             $or: [
-                { name: { $regex: req.query.search, $options: "i" } },
-                { category: { $regex: req.query.search, $options: "i" }, },
-                { subCategory: { $regex: req.query.search, $options: "i" }, },
-            ], status: status
-        } : { status: status };
-        const withdraw = await BalanceWithdraw.find(keyword).populate({
+                { transaction_id: { $regex: req.query.search?.trim(), $options: "i" }, },
+            ], status: status?.trim()
+        } : { status: status?.trim() };
+        const withdraw = await BalanceWithdraw.find(keyword).populate("bank_pay", "bank_acc_num").populate({
             path: "user",
-            select: "_id name sellerShop",
+            select: "_id name sellerShop pic",
             populate: [
                 {
                     path: "sellerShop",
@@ -109,13 +125,33 @@ const withdrawStatusByHistory = async (req, res, next) => {
                 },
             ],
         }).sort({ "createdAt": 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
-        const count = await Product.find(keyword).count();
-
-        return res.status(200).json({ "message": "product data successfully fetch!", count, data: product })
+        const count = await BalanceWithdraw.find(keyword).count();
+        return res.status(200).json({ "message": "balance data successfully fetch!", count, data: withdraw })
 
     }
     catch (error) {
         next(error)
     }
 }
-module.exports = { balanceWithdraw, withdrawTransAcction, withdrawStatusByHistory };
+const getWithdrawSingle = async (req, res, next) => {
+    if (!(req?.user?.isAdmin === true)) {
+        return res.status(400).json({ error: { "status": "permission denied! you can perform only admin!" } })
+    }
+    try {
+        const withdraw = await BalanceWithdraw.findOne({ _id: req.params.id }).populate("bank_pay").populate({
+            path: "user",
+            select: "_id name sellerShop pic",
+            populate: [
+                {
+                    path: "sellerShop",
+                    select: "_id address location name",
+                },
+            ],
+        });
+        return res.status(200).json({ data: withdraw })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = { balanceWithdraw, getWithdrawSingle, withdrawTransAcction, withdrawStatusByHistory };

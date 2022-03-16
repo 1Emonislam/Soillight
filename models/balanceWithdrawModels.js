@@ -15,10 +15,14 @@ const balanceWithdrawSchema = mongoose.Schema({
     tax: {
         type: Number,
     },
+    bank_pay: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "BankLinked"
+    },
     status: {
         type: String,
         default: 'pending',
     },
-}, { timestams: true })
+},{ timestamps: true })
 const BalanceWithdraw = mongoose.model("BalanceWithdraw", balanceWithdrawSchema);
 module.exports = BalanceWithdraw;
