@@ -7,11 +7,13 @@ const orderAdd = async (req, res, next) => {
 	const { latitude, longitude } = req?.body?.location;
 	const buyer = await User.findOne({ _id: req.user._id });
 	try {
+		const role = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
 		const created = await Order.create({
 			user: req.user._id,
 			transaction_id,
 			tx_ref,
 			products,
+			userType: role,
 			location: { latitude, longitude }
 		});
 		if (!created) {

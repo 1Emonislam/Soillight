@@ -27,7 +27,7 @@ const orderSchema = mongoose.Schema({
     },
     userType: {
         type: String,
-        enum: ['admin', 'rider', 'seller', 'buyer'],
+        enum: ['admin', 'rider', 'seller', 'buyer','user'],
         default: 'user',
     },
     statusUpdatedBy: {
