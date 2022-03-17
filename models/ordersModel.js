@@ -34,10 +34,6 @@ const orderSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
     },
-    statusUpdatedByAdmin: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-    },
     products: [{
         productOwner: {
             type: Schema.Types.ObjectId,

@@ -311,131 +311,20 @@ const orderStatusUpdate = async (req, res, next) => {
 		if (order?.status === 'progress' && status === 'progress') {
 			return res.status(400).json({ error: { "status": "you have already progress order please update another status!" } })
 		}
-
 		// console.log(order)
 		if (!(req?.user?.isAdmin === true || req?.user?.role === 'buyer')) {
 			return res.status(400).json({ error: { status: "you can perform only rider and admin permission required!" } })
 		}
-		if (req?.user?.isAdmin === true) {
+		if (req?.user?.role === 'rider' || req?.user?.isAdmin === true) {
 			if (order) {
 				let productOwnerNotify = [];
 				for (let owner = 0; owner < order?.products.length; owner++) {
 					productOwnerNotify.unshift(order?.products[owner].productOwner)
 				}
+				const roleBy = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
 				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
 					status: status,
-					userType: req.user.role,
-					statusUpdatedByAdmin: req.user._id,
-				}, { new: true }).populate({
-					path: "user",
-					select: "_id name address phone email pic",
-				})
-					.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
-					.populate({
-						path: "products.productOwner",
-						select: "_id name address phone email sellerShop pic",
-						populate: [
-							{
-								path: "sellerShop",
-								select: "_id address location name",
-							},
-						],
-					});
-				if (!updated) return res.status(400).json({ error: { "order": "order status update failed!" } });
-				if (updated) {
-					if (updated?.status === 'delivered') {
-						for (let i = 0; i < order?.products.length; i++) {
-							let updatedBalance;
-							updatedBalance = order?.products[i].price;
-							//console.log(updatedBalance)
-							const updateTransaction = await MyBalance.findOneAndUpdate(
-								{
-									user: order?.products[i].productOwner,
-								},
-								{ $inc: { balance: updatedBalance } },
-								{ new: true }
-							);
-						}
-						const NotificationSendSeller = {
-							sender: req.user._id,
-							product: [...order?.products],
-							receiver: [...productOwnerNotify],
-							message: `Congratulations! Your product has been Delivered! Balance added Transaction Complete. ${order?.user?.name}`,
-						}
-						await Notification.create(NotificationSendSeller);
-
-						return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: updated });
-					}
-					if (updated?.status === 'cancelled') {
-						const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
-						for (let i = 0; i < order?.products.length; i++) {
-							let updatedBalance;
-							updatedBalance = order?.products[i].price;
-							//console.log(updatedBalance)
-							const updateTransaction = await MyBalance.findOneAndUpdate(
-								{
-									user: order?.products[i].productOwner,
-								},
-								{ $inc: { balance: -updatedBalance } },
-								{ new: true }
-							);
-							const buyerBalance = await MyBalance.findOneAndUpdate(
-								{
-									user: order?.user,
-								},
-								{ $inc: { balance: buyerAmountPay } },
-								{ new: true }
-							);
-						}
-
-						const NotificationSendSeller = {
-							sender: req.user._id,
-							product: [...order?.products],
-							receiver: [...productOwnerNotify],
-							message: `Order Cancelled: Refund Balance to Buyer account. Buyer ${updated?.user?.name}`,
-						}
-						const NotificationSendBuyer = {
-							sender: req.user._id,
-							product: [...order?.products],
-							receiver: [order?.user],
-							message: `Order delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
-						}
-						await Notification.create(NotificationSendSeller);
-						await Notification.create(NotificationSendBuyer);
-						return res.status(200).json({ message: `order Successfully Cancelled ! automatic subtract seller balance Refund to Buyer Account amount $${buyerAmountPay}`, data: updated });
-					}
-				} else {
-					let productOwnerNotify = [];
-					for (let owner = 0; owner < order?.products.length; owner++) {
-						productOwnerNotify.unshift(order?.products[owner].productOwner)
-					}
-					const NotificationSendSeller = {
-						sender: req.user._id,
-						product: [...order?.products],
-						receiver: [...productOwnerNotify],
-						message: `order status ${status}`,
-					}
-					const NotificationSendBuyer = {
-						sender: req.user._id,
-						product: [...order?.products],
-						receiver: [order?.user],
-						message: `your order status is ${status}`,
-					}
-					await Notification.create(NotificationSendBuyer);
-					await Notification.create(NotificationSendSeller);
-					return res.status(200).json({ message: "order status successfully updated!", data: updated })
-				}
-			}
-		}
-		if (req?.user?.role === 'rider') {
-			if (order) {
-				let productOwnerNotify = [];
-				for (let owner = 0; owner < order?.products.length; owner++) {
-					productOwnerNotify.unshift(order?.products[owner].productOwner)
-				}
-				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
-					status: status,
-					userType: req.user.role,
+					userType: roleBy,
 					statusUpdatedBy: req.user._id,
 				}, { new: true }).populate({
 					path: "user",
