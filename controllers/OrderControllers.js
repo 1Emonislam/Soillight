@@ -291,11 +291,27 @@ const orderStatusUpdate = async (req, res, next) => {
 		const order = await Order.findOne({ _id: req.params.id });
 		if (!order) return res.status(400).json({ error: { "order": "order emty" } });
 		if (order?.status === 'cancelled' && status === 'cancelled') {
-			return res.status(400).json({ error: { "status": "you have already cancelled order please update another status!" } })
+			return res.status(400).json({ error: { "status": "you have already Cancelled order please update another status!" } })
 		}
 		if (order?.status === 'delivered' &&  status === 'delivered') {
-			return res.status(400).json({ error: { "status": "you have already delivered order please update another status!" } })
+			return res.status(400).json({ error: { "status": "you have already Delivered order please update another status!" } })
 		}
+		if (order?.status === 'completed' && status === 'completed') {
+			return res.status(400).json({ error: { "status": "you have already Completed order please update another status!" } })
+		}
+		if (order?.status === 'pending' &&  status === 'pending') {
+			return res.status(400).json({ error: { "status": "you have already Pending order please update another status!" } })
+		}
+		if (order?.status === 'approved' && status === 'approved') {
+			return res.status(400).json({ error: { "status": "you have already Approved order please update another status!" } })
+		}
+		if (order?.status === 'shipped' && status === 'shipped') {
+			return res.status(400).json({ error: { "status": "you have already Shipped order please update another status!" } })
+		}
+		if (order?.status === 'progress' && status === 'progress') {
+			return res.status(400).json({ error: { "status": "you have already progress order please update another status!" } })
+		}
+
 		// console.log(order)
 		if (!(req?.user?.isAdmin === true || req?.user?.role === 'buyer')) {
 			return res.status(400).json({ error: { status: "you can perform only rider and admin permission required!" } })
