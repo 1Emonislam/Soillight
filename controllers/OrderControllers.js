@@ -283,11 +283,14 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 };
 const orderStatusUpdate = async (req, res, next) => {
 	let { status } = req.body;
-	// console.log(req.user._id)
+	// console.log(req.user)
 	const statusArr = ['pending', 'approved', 'cancelled', 'completed', 'shipped', 'progress', 'delivered'];
 	const valided = statusArr.includes(status);
 	if (!valided) return res.status(400).json({ error: { status: "please provide valid status credentials!" } })
 	try {
+		if (!(req?.user?.isAdmin === true || req?.user?.role === 'buyer')) {
+			return res.status(400).json({ error: { status: "you can perform only rider and admin permission required!" } })
+		}
 		if (req?.user?.isAdmin === true) {
 			const order = await Order.findOne({ _id: req.params.id });
 			if (!order) return res.status(400).json({ error: { "order": "bad request please provide valid credentials!" } });
@@ -353,8 +356,6 @@ const orderStatusUpdate = async (req, res, next) => {
 					return res.status(200).json({ message: "order status successfully updated!", data: updated })
 				}
 			}
-		} else {
-			return res.status(400).json({ error: { order: "you can perform only rider and admin permission required!" } })
 		}
 	}
 	catch (error) {
