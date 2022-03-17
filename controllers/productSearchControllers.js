@@ -6,8 +6,8 @@ const productSearch = async (req, res, next) => {
         search = search?.trim();
         const KeyWordRegExp = new RegExp(search, "i");
         if (!search) {
-            const result = await Product.find({}).populate("user", "_id pic").sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({}).sort({ createdAt: 1, _id: -1 }).count();
+            const result = await Product.find({}).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
+            const count = await Product.find({}).sort([['date', -1]]).count();
             return res.json({ count: count, data: result })
         }
         if (search) {
@@ -35,10 +35,10 @@ const categoriesSearch = async (req, res, next) => {
     try {
         const result = await Product.find({
             $or: [{ category: KeyWordRegExp }, { subCategory: KeyWordRegExp },]
-        }).populate("user", "_id pic").sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
+        }).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find({
             $or: [{ category: KeyWordRegExp }, { subCategory: KeyWordRegExp },]
-        }).sort({ createdAt: 1, _id: -1 }).count();
+        }).sort([['date', -1]]).count();
         return res.json({ count: count, data: result })
     }
     catch (error) {
@@ -62,8 +62,8 @@ const myProducts = async (req, res, next) => {
     let { page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     try {
-        const result = await Product.find({ user: req.user._id }).sort({ createdAt: 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
-        const count = await Product.find({ user: req.user._id }).sort({ createdAt: 1, _id: -1 }).count();
+        const result = await Product.find({ user: req.user._id }).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
+        const count = await Product.find({ user: req.user._id }).sort([['date', -1]]).count();
         return res.json({ count: count, data: result })
     }
     catch (error) {
