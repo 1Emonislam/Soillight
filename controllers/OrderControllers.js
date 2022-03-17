@@ -24,13 +24,13 @@ const orderAdd = async (req, res, next) => {
 			for (let owner = 0; owner < products.length; owner++) {
 				productOwnerNotify.unshift(products[owner].productOwner);
 			}
-			const NotificationSendObj = {
+			const NotificationSendSeller = {
 				sender: req.user._id,
 				product: [...products],
 				receiver: [...productOwnerNotify],
 				message: `You Have Received New Order From ${buyer.name}`,
 			};
-			await Notification.create(NotificationSendObj);
+			await Notification.create(NotificationSendSeller);
 			const NotificationSendBuyer = {
 				sender: req.user._id,
 				product: [...products],
@@ -192,13 +192,13 @@ const orderCompeleteToBlanceAdd = async (req, res, next) => {
 			for (let owner = 0; owner < order?.products.length; owner++) {
 				productOwnerNotify.unshift(order?.products[owner].productOwner)
 			}
-			const NotificationSendObj = {
+			const NotificationSendSeller = {
 				sender: req.user._id,
 				product: [...order?.products],
 				receiver: [...productOwnerNotify],
-				message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.name}`,
+				message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.user?.name}`,
 			}
-			await Notification.create(NotificationSendObj);
+			await Notification.create(NotificationSendSeller);
 			order.status = "completed";
 			await order.save();
 			return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: order });
@@ -259,19 +259,19 @@ const orderCancelToBalanceSub = async (req, res, next) => {
 			for (let owner = 0; owner < order?.products.length; owner++) {
 				productOwnerNotify.unshift(order?.products[owner].productOwner)
 			}
-			const NotificationSendObj = {
+			const NotificationSendSeller = {
 				sender: req.user._id,
 				product: [...order?.products],
 				receiver: [...productOwnerNotify],
-				message: `Cancelled Order: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. ${order?.name}`,
+				message: `Cancelled Order: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. ${order?.user?.name}`,
 			}
 			const NotificationSendBuyer = {
 				sender: req.user._id,
 				product: [...order?.products],
 				receiver: [order?.user],
-				message: `Order delivered failed! Refund Balance. you have received money ${order?.name}. ${order?.name}`,
+				message: `Order delivered failed! Refund Balance. you have received money ${order?.user?.name}. ${order?.user?.name}`,
 			}
-			await Notification.create(NotificationSendObj);
+			await Notification.create(NotificationSendSeller);
 			await Notification.create(NotificationSendBuyer);
 			order.status = "cancelled";
 			await order.save();
@@ -288,72 +288,234 @@ const orderStatusUpdate = async (req, res, next) => {
 	const valided = statusArr.includes(status);
 	if (!valided) return res.status(400).json({ error: { status: "please provide valid status credentials!" } })
 	try {
+		const order = await Order.findOne({ _id: req.params.id });
+		if (!order) return res.status(400).json({ error: { "order": "order emty" } });
+		// console.log(order)
 		if (!(req?.user?.isAdmin === true || req?.user?.role === 'buyer')) {
 			return res.status(400).json({ error: { status: "you can perform only rider and admin permission required!" } })
 		}
 		if (req?.user?.isAdmin === true) {
-			const order = await Order.findOne({ _id: req.params.id });
-			if (!order) return res.status(400).json({ error: { "order": "bad request please provide valid credentials!" } });
 			if (order) {
+				let productOwnerNotify = [];
+				for (let owner = 0; owner < order?.products.length; owner++) {
+					productOwnerNotify.unshift(order?.products[owner].productOwner)
+				}
 				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
 					status: status,
 					userType: req.user.role,
 					statusUpdatedByAdmin: req.user._id,
-				}, { new: true });
+				}, { new: true }).populate({
+					path: "user",
+					select: "_id name address phone email pic",
+				})
+					.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+					.populate({
+						path: "products.productOwner",
+						select: "_id name address phone email sellerShop pic",
+						populate: [
+							{
+								path: "sellerShop",
+								select: "_id address location name",
+							},
+						],
+					});
 				if (!updated) return res.status(400).json({ error: { "order": "order status update failed!" } });
 				if (updated) {
-					let productOwnerNotify = [];
-					for (let owner = 0; owner < order?.products.length; owner++) {
-						productOwnerNotify.unshift(order?.products[owner].productOwner)
+					if (updated?.status === 'cancelled' || updated?.status === 'delivered') {
+						if (updated?.status === 'delivered') {
+							for (let i = 0; i < order?.products.length; i++) {
+								let updatedBalance;
+								updatedBalance = order?.products[i].price;
+								//console.log(updatedBalance)
+								const updateTransaction = await MyBalance.findOneAndUpdate(
+									{
+										user: order?.products[i].productOwner,
+									},
+									{ $inc: { balance: updatedBalance } },
+									{ new: true }
+								);
+							}
+							const NotificationSendSeller = {
+								sender: req.user._id,
+								product: [...order?.products],
+								receiver: [...productOwnerNotify],
+								message: `Congratulations! Your product has been Delivered! Balance added Transaction Complete. ${order?.user?.name}`,
+							}
+							await Notification.create(NotificationSendSeller);
+
+							return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: updated });
+						}
+						if (updated?.status === 'cancelled') {
+							const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
+							for (let i = 0; i < order?.products.length; i++) {
+								let updatedBalance;
+								updatedBalance = order?.products[i].price;
+								//console.log(updatedBalance)
+								const updateTransaction = await MyBalance.findOneAndUpdate(
+									{
+										user: order?.products[i].productOwner,
+									},
+									{ $inc: { balance: -updatedBalance } },
+									{ new: true }
+								);
+								const buyerBalance = await MyBalance.findOneAndUpdate(
+									{
+										user: order?.user,
+									},
+									{ $inc: { balance: buyerAmountPay } },
+									{ new: true }
+								);
+							}
+
+							const NotificationSendSeller = {
+								sender: req.user._id,
+								product: [...order?.products],
+								receiver: [...productOwnerNotify],
+								message: `Order Cancelled: Refund Balance to Buyer account. Buyer ${updated?.user?.name}`,
+							}
+							const NotificationSendBuyer = {
+								sender: req.user._id,
+								product: [...order?.products],
+								receiver: [order?.user],
+								message: `Order delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
+							}
+							await Notification.create(NotificationSendSeller);
+							await Notification.create(NotificationSendBuyer);
+							return res.status(200).json({ message: `order Successfully Cancelled ! automatic subtract seller balance Refund to Buyer Account amount $${buyerAmountPay}`, data: updated });
+						}
+					} else {
+						let productOwnerNotify = [];
+						for (let owner = 0; owner < order?.products.length; owner++) {
+							productOwnerNotify.unshift(order?.products[owner].productOwner)
+						}
+						const NotificationSendSeller = {
+							sender: req.user._id,
+							product: [...order?.products],
+							receiver: [...productOwnerNotify],
+							message: `order status ${status}`,
+						}
+						const NotificationSendBuyer = {
+							sender: req.user._id,
+							product: [...order?.products],
+							receiver: [order?.user],
+							message: `your order status is ${status}`,
+						}
+						await Notification.create(NotificationSendBuyer);
+						await Notification.create(NotificationSendSeller);
+						return res.status(200).json({ message: "order status successfully updated!", data: updated })
 					}
-					const NotificationSendObj = {
-						sender: req.user._id,
-						product: [...order?.products],
-						receiver: [...productOwnerNotify],
-						message: `order status ${status}`,
-					}
-					const NotificationSendBuyer = {
-						sender: req.user._id,
-						product: [...order?.products],
-						receiver: [order?.user],
-						message: `your order status is ${status}`,
-					}
-					await Notification.create(NotificationSendBuyer);
-					await Notification.create(NotificationSendObj);
-					return res.status(200).json({ message: "order status successfully updated!", data: updated })
 				}
 			}
 		}
 		if (req?.user?.role === 'rider') {
-			const order = await Order.findOne({ _id: req.params.id });
-			if (!order) return res.status(400).json({ error: { "order": "bad request please provide valid credentials!" } });
 			if (order) {
+				let productOwnerNotify = [];
+				for (let owner = 0; owner < order?.products.length; owner++) {
+					productOwnerNotify.unshift(order?.products[owner].productOwner)
+				}
 				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
 					status: status,
 					userType: req.user.role,
 					statusUpdatedBy: req.user._id,
-				}, { new: true });
-				if (!updated) return res.status(400).json({ error: { "order": "order status update failed!" } });
+				}, { new: true }).populate({
+					path: "user",
+					select: "_id name address phone email pic",
+				})
+					.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+					.populate({
+						path: "products.productOwner",
+						select: "_id name address phone email sellerShop pic",
+						populate: [
+							{
+								path: "sellerShop",
+								select: "_id address location name",
+							},
+						],
+					});
 				if (updated) {
-					let productOwnerNotify = [];
-					for (let owner = 0; owner < order?.products.length; owner++) {
-						productOwnerNotify.unshift(order?.products[owner].productOwner)
+					if (updated?.status === 'cancelled' || updated?.status === 'delivered') {
+						if (updated?.status === 'delivered') {
+							for (let i = 0; i < order?.products.length; i++) {
+								let updatedBalance;
+								updatedBalance = order?.products[i].price;
+								//console.log(updatedBalance)
+								const updateTransaction = await MyBalance.findOneAndUpdate(
+									{
+										user: order?.products[i].productOwner,
+									},
+									{ $inc: { balance: updatedBalance } },
+									{ new: true }
+								);
+							}
+							const NotificationSendSeller = {
+								sender: req.user._id,
+								product: [...order?.products],
+								receiver: [...productOwnerNotify],
+								message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.user?.name}`,
+							}
+							await Notification.create(NotificationSendSeller);
+
+							return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: updated });
+						}
+						if (updated?.status === 'cancelled') {
+							const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
+							for (let i = 0; i < order?.products.length; i++) {
+								let updatedBalance;
+								updatedBalance = order?.products[i].price;
+								//console.log(updatedBalance)
+								const updateTransaction = await MyBalance.findOneAndUpdate(
+									{
+										user: order?.products[i].productOwner,
+									},
+									{ $inc: { balance: -updatedBalance } },
+									{ new: true }
+								);
+								const buyerBalance = await MyBalance.findOneAndUpdate(
+									{
+										user: order?.user,
+									},
+									{ $inc: { balance: buyerAmountPay } },
+									{ new: true }
+								);
+							}
+
+							const NotificationSendSeller = {
+								sender: req.user._id,
+								product: [...order?.products],
+								receiver: [...productOwnerNotify],
+								message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${updated?.user?.name}`,
+							}
+							const NotificationSendBuyer = {
+								sender: req.user._id,
+								product: [...order?.products],
+								receiver: [order?.user],
+								message: `Order delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
+							}
+							await Notification.create(NotificationSendSeller);
+							await Notification.create(NotificationSendBuyer);
+							return res.status(200).json({ message: "order Successfully Cancelled ! automatic subtract seller balance Refund to Buyer Account!", data: updated });
+						}
+					} else {
+						let productOwnerNotify = [];
+						for (let owner = 0; owner < order?.products.length; owner++) {
+							productOwnerNotify.unshift(order?.products[owner].productOwner)
+						}
+						const NotificationSendSeller = {
+							sender: req.user._id,
+							product: [...order?.products],
+							receiver: [...productOwnerNotify],
+							message: `order status ${status}`,
+						}
+						const NotificationSendBuyer = {
+							sender: req.user._id,
+							product: [...order?.products],
+							receiver: [order?.user],
+							message: `your order status is ${status}`,
+						}
+						await Notification.create(NotificationSendBuyer);
+						await Notification.create(NotificationSendSeller);
+						return res.status(200).json({ message: "order status successfully updated!", data: updated })
 					}
-					const NotificationSendObj = {
-						sender: req.user._id,
-						product: [...order?.products],
-						receiver: [...productOwnerNotify],
-						message: `order status ${status}`,
-					}
-					const NotificationSendBuyer = {
-						sender: req.user._id,
-						product: [...order?.products],
-						receiver: [order?.user],
-						message: `your order status is ${status}`,
-					}
-					await Notification.create(NotificationSendBuyer);
-					await Notification.create(NotificationSendObj);
-					return res.status(200).json({ message: "order status successfully updated!", data: updated })
 				}
 			}
 		}
