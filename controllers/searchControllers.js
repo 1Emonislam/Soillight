@@ -18,7 +18,7 @@ const DashboardCounterData = async (req, res, next) => {
         const todayRiderCount = await User.find({ timestamp: { $gte: today }, role: 'rider' }).count();
         const todaySellerCount = await User.find({ timestamp: { $gte: today }, role: 'seller' }).count();
         const todaySellerApprove = await User.find({ timestamp: { $gte: today }, role: 'seller', status: 'approved' }).count();
-        const todayOrderComplete = await Order.find({ timestamp: { $gte: today }, status: 'completed' }).count();
+        const todayOrderDelivered = await Order.find({ timestamp: { $gte: today }, status: 'delivered' }).count();
         const todayOrderCancel = await Order.find({ timestamp: { $gte: today }, status: 'cancelled' }).count();
         const todayOrderPending = await Order.find({ timestamp: { $gte: today }, status: 'pending' }).count();
         const todayRiderApprove = await User.find({ timestamp: { $gte: today }, role: 'rider', status: 'approved' }).count();
@@ -35,11 +35,11 @@ const DashboardCounterData = async (req, res, next) => {
         const lastWeekRiderApprove = await User.find({ timestamp: { $gte: lastWeak }, role: 'rider', status: 'approved' }).count();
         const lastWeekRiderRejected = await User.find({ timestamp: { $gte: lastWeak }, role: 'rider', status: 'rejected' }).count();
         const lastWeekOrderPending = await Order.find({ timestamp: { $gte: lastWeak }, status: 'pending' }).count();
-        const lastWeekOrderComplete = await Order.find({ timestamp: { $gte: lastWeak }, status: 'completed' }).count();
+        const lastWeekOrderDelivered = await Order.find({ timestamp: { $gte: lastWeak }, status: 'delivered' }).count();
         const lastWeekOrderCancel = await Order.find({ timestamp: { $gte: lastWeak }, status: 'cancelled' }).count();
         const lastWeakSellerRejected = await User.find({ timestamp: { $gte: lastWeak }, role: 'seller', status: 'rejected' }).count();
         const lastWeekBuyerRejected = await User.find({ timestamp: { $gte: lastWeak }, role: 'buyer', status: 'rejected' }).count();
-        return res.status(200).json({ message: 'data successfully fetch', lastWeekDate, todayDate, totalCount: { buyerCount, sellerCount, riderCount,orderCount }, today: {todayOrderCount,todayOrderCancel,todayOrderPending,todayOrderComplete, todayBuyerCount, todayRiderCount, todaySellerCount, todaySellerApprove, todayRiderApprove, todayBuyerRejected, todaySellerRejected, todayRiderRejected }, lastWeek: {lastWeekOrderCount,lastWeekOrderCancel,lastWeekOrderComplete,lastWeekOrderPending, lastWeekBuyerCount, lastWeekRiderCount, lastWeekSellerCount, lastWeekSellerApprove, lastWeekRiderApprove, lastWeekRiderRejected, lastWeekBuyerRejected, lastWeakSellerRejected } })
+        return res.status(200).json({ message: 'data successfully fetch', lastWeekDate, todayDate, totalCount: { buyerCount, sellerCount, riderCount,orderCount }, today: {todayOrderCount,todayOrderCancel,todayOrderPending,todayOrderDelivered, todayBuyerCount, todayRiderCount, todaySellerCount, todaySellerApprove, todayRiderApprove, todayBuyerRejected, todaySellerRejected, todayRiderRejected }, lastWeek: {lastWeekOrderCount,lastWeekOrderCancel,lastWeekOrderDelivered,lastWeekOrderPending, lastWeekBuyerCount, lastWeekRiderCount, lastWeekSellerCount, lastWeekSellerApprove, lastWeekRiderApprove, lastWeekRiderRejected, lastWeekBuyerRejected, lastWeakSellerRejected } })
     } catch (error) {
         next(error)
     }
