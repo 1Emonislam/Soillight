@@ -231,7 +231,7 @@ const orderStatusUpdate = async (req, res, next) => {
 							}
 							await Notification.create(NotificationSendSeller);
 
-							return res.status(200).json({ message: "order Successfully Completed! automatic added seller balance Transaction Complete!", data: updated });
+							return res.status(200).json({ message: "Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed!", data: updated });
 						}
 						if (updated?.status === 'cancelled') {
 							const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
@@ -265,11 +265,11 @@ const orderStatusUpdate = async (req, res, next) => {
 								sender: req.user._id,
 								product: [...order?.products],
 								receiver: [order?.user],
-								message: `Order delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
+								message: `Order Delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
 							}
 							await Notification.create(NotificationSendSeller);
 							await Notification.create(NotificationSendBuyer);
-							return res.status(200).json({ message: "order Successfully Cancelled ! automatic subtract seller balance Refund to Buyer Account!", data: updated });
+							return res.status(200).json({ message: "Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account!", data: updated });
 						}
 					} else {
 						let productOwnerNotify = [];
@@ -290,7 +290,7 @@ const orderStatusUpdate = async (req, res, next) => {
 						}
 						await Notification.create(NotificationSendBuyer);
 						await Notification.create(NotificationSendSeller);
-						return res.status(200).json({ message: "order status successfully updated!", data: updated })
+						return res.status(200).json({ message: "Order Status Successfully Updated!", data: updated })
 					}
 				}
 			}
