@@ -65,10 +65,10 @@ const orderSearch = async (req, res, next) => {
 					},
 				],
 			})
-			.sort([['date', -1]])
+			.sort({ createdAt: 1,_id:-1})
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ user: req.user._id, status: status }).sort([['date', -1]]).count();
+		const count = await Order.find({ user: req.user._id, status: status }).sort({ createdAt: 1,_id:-1}).count();
 		return res.status(200).json({ count, data: order });
 	} catch (error) {
 		next(error);
@@ -98,10 +98,10 @@ const adminSeenOrdersSearch = async (req, res, next) => {
 					path: "products.productOwner",
 					select: "_id name email pic"
 				})
-				.sort([['date', -1]])
+				.sort({ createdAt: 1,_id:-1})
 				.limit(limit * 1)
 				.skip((page - 1) * limit);
-			const count = await Order.find(keyword).sort([['date', -1]]).count();
+			const count = await Order.find(keyword).sort({ createdAt: 1,_id:-1}).count();
 			return res.status(200).json({ count, data: order });
 		} catch (error) {
 			next(error);
@@ -305,7 +305,7 @@ const allStatusOrder = async (req, res, next) => {
 						select: "_id address location name",
 					},
 				],
-			}).sort([['date', -1]])
+			}).sort({ createdAt: 1,_id:-1})
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
 		const count = await Order.find({ status: status }).populate({
@@ -346,7 +346,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 						select: "_id address location name",
 					},
 				],
-			}).sort([['date', -1]])
+			}).sort({ createdAt: 1,_id:-1})
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
 		const count = await Order.find({ statusUpdatedBy: req.user._id }).populate({
@@ -362,7 +362,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 						select: "_id address location name",
 					},
 				],
-			}).sort([['date', -1]]).count();
+			}).sort({ createdAt: 1,_id:-1}).count();
 		if (!order) {
 			return res.status(404).json({ error: [] })
 		} if (order) {
@@ -375,4 +375,4 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 }
 
 
-module.exports = { orderAdd, allStatusOrder, orderStatusUpdate, orderSearch, singleOrder, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
+module.exports = { orderAdd, allStatusOrder,orderStatusUpdate, orderSearch, singleOrder, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
