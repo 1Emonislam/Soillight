@@ -38,7 +38,8 @@ const login = async (req, res, next) => {
 }
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
-    const { latitude, longitude } = req?.body?.location;
+    const latitude= req?.body?.location?.latitude;
+    const longitude = req?.body?.location?.longitude;
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
