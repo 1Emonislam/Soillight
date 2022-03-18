@@ -35,7 +35,7 @@ const orderAdd = async (req, res, next) => {
 				sender: req.user._id,
 				product: [...products],
 				receiver: [req.user._id],
-				message: `Congratulations! your order has been placed successfully!`,
+				message: `Thank You For Placing The order. Your Purchase Has Been Confirmed. View Status`,
 			};
 			await Notification.create(NotificationSendBuyer);
 		}
@@ -65,10 +65,10 @@ const orderSearch = async (req, res, next) => {
 					},
 				],
 			})
-			.sort({ createdAt: 1,_id:-1})
+			.sort({ createdAt: 1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ user: req.user._id, status: status }).sort({ createdAt: 1,_id:-1}).count();
+		const count = await Order.find({ user: req.user._id, status: status }).sort({ createdAt: 1, _id: -1 }).count();
 		return res.status(200).json({ count, data: order });
 	} catch (error) {
 		next(error);
@@ -98,10 +98,10 @@ const adminSeenOrdersSearch = async (req, res, next) => {
 					path: "products.productOwner",
 					select: "_id name email pic"
 				})
-				.sort({ createdAt: 1,_id:-1})
+				.sort({ createdAt: 1, _id: -1 })
 				.limit(limit * 1)
 				.skip((page - 1) * limit);
-			const count = await Order.find(keyword).sort({ createdAt: 1,_id:-1}).count();
+			const count = await Order.find(keyword).sort({ createdAt: 1, _id: -1 }).count();
 			return res.status(200).json({ count, data: order });
 		} catch (error) {
 			next(error);
@@ -147,13 +147,13 @@ const orderStatusUpdate = async (req, res, next) => {
 		if (order?.status === 'cancelled' && status === 'cancelled') {
 			return res.status(400).json({ error: { "status": "you have already Cancelled order please update another status!" } })
 		}
-		if (order?.status === 'delivered' &&  status === 'delivered') {
+		if (order?.status === 'delivered' && status === 'delivered') {
 			return res.status(400).json({ error: { "status": "you have already Delivered order please update another status!" } })
 		}
 		if (order?.status === 'completed' && status === 'completed') {
 			return res.status(400).json({ error: { "status": "you have already Completed order please update another status!" } })
 		}
-		if (order?.status === 'pending' &&  status === 'pending') {
+		if (order?.status === 'pending' && status === 'pending') {
 			return res.status(400).json({ error: { "status": "you have already Pending order please update another status!" } })
 		}
 		if (order?.status === 'approved' && status === 'approved') {
@@ -177,10 +177,12 @@ const orderStatusUpdate = async (req, res, next) => {
 					productOwnerNotify.unshift(order?.products[owner].productOwner)
 				}
 				const roleBy = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
+				const roleAdmin = req?.user?.isAdmin === true && req?.user?._id;
 				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
 					status: status,
 					userType: roleBy,
 					statusUpdatedBy: req.user._id,
+					statusUpdatedByAdmin: roleAdmin,
 				}, { new: true }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
@@ -199,6 +201,7 @@ const orderStatusUpdate = async (req, res, next) => {
 				if (updated) {
 					if (updated?.status === 'cancelled' || updated?.status === 'delivered') {
 						if (updated?.status === 'delivered') {
+							const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
 							for (let i = 0; i < order?.products.length; i++) {
 								let updatedBalance;
 								updatedBalance = order?.products[i].price;
@@ -217,7 +220,14 @@ const orderStatusUpdate = async (req, res, next) => {
 								receiver: [...productOwnerNotify],
 								message: `Congratulations! Your product has been delivered! Balance added Transaction Complete. ${order?.user?.name}`,
 							}
+							const NotificationSendBuyer = {
+								sender: req.user._id,
+								product: [...order?.products],
+								receiver: [order?.user],
+								message: `The Rider has delivered the order. if you have received The Order Then Please Confirm it. $${buyerAmountPay} `,
+							}
 							await Notification.create(NotificationSendSeller);
+							await Notification.create(NotificationSendBuyer);
 
 							return res.status(200).json({ message: "Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed!", data: updated });
 						}
@@ -306,7 +316,7 @@ const allStatusOrder = async (req, res, next) => {
 						select: "_id address location name",
 					},
 				],
-			}).sort({ createdAt: 1,_id:-1})
+			}).sort({ createdAt: 1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
 		const count = await Order.find({ status: status }).populate({
@@ -347,7 +357,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 						select: "_id address location name",
 					},
 				],
-			}).sort({ createdAt: 1,_id:-1})
+			}).sort({ createdAt: 1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
 		const count = await Order.find({ statusUpdatedBy: req.user._id }).populate({
@@ -363,7 +373,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 						select: "_id address location name",
 					},
 				],
-			}).sort({ createdAt: 1,_id:-1}).count();
+			}).sort({ createdAt: 1, _id: -1 }).count();
 		if (!order) {
 			return res.status(404).json({ error: [] })
 		} if (order) {
@@ -376,4 +386,4 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 }
 
 
-module.exports = { orderAdd, allStatusOrder,orderStatusUpdate, orderSearch, singleOrder, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
+module.exports = { orderAdd, allStatusOrder, orderStatusUpdate, orderSearch, singleOrder, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };

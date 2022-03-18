@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const ProductReview = require('../models/productReviewModel');
 const MyBlance = require('../models/myBalance');
+const Notification = require('../models/notificationMdels');
 const { genToken } = require('../utils/genToken');
 const singleUser = async (req, res, next) => {
     const { id } = req.params;
@@ -12,7 +13,7 @@ const singleUser = async (req, res, next) => {
         return res.status(200).json({ totalRate, avgRating, data: user })
     }
     catch (error) {
-
+        next(error)
     }
 }
 
@@ -251,7 +252,12 @@ const userApproved = async (req, res, next) => {
     const { id } = req.params;
     try {
         if (!(req?.user?.isAdmin === true)) {
-            return res.status(400).json({ error: "user permission denied! only perform Admin!" })
+            if (req?.user?.role === 'buyer') {
+                return res.status(400).json({ error: { "buyer": "Buyer permission denied! only perform Admin!" } })
+            }
+            if (req?.user?.role === 'rider') {
+                return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
+            }
         }
         if (req?.user?.isAdmin === true) {
             const data = await User.findOne({ _id: id }).populate("sellerShop").select("-password");
@@ -260,6 +266,12 @@ const userApproved = async (req, res, next) => {
             }
             data.status = 'approved';
             await data.save();
+            const sendNotification = {
+                sender: req.user._id,
+                receiver: [data._id],
+                message: `Congratulations ${data.name} Registration Approved!`
+            }
+            await Notification.create(sendNotification)
             const finding = await ProductReview.find({ user: id });
             let totalRate = finding?.length;
             let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
@@ -276,7 +288,12 @@ const userRejected = async (req, res, next) => {
     const { id } = req.params;
     try {
         if (!(req?.user?.isAdmin === true)) {
-            return res.status(400).json({ error: "user permission denied! only perform Admin!" })
+            if (req?.user?.role === 'buyer') {
+                return res.status(400).json({ error: { "buyer": "Buyer permission denied! only perform Admin!" } })
+            }
+            if (req?.user?.role === 'rider') {
+                return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
+            }
         }
         if (req?.user?.isAdmin === true) {
             const data = await User.findOne({ _id: id }).populate("sellerShop").select("-password");
@@ -285,6 +302,12 @@ const userRejected = async (req, res, next) => {
             }
             data.status = 'rejected';
             await data.save();
+            const sendNotification = {
+                sender: req.user._id,
+                receiver: [data._id],
+                message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Data`
+            }
+            await Notification.create(sendNotification)
             const finding = await ProductReview.find({ user: id });
             let totalRate = finding?.length;
             let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
@@ -312,6 +335,12 @@ const changePassword = async (req, res, next) => {
         if (!(user === userSave)) {
             return res.status(400).json({ error: { "password": "Password Change failed!" } })
         } if (user === userSave) {
+            const sendNotification = {
+                sender: req.user._id,
+                receiver: [user._id],
+                message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Data`
+            }
+            await Notification.create(sendNotification)
             return res.status(200).json({ message: "Password Change successfully!", data: userSave, token: genToken(userSave._id) })
         }
     }
@@ -327,23 +356,53 @@ const profileView = async (req, res, next) => {
         next(error)
     }
 }
-const userIDLicense = async (req, res, next) => {
+const userIDLicenseVerify = async (req, res, next) => {
+    if (!(req?.user?.isAdmin === true)) {
+        if (req?.user?.role === 'buyer') {
+            return res.status(400).json({ error: { "buyer": "Buyer permission denied! only perform Admin!" } })
+        }
+        if (req?.user?.role === 'rider') {
+            return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
+        }
+    }
     const valid_id = req?.body?.valid_id;
     const license_card = req?.body?.license_card;
     const arrCheck = ['true', 'false', true, false];
-    
+
     if (!(arrCheck.includes(valid_id?.verify_id))) {
-        return res.status(400).json({ error: { verify: "Valid ID only accepts Boolean values!" } })
+        return res.status(400).json({ error: { verify: "Valid ID only accepts Boolean value!" } })
     }
     if (!(arrCheck.includes(license_card?.verify_card))) {
-        return res.status(400).json({ error: { verify: "LICENSE CARD ID only accepts Boolean values!" } })
+        return res.status(400).json({ error: { verify: "LICENSE CARD ID only accepts Boolean value!" } })
     }
-    const verify = await User.findOneAndUpdate({ _id: req.params?.id?.trim() }, {
-        valid_id, license_card
-    }, { new: true });
-    if (!verify) {
-        return res.status(400).json({ error: { verify: "updated failed! please try again!" } })
+    try {
+        const verify = await User.findOneAndUpdate({ _id: req.params?.id?.trim() }, {
+            valid_id, license_card
+        }, { new: true });
+        if (!verify) {
+            return res.status(400).json({ error: { verify: "updated failed! please try again!" } })
+        }
+        if (verify?.valid_id?.valid_id === true && valid_id) {
+            const sendNotification = {
+                sender: req.user._id,
+                receiver: [verify._id],
+                message: `Congratulations ${data.name} Registration Rejected! Please provide to Valid Data`
+            }
+            await Notification.create(sendNotification)
+        }
+        if (verify?.valid_id?.valid_id === false && verify_card) {
+            const sendNotification = {
+                sender: req.user._id,
+                receiver: [verify._id],
+                message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Data`
+            }
+            await Notification.create(sendNotification)
+        }
+
+        return res.status(200).json({ message: "you have successfully updated!", data: verify })
     }
-    return res.status(200).json({ message: "you have successfully updated!", data: verify })
+    catch (error) {
+        next(error)
+    }
 }
-module.exports = { login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicense, changePassword };
+module.exports = { login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, changePassword };
