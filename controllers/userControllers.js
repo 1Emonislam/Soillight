@@ -186,7 +186,8 @@ const profileUpdate = async (req, res, next) => {
     }
     // console.log(req.body)
     let { name, email, role, phone, pic, address } = req.body;
-    const { latitude, longitude } = req?.body?.location;
+    const latitude= req?.body?.location?.latitude;
+    const longitude = req?.body?.location?.longitude;
     // console.log(latitude,longitude)
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
