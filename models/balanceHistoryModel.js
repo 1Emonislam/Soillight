@@ -5,6 +5,10 @@ const balanceHistorySchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "User",
     },
+    balancePayBuyer: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+    },
     productId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product"

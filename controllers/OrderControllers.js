@@ -269,6 +269,7 @@ const orderStatusUpdate = async (req, res, next) => {
 								const balanceHistory = await BalanceHistory.create({
 									amount: order?.products[i].price,
 									trans_pay: "amount_added",
+									balancePayBuyer: order?.products[i]?.user?._id,
 									productId: order?.products[i]?.productId?._id,
 									balanceAddedOwner: order?.products[i]?.productOwner?._id,
 									status: 'approved',
@@ -309,6 +310,7 @@ const orderStatusUpdate = async (req, res, next) => {
 								const balanceHistory = await BalanceHistory.create({
 									amount: order?.products[i].price,
 									trans_pay: "amount_subtract",
+									balancePayBuyer: order?.products[i]?.user?._id,
 									productId: order?.products[i]?.productId?._id,
 									balanceAddedOwner: order?.products[i]?.productOwner?._id,
 									status: 'approved',
