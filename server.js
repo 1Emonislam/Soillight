@@ -32,6 +32,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/OrderRoutes");
 const bankLinkedRoutes = require('./routes/bankLinkedRoutes');
 const balanceWithdrawRoutes = require('./routes/balanceWithdrawRoutes');
+const balanceHistoryRoutes = require('./routes/balanceHistoryRoutes');
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -54,6 +55,7 @@ app.use("/", cartRoutes);
 app.use("/", orderRoutes);
 app.use('/', bankLinkedRoutes)
 app.use('/', balanceWithdrawRoutes)
+app.use('/', balanceHistoryRoutes)
 server.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });
