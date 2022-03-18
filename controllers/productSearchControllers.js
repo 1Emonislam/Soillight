@@ -6,16 +6,16 @@ const productSearch = async (req, res, next) => {
         search = search?.trim();
         const KeyWordRegExp = new RegExp(search, "i");
         if (!search) {
-            const result = await Product.find({}).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({}).sort([['date', -1]]).count();
+            const result = await Product.find({ status: 'approved' }).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
+            const count = await Product.find({ status: 'approved' }).sort([['date', -1]]).count();
             return res.json({ count: count, data: result })
         }
         if (search) {
             const result = await Product.find({
-                $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },],
+                $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },], status: 'approved'
             }).populate("user", "_id pic").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({
-                $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },]
+                $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },], status: 'approved'
             }).count();
             if (count === 0) {
                 return res.status(404).json({ error: { badRequest: "Search not found 404!" } })
@@ -34,10 +34,10 @@ const categoriesSearch = async (req, res, next) => {
     const KeyWordRegExp = new RegExp(category, "i");
     try {
         const result = await Product.find({
-            $or: [{ category: KeyWordRegExp }, { subCategory: KeyWordRegExp },]
+            $or: [{ category: KeyWordRegExp }, { subCategory: KeyWordRegExp },], status: 'approved'
         }).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find({
-            $or: [{ category: KeyWordRegExp }, { subCategory: KeyWordRegExp },]
+            $or: [{ category: KeyWordRegExp }, { subCategory: KeyWordRegExp },], status: 'approved'
         }).sort([['date', -1]]).count();
         return res.json({ count: count, data: result })
     }
@@ -47,11 +47,11 @@ const categoriesSearch = async (req, res, next) => {
 }
 
 const latestProducts = async (req, res, next) => {
-    let {status, page = 1, limit = 10 } = req.query;
+    let { status, page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     try {
-        const result = await Product.find({status:status}).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
-        const count = await Product.find({status:status}).sort([['date', -1]]).count();
+        const result = await Product.find({ status: status }).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
+        const count = await Product.find({ status: status }).sort([['date', -1]]).count();
         return res.json({ count: count, data: result })
     }
     catch (error) {
@@ -59,12 +59,18 @@ const latestProducts = async (req, res, next) => {
     }
 }
 const myProducts = async (req, res, next) => {
-    let { page = 1, limit = 10 } = req.query;
+    let { status, page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     try {
-        const result = await Product.find({ user: req.user._id }).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
-        const count = await Product.find({ user: req.user._id }).sort([['date', -1]]).count();
-        return res.json({ count: count, data: result })
+        if (status) {
+            const result = await Product.find({ user: req.user._id,status:status }).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
+            const count = await Product.find({ user: req.user._id }).sort([['date', -1]]).count();
+            return res.json({ count: count, data: result })
+        } else {
+            const result = await Product.find({ user: req.user._id ,status:status}).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
+            const count = await Product.find({ user: req.user._id,status:status }).sort([['date', -1]]).count();
+            return res.json({ count: count, data: result })
+        }
     }
     catch (error) {
         next(error)
@@ -95,7 +101,7 @@ const allProductGet = async (req, res, next) => {
             ],
         }).sort({ "createdAt": 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find(keyword).count();
-        
+
         return res.status(200).json({ "message": "product data successfully fetch!", count, data: product })
 
     }
