@@ -169,7 +169,7 @@ const orderStatusUpdate = async (req, res, next) => {
 		if (!(req?.user?.isAdmin === true || req?.user?.role === 'rider')) {
 			return res.status(400).json({ error: { status: "you can perform only rider and admin permission required!" } })
 		}
-		console.log(req.user)
+		// console.log(req.user)
 		if (req?.user?.role === 'rider' || req?.user?.isAdmin === true) {
 			if (order) {
 				let productOwnerNotify = [];
