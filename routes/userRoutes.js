@@ -1,5 +1,5 @@
 const express = require('express');
-const { registrationSeller, registrationBuyer, registrationRider, login, profileUpdate, singleUser, userApproved, userRejected, changePassword, profileView } = require('../controllers/userControllers');
+const { registrationSeller, registrationBuyer, registrationRider, login, profileUpdate, singleUser, userApproved, userRejected, changePassword, profileView, userIDLicense } = require('../controllers/userControllers');
 const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.route('/users').put(protect, profileUpdate).get(protect, profileView)
@@ -11,4 +11,5 @@ router.route('/users/change-password').put(protect, changePassword);
 router.route('/users/rider').post(registrationRider);
 router.route('/users/approved/:id').put(protect, userApproved);
 router.route('/users/rejected/:id').put(protect, userRejected);
+router.route('/users/id/license/verify/:id').put(protect, userIDLicense);
 module.exports = router;

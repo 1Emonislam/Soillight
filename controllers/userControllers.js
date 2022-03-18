@@ -199,7 +199,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, phone, pic, address,location:{latitude,longitude}
+                name, email, role: role || req.user.role, phone, pic, address, location: { latitude, longitude }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
@@ -210,7 +210,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, pic, phone, address,location:{latitude,longitude},
+                name, email, role: role || req.user.role, pic, phone, address, location: { latitude, longitude },
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
@@ -221,7 +221,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, role: role || req.user.role, pic,location:{latitude,longitude}, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, email, phone, role: role || req.user.role, pic, location: { latitude, longitude }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
@@ -320,11 +320,30 @@ const changePassword = async (req, res, next) => {
 const profileView = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
-        if (!user) return res.status(400).json({ error: { email: "bad request! please try again!" } })
+        if (!user) return res.status(404).json({ error: { email: "doesn't exists" } })
         return res.status(200).json({ data: user })
     }
     catch (error) {
         next(error)
     }
 }
-module.exports = { login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, changePassword };
+const userIDLicense = async (req, res, next) => {
+    const valid_id = req?.body?.valid_id;
+    const license_card = req?.body?.license_card;
+    const arrCheck = ['true', 'false', true, false];
+    
+    if (!(arrCheck.includes(valid_id?.verify_id))) {
+        return res.status(400).json({ error: { verify: "Valid ID only accepts Boolean values!" } })
+    }
+    if (!(arrCheck.includes(license_card?.verify_card))) {
+        return res.status(400).json({ error: { verify: "LICENSE CARD ID only accepts Boolean values!" } })
+    }
+    const verify = await User.findOneAndUpdate({ _id: req.params?.id?.trim() }, {
+        valid_id, license_card
+    }, { new: true });
+    if (!verify) {
+        return res.status(400).json({ error: { verify: "updated failed! please try again!" } })
+    }
+    return res.status(200).json({ message: "you have successfully updated!", data: verify })
+}
+module.exports = { login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicense, changePassword };
