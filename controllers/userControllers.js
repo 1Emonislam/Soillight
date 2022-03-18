@@ -121,7 +121,8 @@ const registrationSeller = async (req, res, next) => {
 
 const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
-    const { latitude, longitude } = req?.body?.location;
+    const latitude= req?.body?.location?.latitude;
+    const longitude = req?.body?.location?.longitude;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
