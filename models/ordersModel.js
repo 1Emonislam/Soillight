@@ -1,19 +1,22 @@
 const mongoose = require("mongoose");
 const Schema = require('mongoose').Schema;
+const LocationSchema = new Schema({
+	type: {
+		type: String,
+		default: "Point"
+	},
+	coordinates: {
+		type: [Number],
+		index: "2dsphere"
+	}
+});
 const orderSchema = mongoose.Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: [true, "Please provide user ID"]
     },
-    location: {
-        latitude: {
-            type: String,
-        },
-        longitude: {
-            type: String,
-        }
-    },
+    location:LocationSchema,
     transaction_id: {
         type: String,
     },

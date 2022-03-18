@@ -3,16 +3,16 @@ const Notification = require("../models/notificationMdels");
 const bankLinked = async (req, res, next) => {
     const { bank_acc_name, bank_acc_num, routing_num, bank_location } = req.body;
     try {
-        const bankCheck = await BankLinked.findOne({ bank_owner: req.user._id })
+        const bankCheck = await BankLinked.findOne({ bank_owner: req?.user?._id })
         if (bankCheck) {
             return res.status(302).json({ error: { "bank": "you have already linked bank!" } })
         }
         const created = await BankLinked.create({
-            bank_acc_name, bank_acc_num, routing_num, bank_location, bank_owner: req.user._id,
+            bank_acc_name, bank_acc_num, routing_num, bank_location, bank_owner: req?.user?._id,
         })
         if (created) {
             const NotificationSendObj = {
-                sender: req.user._id,
+                sender: req?.user?._id,
                 receiver: [req.user._id],
                 message: `Your Bank Account Linked Successfully! Manualy approve your Bank accounts!`,
             }
@@ -45,7 +45,7 @@ const bankLinkedRemoved = async (req, res, next) => {
             return res.status(200).json({ "message": "Bank account successfully removed!" })
         } else {
             const NotificationSendObj = {
-                sender: req.user._id,
+                sender: req?.user?._id,
                 receiver: [req.user._id],
                 message: `your Bank account successfully removed!`,
             }
@@ -73,7 +73,7 @@ const bankStatusAction = async (req, res, next) => {
             .then((doc) => {
                 if (status === 'approved') {
                     const NotificationSendObj = {
-                        sender: req.user._id,
+                        sender: req?.user?._id,
                         receiver: [req.user._id],
                         message: `Congratulations! your bank account is approved!`,
                     }
@@ -81,7 +81,7 @@ const bankStatusAction = async (req, res, next) => {
                 }
                 if (status === 'rejected') {
                     const NotificationSendObj = {
-                        sender: req.user._id,
+                        sender: req?.user?._id,
                         receiver: [req.user._id],
                         message: `Unfortunately! your bank account is Rejected!`,
                     }

@@ -10,21 +10,22 @@ const orderAdd = async (req, res, next) => {
 	if (!latitude || !longitude) {
 		return res.status(400).json({ error: { location: "please provide area location latitude and longitude" } })
 	}
-	const buyer = await User.findOne({ _id: req.user._id });
+	const buyer = await User.findOne({ _id: req?.user?._id });
 	try {
 		const role = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
 		const created = await Order.create({
-			user: req.user._id,
+			user: req?.user?._id,
 			transaction_id,
 			tx_ref,
 			products,
 			userType: role,
-			location: { latitude, longitude }
+			location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }
 		});
 		if (!created) {
 			return res.status(400).json({ error: { order: "something wrong!" } });
 		}
 		if (created) {
+
 			const orderCreated = await Order.findOne({ _id: created._id }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
@@ -44,7 +45,7 @@ const orderAdd = async (req, res, next) => {
 			const buyerAmountPay = orderCreated?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
 			for (let i = 0; i < orderCreated?.products.length; i++) {
 				const NotificationSendSeller = {
-					sender: req.user._id,
+					sender: req?.user?._id,
 					product: [{
 						productOwner: orderCreated?.products[i]?.productOwner?._id,
 						productId: orderCreated?.products[i]?.productId?._id,
@@ -59,7 +60,7 @@ const orderAdd = async (req, res, next) => {
 
 			}
 			const NotificationSendBuyer = {
-				sender: req.user._id,
+				sender: req?.user?._id,
 				product: [...products],
 				receiver: [req.user._id],
 				message: `Thank You For Placing The order. Your Purchase Has Been Confirmed Paid $${buyerAmountPay}. View Status `,
@@ -76,7 +77,7 @@ const orderSearch = async (req, res, next) => {
 	let { status, page = 1, limit = 10 } = req.query;
 	limit = parseInt(limit);
 	try {
-		const order = await Order.find({ user: req.user._id, status: status })
+		const order = await Order.find({ user: req?.user?._id, status: status })
 			.populate({
 				path: "user",
 				select: "_id name address phone email pic",
@@ -95,7 +96,7 @@ const orderSearch = async (req, res, next) => {
 			.sort({ createdAt: 1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ user: req.user._id, status: status }).sort({ createdAt: 1, _id: -1 }).count();
+		const count = await Order.find({ user: req?.user?._id, status: status }).sort({ createdAt: 1, _id: -1 }).count();
 		return res.status(200).json({ count, data: order });
 	} catch (error) {
 		next(error);
@@ -220,7 +221,7 @@ const orderStatusUpdate = async (req, res, next) => {
 				if (order?.status === 'delivered' && status === 'cancelled') {
 					for (let i = 0; i < order?.products.length; i++) {
 						const NotificationSendSeller = {
-							sender: req.user._id,
+							sender: req?.user?._id,
 							product: [{
 								productOwner: order?.products[i]?.productOwner?._id,
 								productId: order?.products[i]?.productId?._id,
@@ -262,7 +263,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					}
 
 					const NotificationSendBuyer = {
-						sender: req.user._id,
+						sender: req?.user?._id,
 						product: [...order?.products],
 						receiver: [order?.user],
 						message: `Order Delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
@@ -274,7 +275,7 @@ const orderStatusUpdate = async (req, res, next) => {
 				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
 					status: status,
 					userType: roleBy,
-					statusUpdatedBy: req.user._id,
+					statusUpdatedBy: req?.user?._id,
 					statusUpdatedByAdmin: roleAdmin,
 				}, { new: true }).populate({
 					path: "user",
@@ -292,66 +293,65 @@ const orderStatusUpdate = async (req, res, next) => {
 						],
 					});
 				if (updated) {
-					if (updated?.status === 'cancelled' || updated?.status === 'delivered') {
-						if (updated?.status === 'delivered') {
-							function withdrawTrans(length, id) {
-								for (var s = ''; s.length < length; s += `${id}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01`.charAt(Math.random() * 62 | 0));
-								return s;
-							}
-							const NotificationSendBuyer = {
-								sender: req.user._id,
-								product: [...order?.products],
-								receiver: [order?.user],
-								message: `The Rider has delivered the order. if you have received The Order Then Please Confirm it. $${buyerAmountPay} `,
-							}
-							// console.log(order)
-
-							for (let i = 0; i < order?.products.length; i++) {
-								const NotificationSendSeller = {
-									sender: req.user._id,
-									product: [{
-										productOwner: order?.products[i]?.productOwner?._id,
-										productId: order?.products[i]?.productId?._id,
-										quantity: order?.products[i]?.quantity,
-										price: order?.products[i]?.price,
-									}],
-									receiver: [order?.products[i]?.productOwner?._id],
-									message: `Rider Mark it Delivery as Completed From ${order?.user?.name} Click to view Details order Amount ${order?.products[i]?.price}`,
-								}
-								const notificationSending = await Notification.create(NotificationSendSeller);
-								// console.log(notificationSending)
-								//added balance history
-								const balanceHistory = await BalanceHistory.create({
-									amount: order?.products[i].price,
-									trans_pay: "amount_added",
-									balancePayBuyer: order?.products[i]?.user?._id,
-									productId: order?.products[i]?.productId?._id,
-									balanceAddedOwner: order?.products[i]?.productOwner?._id,
-									status: 'approved',
-									transaction_id: withdrawTrans(10, order?.products[i]?.productOwner?._id)
-								})
-								// console.log(balanceHistory)
-								//balance added
-								let updatedBalance;
-								updatedBalance = order?.products[i].price;
-								const createdNotification = await Notification.create(NotificationSendSeller);
-								const updateTransaction = await MyBalance.findOneAndUpdate(
-									{
-										user: order?.products[i].productOwner,
-									},
-									{ $inc: { balance: updatedBalance } },
-									{ new: true }
-								);
-							}
-
-							await Notification.create(NotificationSendBuyer);
-
-							return res.status(200).json({ message: "Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed!", data: updated });
+					if (updated?.status === 'delivered') {
+						function withdrawTrans(length, id) {
+							for (var s = ''; s.length < length; s += `${id}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01`.charAt(Math.random() * 62 | 0));
+							return s;
 						}
+						const NotificationSendBuyer = {
+							sender: req?.user?._id,
+							product: [...order?.products],
+							receiver: [order?.user],
+							message: `The Rider has delivered the order. if you have received The Order Then Please Confirm it. $${buyerAmountPay} `,
+						}
+						// console.log(order)
+
+						for (let i = 0; i < order?.products.length; i++) {
+							const NotificationSendSeller = {
+								sender: req?.user?._id,
+								product: [{
+									productOwner: order?.products[i]?.productOwner?._id,
+									productId: order?.products[i]?.productId?._id,
+									quantity: order?.products[i]?.quantity,
+									price: order?.products[i]?.price,
+								}],
+								receiver: [order?.products[i]?.productOwner?._id],
+								message: `Rider Mark it Delivery as Completed From ${order?.user?.name} Click to view Details order Amount ${order?.products[i]?.price}`,
+							}
+							const notificationSending = await Notification.create(NotificationSendSeller);
+							// console.log(notificationSending)
+							//added balance history
+							const balanceHistory = await BalanceHistory.create({
+								amount: order?.products[i].price,
+								trans_pay: "amount_added",
+								balancePayBuyer: order?.products[i]?.user?._id,
+								productId: order?.products[i]?.productId?._id,
+								balanceAddedOwner: order?.products[i]?.productOwner?._id,
+								status: 'approved',
+								transaction_id: withdrawTrans(10, order?.products[i]?.productOwner?._id)
+							})
+							// console.log(balanceHistory)
+							//balance added
+							let updatedBalance;
+							updatedBalance = order?.products[i].price;
+							const createdNotification = await Notification.create(NotificationSendSeller);
+							const updateTransaction = await MyBalance.findOneAndUpdate(
+								{
+									user: order?.products[i].productOwner,
+								},
+								{ $inc: { balance: updatedBalance } },
+								{ new: true }
+							);
+						}
+
+						await Notification.create(NotificationSendBuyer);
+
+						return res.status(200).json({ message: "Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed!", data: updated });
+
 					} else {
 						for (let i = 0; i < order?.products.length; i++) {
 							const NotificationSendSeller = {
-								sender: req.user._id,
+								sender: req?.user?._id,
 								product: [{
 									productOwner: order?.products[i]?.productOwner?._id,
 									productId: order?.products[i]?.productId?._id,
@@ -420,7 +420,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 	try {
 		let { page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
-		const order = await Order.find({ statusUpdatedBy: req.user._id }).populate({
+		const order = await Order.find({ statusUpdatedBy: req?.user?._id }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -436,7 +436,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			}).sort({ createdAt: 1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ statusUpdatedBy: req.user._id }).populate({
+		const count = await Order.find({ statusUpdatedBy: req?.user?._id }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")

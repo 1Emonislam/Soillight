@@ -5,8 +5,8 @@ const Notification = require('../models/notificationMdels');
 const balanceWithdraw = async (req, res, next) => {
     const { amount, tax } = req.body;
     try {
-        const myBalance = await MyBalance.findOne({ user: req.user._id }).populate("user", "name");
-        const bankLinked = await BankLinked.findOne({ bank_owner: req.user._id });
+        const myBalance = await MyBalance.findOne({ user: req?.user?._id }).populate("user", "name");
+        const bankLinked = await BankLinked.findOne({ bank_owner: req?.user?._id });
         if (!bankLinked) {
             return res.status(400).json({ error: { "withdraw": "please bank linked before withdrawing your balance" } })
         }
@@ -22,21 +22,21 @@ const balanceWithdraw = async (req, res, next) => {
         }
         const updateTransaction = await MyBalance.findOneAndUpdate(
             {
-                user: req.user._id
+                user: req?.user?._id
             },
             { $inc: { balance: -(Number(amount) + Number(tax)) } },
             { new: true }
         );
 
         const NotificationSendObj = {
-            sender: req.user._id,
+            sender: req?.user?._id,
             receiver: [req.user._id],
             message: `Congratulations!  ${myBalance?.user?.name}  Your withdrawal balance transaction is complete. Manualy approve your Transaction!`,
         }
         const withdraw = await BalanceWithdraw.create({
             amount,
             tax,
-            user: req.user._id,
+            user: req?.user?._id,
             bank_pay: bankLinked._id,
         })
         function withdrawTrans(length, id) {
@@ -79,7 +79,7 @@ const withdrawTransAcction = async (req, res, next) => {
             });
             if (status === 'approved') {
                 const NotificationSend = {
-                    sender: req.user._id,
+                    sender: req?.user?._id,
                     receiver: [statusUpdated.user],
                     message: `Congratulations! Your Withdrawal Transaction is Approved!`,
                 };
@@ -87,7 +87,7 @@ const withdrawTransAcction = async (req, res, next) => {
             }
             if (status === 'cancelled') {
                 const NotificationSend = {
-                    sender: req.user._id,
+                    sender: req?.user?._id,
                     receiver: [statusUpdated.user],
                     message: `Unfortunately! Your Withdrawal Transaction is Cancelled!`,
                 };

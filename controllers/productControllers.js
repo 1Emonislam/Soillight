@@ -21,14 +21,14 @@ const productCreate = async (req, res, next) => {
         return res.status(400).json({ error: { "price": "Please fill up the Product Price!" } });
     }
     try {
-        const shop = await Shop.findOne({ user: req.user._id });
+        const shop = await Shop.findOne({ user: req?.user?._id });
         if (!shop) {
             return res.status(400).json({ error: { "product": "Shop registration required! Register Your Own Store!" } })
         }
         if (shop) {
             if (req?.user?.isAdmin === true) {
                 const productCreated = await Product.create({
-                    name, category, subCategory, pack_type, serving_size, status: 'approved', shop: shop._id, quantity, price, img, user: req.user._id
+                    name, category, subCategory, pack_type, serving_size, status: 'approved', shop: shop._id, quantity, price, img, user: req?.user?._id
                 });
                 if (!productCreated) {
                     return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })
@@ -39,7 +39,7 @@ const productCreate = async (req, res, next) => {
             }
             if ((req?.user?.role === 'seller')) {
                 const productCreated = await Product.create({
-                    name, category, subCategory, pack_type, serving_size, quantity, price, img, user: req.user._id
+                    name, category, subCategory, pack_type, serving_size, quantity, price, img, user: req?.user?._id
                 });
                 if (!productCreated) {
                     return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })

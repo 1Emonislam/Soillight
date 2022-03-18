@@ -11,7 +11,7 @@ const giveAReview = async (req, res, next) => {
         const product = await Product.findOne({ _id: req?.params?.id });
         // console.log(product)
         if (product) {
-            const productReviewed = await ProductReview.findOne({ user: req.user._id, product: req.params.id })
+            const productReviewed = await ProductReview.findOne({ user: req?.user?._id, product: req.params.id })
             if (productReviewed) {
                 return res.status(400).json({ error: { "product": "Product already reviewed!" } })
             } else {
@@ -53,13 +53,13 @@ const reviewUpdate = async (req, res, next) => {
                 user: req?.user?._id,
                 product: req?.params?.id
             }
-            const reviewUpdate = await ProductReview.updateOne({ product: req.params.id, user: req.user._id }, review, { new: true });
+            const reviewUpdate = await ProductReview.updateOne({ product: req.params.id, user: req?.user?._id }, review, { new: true });
             if (reviewUpdate) {
                 const finding = await ProductReview.find({ product: req.params.id });
                 product.numReviews = finding?.length;
                 product.rating = finding.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
                 await product.save();
-                const resReview = await ProductReview.findOne({ product: req.params.id, user: req.user._id });
+                const resReview = await ProductReview.findOne({ product: req.params.id, user: req?.user?._id });
                 if (resReview) {
                     return res.status(200).json({ message: "Review update successfully!", resReview })
                 } else {

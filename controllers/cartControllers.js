@@ -5,7 +5,7 @@ const addProductToCart = async (req, res, next) => {
     let data = null;
     try {
         quantity = Number.parseInt(quantity);
-        let cart = await Cart.findOne({ userId: req.user._id });
+        let cart = await Cart.findOne({ userId: req?.user?._id });
         const product = await Product.findById(productId);
         if(!product){
             return res.status(404).json({error:{product:'Product Not Founds! 404'}})
@@ -46,7 +46,7 @@ const addProductToCart = async (req, res, next) => {
         //------if there is no user with a cart then it creates a new cart and then adds the item to the cart that has been created---------
         else {
             const cartData = {
-                userId: req.user._id,
+                userId: req?.user?._id,
                 items: [{
                     productId: productId,
                     quantity: quantity,

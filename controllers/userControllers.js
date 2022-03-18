@@ -38,7 +38,7 @@ const login = async (req, res, next) => {
 }
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
-    const latitude= req?.body?.location?.latitude;
+    const latitude = req?.body?.location?.latitude;
     const longitude = req?.body?.location?.longitude;
     email?.toLowerCase();
     function validateEmail(elementValue) {
@@ -57,7 +57,7 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved', location: { latitude, longitude }, password, address });
+        const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved', location: { type: "Point", "coordinates": [longitude, latitude] }, password, address });
         if (!created) {
             return res.status(400).json({ error: { "buyer": "Buyer Registration failed!" } });
         }
@@ -121,7 +121,7 @@ const registrationSeller = async (req, res, next) => {
 
 const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
-    const latitude= req?.body?.location?.latitude;
+    const latitude = req?.body?.location?.latitude;
     const longitude = req?.body?.location?.longitude;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
@@ -163,7 +163,7 @@ const registrationRider = async (req, res, next) => {
         return res.json({ error: { "back_side_id": "Please fillup the license card  valided back side!" } });
     }
     try {
-        const created = await User.create({ name, email, role: 'rider', phone, location: { latitude, longitude }, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
+        const created = await User.create({ name, email, role: 'rider', phone, location: { type: "Point", "coordinates": [longitude, latitude] }, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
         if (!created) {
             return res.status(400).json({ error: { "rider": "Rider Registration failed!" } });
         }
@@ -186,7 +186,7 @@ const profileUpdate = async (req, res, next) => {
     }
     // console.log(req.body)
     let { name, email, role, phone, pic, address } = req.body;
-    const latitude= req?.body?.location?.latitude;
+    const latitude = req?.body?.location?.latitude;
     const longitude = req?.body?.location?.longitude;
     // console.log(latitude,longitude)
     let verify_id = req?.body?.valid_id?.verify_id;
@@ -202,8 +202,8 @@ const profileUpdate = async (req, res, next) => {
             return res.status(400).json({ error: { "role": "profile update permission denied! please switch to another role!" } })
         }
         if (req?.user?.role === 'buyer') {
-            const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, phone, pic, address, location: { latitude, longitude }
+            const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                name, email, role: role || req.user.role, phone, pic, address, location: { type: "Point", "coordinates": [longitude, latitude] }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
@@ -213,8 +213,8 @@ const profileUpdate = async (req, res, next) => {
             }
         }
         if (req?.user?.role === 'seller') {
-            const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, role: role || req.user.role, pic, phone, address, location: { latitude, longitude },
+            const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                name, email, role: role || req.user.role, pic, phone, address, location: { type: "Point", "coordinates": [longitude, latitude] },
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
@@ -224,8 +224,8 @@ const profileUpdate = async (req, res, next) => {
             }
         }
         if (req?.user?.role === 'rider') {
-            const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
-                name, email, phone, role: role || req.user.role, pic, location: { latitude, longitude }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+            const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                name, email, phone, role: role || req.user.role, pic, location: { type: "Point", "coordinates": [longitude, latitude] }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
@@ -235,7 +235,7 @@ const profileUpdate = async (req, res, next) => {
             }
         }
         if (req?.user?.isAdmin === true) {
-            const updatedCheck = await User.findOneAndUpdate({ _id: req.user._id }, {
+            const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                 name, email, phone, role: 'admin', pic, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
@@ -270,7 +270,7 @@ const userApproved = async (req, res, next) => {
             data.status = 'approved';
             await data.save();
             const sendNotification = {
-                sender: req.user._id,
+                sender: req?.user?._id,
                 receiver: [data._id],
                 message: `Congratulations ${data.name} Registration Approved!`
             }
@@ -306,7 +306,7 @@ const userRejected = async (req, res, next) => {
             data.status = 'rejected';
             await data.save();
             const sendNotification = {
-                sender: req.user._id,
+                sender: req?.user?._id,
                 receiver: [data._id],
                 message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Data`
             }
@@ -339,7 +339,7 @@ const changePassword = async (req, res, next) => {
             return res.status(400).json({ error: { "password": "Password Change failed!" } })
         } if (user === userSave) {
             const sendNotification = {
-                sender: req.user._id,
+                sender: req?.user?._id,
                 receiver: [user._id],
                 message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Data`
             }
@@ -387,7 +387,7 @@ const userIDLicenseVerify = async (req, res, next) => {
         }
         if (verify?.valid_id?.valid_id === true && valid_id) {
             const sendNotification = {
-                sender: req.user._id,
+                sender: req?.user?._id,
                 receiver: [verify._id],
                 message: `Congratulations ${data.name} Registration Rejected! Please provide to Valid Data`
             }
@@ -395,7 +395,7 @@ const userIDLicenseVerify = async (req, res, next) => {
         }
         if (verify?.valid_id?.valid_id === false && verify_card) {
             const sendNotification = {
-                sender: req.user._id,
+                sender: req?.user?._id,
                 receiver: [verify._id],
                 message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Data`
             }
