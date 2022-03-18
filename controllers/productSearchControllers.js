@@ -64,11 +64,11 @@ const myProducts = async (req, res, next) => {
     try {
         if (status) {
             const result = await Product.find({ user: req.user._id,status:status }).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({ user: req.user._id }).sort([['date', -1]]).count();
+            const count = await Product.find({ user: req.user._id,status:status}).sort([['date', -1]]).count();
             return res.json({ count: count, data: result })
         } else {
-            const result = await Product.find({ user: req.user._id ,status:status}).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({ user: req.user._id,status:status }).sort([['date', -1]]).count();
+            const result = await Product.find({ user: req.user._id}).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
+            const count = await Product.find({ user: req.user._id}).sort([['date', -1]]).count();
             return res.json({ count: count, data: result })
         }
     }
