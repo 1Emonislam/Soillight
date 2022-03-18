@@ -166,9 +166,10 @@ const orderStatusUpdate = async (req, res, next) => {
 			return res.status(400).json({ error: { "status": "you have already progress order please update another status!" } })
 		}
 		// console.log(order)
-		if (!(req?.user?.isAdmin === true || req?.user?.role === 'buyer')) {
+		if (!(req?.user?.isAdmin === true || req?.user?.role === 'rider')) {
 			return res.status(400).json({ error: { status: "you can perform only rider and admin permission required!" } })
 		}
+		console.log(req.user)
 		if (req?.user?.role === 'rider' || req?.user?.isAdmin === true) {
 			if (order) {
 				let productOwnerNotify = [];
