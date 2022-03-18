@@ -47,11 +47,11 @@ const categoriesSearch = async (req, res, next) => {
 }
 
 const latestProducts = async (req, res, next) => {
-    let { page = 1, limit = 10 } = req.query;
+    let {status, page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     try {
-        const result = await Product.find({}).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
-        const count = await Product.find({}).sort([['date', -1]]).count();
+        const result = await Product.find({status:status}).populate("user", "_id pic").sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit);
+        const count = await Product.find({status:status}).sort([['date', -1]]).count();
         return res.json({ count: count, data: result })
     }
     catch (error) {
