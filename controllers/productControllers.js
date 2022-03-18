@@ -104,7 +104,7 @@ const getSignleProduct = async (req, res, next) => {
             populate: [
                 {
                     path: "sellerShop",
-                    select: "_id address location name name",
+                    select: "_id address location name",
                 },
             ],
         });
@@ -132,7 +132,7 @@ const productStatusUpdate = async (req, res, next) => {
         populate: [
             {
                 path: "sellerShop",
-                select: "_id address location name name",
+                select: "_id address location name",
             },
         ],
     });
