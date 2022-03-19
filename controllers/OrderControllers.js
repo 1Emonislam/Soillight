@@ -14,6 +14,13 @@ const orderAdd = async (req, res, next) => {
 	for (let i = 0; i < products.length; i++) {
 		productOwner.unshift(products[i]?.productOwner)
 	}
+	const riderArr = [];
+	const riders = await User.find({ role: 'rider', status: 'approved' });
+	if (riders) {
+		for (let r = 0; r < riders.length; r++) {
+			riderArr.unshift(riders[r]._id)
+		}
+	}
 	try {
 		const role = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
 		const created = await Order.create({
@@ -29,7 +36,7 @@ const orderAdd = async (req, res, next) => {
 		}
 		if (created) {
 			const orderCreated = await Order.findOneAndUpdate({ _id: created._id }, {
-				$addToSet: { statusUpdatedBy: [req.user._id, ...productOwner] },
+				$addToSet: { statusUpdatedBy: [req.user._id, ...productOwner, ...riderArr] },
 			}, { new: true }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
