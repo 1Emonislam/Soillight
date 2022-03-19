@@ -261,6 +261,9 @@ const userApproved = async (req, res, next) => {
             if (req?.user?.role === 'rider') {
                 return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
             }
+            if (req?.user?.role === 'seller') {
+                return res.status(400).json({ error: { "seller": "Seller permission denied! only perform Admin!" } })
+            }
         }
         if (req?.user?.isAdmin === true) {
             const data = await User.findOne({ _id: id }).populate("sellerShop").select("-password");
@@ -297,6 +300,9 @@ const userRejected = async (req, res, next) => {
             if (req?.user?.role === 'rider') {
                 return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
             }
+            if (req?.user?.role === 'seller') {
+                return res.status(400).json({ error: { "seller": "Seller permission denied! only perform Admin!" } })
+            }
         }
         if (req?.user?.isAdmin === true) {
             const data = await User.findOne({ _id: id }).populate("sellerShop").select("-password");
@@ -308,7 +314,7 @@ const userRejected = async (req, res, next) => {
             const sendNotification = {
                 sender: req?.user?._id,
                 receiver: [data._id],
-                message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Data`
+                message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Information`
             }
             await Notification.create(sendNotification)
             const finding = await ProductReview.find({ user: id });
