@@ -219,36 +219,56 @@ const orderStatusUpdate = async (req, res, next) => {
 				const roleAdmin = req?.user?.isAdmin === true && req?.user?._id;
 				//admin approved
 				if (order?.status === 'delivered' && status === 'cancelled') {
-					for (let i = 0; i < order?.products.length; i++) {
+					const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
+						status: status,
+						userType: roleBy,
+						statusUpdatedBy: req?.user?._id,
+						statusUpdatedByAdmin: roleAdmin,
+					}, { new: true }).populate({
+						path: "user",
+						select: "_id name address phone email pic",
+					})
+						.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+						.populate({
+							path: "products.productOwner",
+							select: "_id name address phone email sellerShop pic",
+							populate: [
+								{
+									path: "sellerShop",
+									select: "_id address location name",
+								},
+							],
+						});
+					for (let i = 0; i < updated?.products.length; i++) {
 						const NotificationSendSeller = {
 							sender: req?.user?._id,
 							product: [{
-								productOwner: order?.products[i]?.productOwner?._id,
-								productId: order?.products[i]?.productId?._id,
-								quantity: order?.products[i]?.quantity,
-								price: order?.products[i]?.price,
+								productOwner: updated?.products[i]?.productOwner?._id,
+								productId: updated?.products[i]?.productId?._id,
+								quantity: updated?.products[i]?.quantity,
+								price: updated?.products[i]?.price,
 							}],
-							receiver: [order?.products[i]?.productOwner?._id],
+							receiver: [updated?.products[i]?.productOwner?._id],
 							message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${updated?.user?.name}`,
 						}
 						const notificationSending = await Notification.create(NotificationSendSeller);
 						const balanceHistory = await BalanceHistory.create({
-							amount: order?.products[i].price,
+							amount: updated?.products[i].price,
 							trans_pay: "amount_subtract",
-							balancePayBuyer: order?.products[i]?.user?._id,
-							productId: order?.products[i]?.productId?._id,
-							balanceAddedOwner: order?.products[i]?.productOwner?._id,
+							balancePayBuyer: updated?.products[i]?.user?._id,
+							productId: updated?.products[i]?.productId?._id,
+							balanceAddedOwner: updated?.products[i]?.productOwner?._id,
 							status: 'approved',
-							transaction_id: withdrawTrans(10, order?.products[i]?.productOwner?._id)
+							transaction_id: withdrawTrans(10, updated?.products[i]?.productOwner?._id)
 						})
 						// console.log(notificationSending)
 						// console.log(balanceHistory)
 						let updatedBalance;
-						updatedBalance = order?.products[i].price;
+						updatedBalance = updated?.products[i].price;
 						//console.log(updatedBalance)
 						const updateTransaction = await MyBalance.findOneAndUpdate(
 							{
-								user: order?.products[i].productOwner,
+								user: updated?.products[i].productOwner,
 							},
 							{ $inc: { balance: -updatedBalance } },
 							{ new: true }
