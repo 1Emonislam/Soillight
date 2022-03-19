@@ -11,6 +11,10 @@ const orderAdd = async (req, res, next) => {
 		return res.status(400).json({ error: { location: "please provide area location latitude and longitude" } })
 	}
 	const buyer = await User.findOne({ _id: req?.user?._id });
+	const productOwner = [];
+	for (let i = 0; i < products.length; i++) {
+		productOwner.unshift(products[i]?.productOwner)
+	}
 	try {
 		const role = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
 		const created = await Order.create({
@@ -19,7 +23,7 @@ const orderAdd = async (req, res, next) => {
 			tx_ref,
 			products,
 			userType: role,
-			statusUpdatedBy: [req.user._id],
+			statusUpdatedBy: [req.user._id,...productOwner],
 			location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }
 		});
 		if (!created) {
@@ -53,7 +57,7 @@ const orderAdd = async (req, res, next) => {
 						price: orderCreated?.products[i]?.price,
 					}],
 					receiver: [orderCreated?.products[i]?.productOwner?._id],
-					message: `You have received New Order From ${orderCreated?.user?.name} Click to view Details order Amount ${orderCreated?.products[i]?.price}`,
+					message: `You have received New Order From ${orderCreated?.user?.name} Click to view Details order Amount ${"$", orderCreated?.products[i]?.price}`,
 				}
 				const notificationSending = await Notification.create(NotificationSendSeller);
 				// console.log(notificationSending)
@@ -63,7 +67,7 @@ const orderAdd = async (req, res, next) => {
 				sender: req?.user?._id,
 				product: [...products],
 				receiver: [req.user._id],
-				message: `Thank You For Placing The order. Your Purchase Has Been Confirmed Paid $${buyerAmountPay}. View Status `,
+				message: `Thank You For Placing The order. Your Purchase Has Been Confirmed Paid ${"$", buyerAmountPay}. View Status `,
 			};
 			await Notification.create(NotificationSendBuyer);
 		}
@@ -224,7 +228,7 @@ const orderStatusUpdate = async (req, res, next) => {
 				sender: req?.user?._id,
 				product: [...order?.products],
 				receiver: [order?.user],
-				message: `Order Delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
+				message: `Order Delivered failed! Refund Balance. you have received money ${"$", buyerAmountPay} `,
 			}
 
 			if (order) {
@@ -268,7 +272,7 @@ const orderStatusUpdate = async (req, res, next) => {
 								price: updated?.products[i]?.price,
 							}],
 							receiver: [updated?.products[i]?.productOwner?._id],
-							message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${order?.user?.name}  Refund Amount is ${updated?.products[i]?.price}`,
+							message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${order?.user?.name}  Refund Amount is ${"$", updated?.products[i]?.price}`,
 						}
 						await Notification.create(NotificationSendSeller);
 						// console.log(notificationSending)
@@ -292,7 +296,7 @@ const orderStatusUpdate = async (req, res, next) => {
 						);
 					}
 					await Notification.create(NotificationSendBuyer);
-					return res.status(200).json({ message: `Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account! $${buyerAmountPay}`, data: updated });
+					return res.status(200).json({ message: `Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account! ${"$", buyerAmountPay}`, data: updated });
 				}
 
 				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
@@ -326,7 +330,7 @@ const orderStatusUpdate = async (req, res, next) => {
 									price: order?.products[i]?.price,
 								}],
 								receiver: [order?.products[i]?.productOwner?._id],
-								message: `Rider Mark it Delivery as Completed From ${order?.user?.name} Click to view Details order Amount is $${order?.products[i]?.price}`,
+								message: `Rider Mark it Delivery as Completed From ${order?.user?.name} Click to view Details order Amount is ${"$", order?.products[i]?.price}`,
 							}
 							const notificationSending = await Notification.create(NotificationSendSeller);
 							// console.log(notificationSending)
@@ -356,7 +360,7 @@ const orderStatusUpdate = async (req, res, next) => {
 
 						await Notification.create(NotificationSendBuyer);
 
-						return res.status(200).json({ message: `Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed! Amount is ${buyerAmountPay}`, data: updated });
+						return res.status(200).json({ message: `Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed! Amount is ${"$", buyerAmountPay}`, data: updated });
 
 					} else {
 						for (let i = 0; i < order?.products.length; i++) {
@@ -369,7 +373,7 @@ const orderStatusUpdate = async (req, res, next) => {
 									price: order?.products[i]?.price,
 								}],
 								receiver: [order?.products[i]?.productOwner?._id],
-								message: `Rider Mark it ${status} From ${order?.user?.name} Click to view Details order Amount ${order?.products[i]?.price}`,
+								message: `Rider Mark it ${status} From ${order?.user?.name} Click to view Details order Amount ${"$", order?.products[i]?.price}`,
 							}
 							const notificationSending = await Notification.create(NotificationSendSeller);
 						}
@@ -432,7 +436,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 		let { status, page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
 		if (status) {
-			const order = await Order.find({ statusUpdatedBy: req?.user?._id ,status:status}).populate({
+			const order = await Order.find({ statusUpdatedBy: req?.user?._id, status: status }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -448,7 +452,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				}).sort({ createdAt: 1, _id: -1 })
 				.limit(limit * 1)
 				.skip((page - 1) * limit);
-			const count = await Order.find({ statusUpdatedBy: req?.user?._id ,status:status}).populate({
+			const count = await Order.find({ statusUpdatedBy: req?.user?._id, status: status }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
