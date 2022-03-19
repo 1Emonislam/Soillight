@@ -373,6 +373,9 @@ const userIDLicenseVerify = async (req, res, next) => {
         if (req?.user?.role === 'rider') {
             return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
         }
+        if (req?.user?.role === 'seller') {
+            return res.status(400).json({ error: { "seller": "Seller permission denied! only perform Admin!" } })
+        }
     }
     const valid_id = req?.body?.valid_id;
     const license_card = req?.body?.license_card;
