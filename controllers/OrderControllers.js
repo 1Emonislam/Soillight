@@ -170,6 +170,10 @@ const orderStatusUpdate = async (req, res, next) => {
 	const valided = statusArr.includes(status);
 	if (!valided) return res.status(400).json({ error: { status: "please provide valid status credentials!" } })
 	try {
+		function withdrawTrans(length, id) {
+			for (var s = ''; s.length < length; s += `${id}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01`.charAt(Math.random() * 62 | 0));
+			return s;
+		}
 		const order = await Order.findOne({ _id: req.params.id }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
@@ -314,10 +318,6 @@ const orderStatusUpdate = async (req, res, next) => {
 					});
 				if (updated) {
 					if (updated?.status === 'delivered') {
-						function withdrawTrans(length, id) {
-							for (var s = ''; s.length < length; s += `${id}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01`.charAt(Math.random() * 62 | 0));
-							return s;
-						}
 						const NotificationSendBuyer = {
 							sender: req?.user?._id,
 							product: [...order?.products],
