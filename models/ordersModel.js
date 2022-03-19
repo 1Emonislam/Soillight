@@ -32,8 +32,8 @@ const orderSchema = mongoose.Schema({
         default: 'user',
     },
     statusUpdatedBy: [{
-            type: Schema.Types.ObjectId,
-            ref: 'User'
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }],
     products: [{
         productOwner: {
@@ -50,6 +50,9 @@ const orderSchema = mongoose.Schema({
         },
         price: {
             type: Number
+        },
+        status: {
+            default: progress
         }
     }],
 }, { timestamps: true })
