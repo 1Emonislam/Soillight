@@ -10,7 +10,6 @@ const orderAdd = async (req, res, next) => {
 	if (!latitude || !longitude) {
 		return res.status(400).json({ error: { location: "please provide area location latitude and longitude" } })
 	}
-	const buyer = await User.findOne({ _id: req?.user?._id });
 	const productOwner = [];
 	for (let i = 0; i < products.length; i++) {
 		productOwner.unshift(products[i]?.productOwner)
@@ -23,14 +22,15 @@ const orderAdd = async (req, res, next) => {
 			tx_ref,
 			products,
 			userType: role,
-			statusUpdatedBy: [req.user._id,...productOwner],
 			location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }
 		});
 		if (!created) {
 			return res.status(400).json({ error: { order: "something wrong!" } });
 		}
 		if (created) {
-			const orderCreated = await Order.findOne({ _id: created._id }).populate({
+			const orderCreated = await Order.findOneAndUpdate({ _id: created._id }, {
+				$addToSet: { statusUpdatedBy: [req.user._id, ...productOwner] },
+			}, { new: true }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			})
@@ -45,7 +45,6 @@ const orderAdd = async (req, res, next) => {
 						},
 					],
 				})
-
 			const buyerAmountPay = orderCreated?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
 			for (let i = 0; i < orderCreated?.products.length; i++) {
 				const NotificationSendSeller = {
@@ -70,8 +69,9 @@ const orderAdd = async (req, res, next) => {
 				message: `Thank You For Placing The order. Your Purchase Has Been Confirmed Paid ${"$", buyerAmountPay}. View Status `,
 			};
 			await Notification.create(NotificationSendBuyer);
+			return res.status(200).json({ message: "order successfully!", data: orderCreated });
 		}
-		return res.status(200).json({ message: "order successfully!", data: created });
+
 	} catch (error) {
 		next(error);
 	}
@@ -170,7 +170,7 @@ const singleOrder = async (req, res, next) => {
 const orderStatusUpdate = async (req, res, next) => {
 	let { status } = req.body;
 	// console.log(req.user)
-	const statusArr = ['pending', 'approved', 'cancelled', 'completed', 'shipped', 'progress', 'delivered'];
+	const statusArr = ['cancelled', 'completed', 'progress', 'delivered'];
 	const valided = statusArr.includes(status);
 	if (!valided) return res.status(400).json({ error: { status: "please provide valid status credentials!" } })
 	try {
@@ -202,15 +202,6 @@ const orderStatusUpdate = async (req, res, next) => {
 		}
 		if (order?.status === 'completed' && status === 'completed') {
 			return res.status(400).json({ error: { "status": "you have already Completed order please update another status!" } })
-		}
-		if (order?.status === 'pending' && status === 'pending') {
-			return res.status(400).json({ error: { "status": "you have already Pending order please update another status!" } })
-		}
-		if (order?.status === 'approved' && status === 'approved') {
-			return res.status(400).json({ error: { "status": "you have already Approved order please update another status!" } })
-		}
-		if (order?.status === 'shipped' && status === 'shipped') {
-			return res.status(400).json({ error: { "status": "you have already Shipped order please update another status!" } })
 		}
 		if (order?.status === 'progress' && status === 'progress') {
 			return res.status(400).json({ error: { "status": "you have already progress order please update another status!" } })

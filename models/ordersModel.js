@@ -25,8 +25,6 @@ const orderSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'cancelled', 'shipped', 'completed', 'progress', 'delivered'],
-        default: 'pending',
     },
     userType: {
         type: String,
