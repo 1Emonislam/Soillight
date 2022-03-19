@@ -261,7 +261,7 @@ const orderStatusUpdate = async (req, res, next) => {
 								price: updated?.products[i]?.price,
 							}],
 							receiver: [updated?.products[i]?.productOwner?._id],
-							message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${updated?.user?.name}`,
+							message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${updated?.user?.name} Refund Amount is $${updated?.product[i]?.price}`,
 						}
 						const notificationSending = await Notification.create(NotificationSendSeller);
 						const balanceHistory = await BalanceHistory.create({
@@ -329,7 +329,7 @@ const orderStatusUpdate = async (req, res, next) => {
 									price: order?.products[i]?.price,
 								}],
 								receiver: [order?.products[i]?.productOwner?._id],
-								message: `Rider Mark it Delivery as Completed From ${order?.user?.name} Click to view Details order Amount ${order?.products[i]?.price}`,
+								message: `Rider Mark it Delivery as Completed From ${order?.user?.name} Click to view Details order Amount is $${order?.products[i]?.price}`,
 							}
 							const notificationSending = await Notification.create(NotificationSendSeller);
 							// console.log(notificationSending)
@@ -359,7 +359,7 @@ const orderStatusUpdate = async (req, res, next) => {
 
 						await Notification.create(NotificationSendBuyer);
 
-						return res.status(200).json({ message: "Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed!", data: updated });
+						return res.status(200).json({ message: `Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed! Amount is ${buyerAmountPay}`, data: updated });
 
 					} else {
 						for (let i = 0; i < order?.products.length; i++) {
