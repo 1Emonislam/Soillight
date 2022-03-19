@@ -217,16 +217,18 @@ const orderStatusUpdate = async (req, res, next) => {
 		}
 		// console.log(req.user)
 		if (req?.user?.role === 'rider' || req?.user?.isAdmin === true) {
+			const roleBy = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
+			const roleAdmin = req?.user?.isAdmin === true && req?.user?._id;
+
+			const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
+			const NotificationSendBuyer = {
+				sender: req?.user?._id,
+				product: [...order?.products],
+				receiver: [order?.user],
+				message: `Order Delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
+			}
+
 			if (order) {
-				const NotificationSendBuyer = {
-					sender: req?.user?._id,
-					product: [...order?.products],
-					receiver: [order?.user],
-					message: `Order Delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
-				}
-				const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
-				const roleBy = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
-				const roleAdmin = req?.user?.isAdmin === true && req?.user?._id;
 				//admin approved
 				if (order?.status === 'delivered' && status === 'cancelled') {
 					const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
