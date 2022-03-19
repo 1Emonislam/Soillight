@@ -8,7 +8,7 @@ const addProductToCart = async (req, res, next) => {
         let cart = await Cart.findOne({ userId: req?.user?._id });
         const product = await Product.findById(productId);
         if(!product){
-            return res.status(404).json({error:{product:'Product Not Founds! 404'}})
+            return res.status(404).json({error:{product:'Product Not Founds! 404'},data:[]})
         }
         // console.log("product", product)
 

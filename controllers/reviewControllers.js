@@ -67,7 +67,7 @@ const reviewUpdate = async (req, res, next) => {
                 }
             }
         } else {
-            return res.status(404).json({ error: { "product": "Product not founds!" } })
+            return res.status(404).json({ error: { "product": "Product not founds!" },data:[] })
         }
     }
     catch (error) {

@@ -66,7 +66,7 @@ const productUpdate = async (req, res, next) => {
                 name, category, subCategory, pack_type, serving_size, img, quantity, price
             }, { new: true });
             if (!productUpdated) {
-                return res.status(400).json({ error: { "product": "Product not founds!" } })
+                return res.status(400).json({ error: { "product": "Product not founds!" },data:[] })
             }
             if (productUpdated) {
                 return res.status(200).json({ message: "Product updated successfully!", data: productUpdated })
@@ -84,7 +84,7 @@ const productRemove = async (req, res, next) => {
         } else {
             const productRemove = await Product.findByIdAndRemove(req.params.id);
             if (!productRemove) {
-                return res.status(400).json({ error: { "product": "Product not founds!" } })
+                return res.status(400).json({ error: { "product": "Product not founds!" },data:[] })
             }
             if (productRemove) {
                 return res.status(200).json({ message: "Product removed successfully!" })
