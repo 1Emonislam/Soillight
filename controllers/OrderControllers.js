@@ -426,6 +426,81 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 	try {
 		let { status, page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
+		if (req?.user?.isAdmin === true) {
+			if (status) {
+				const order = await Order.find({ status: status }).populate({
+					path: "user",
+					select: "_id name address phone email pic",
+				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+					.populate({
+						path: "products.productOwner",
+						select: "_id name address phone email sellerShop pic",
+						populate: [
+							{
+								path: "sellerShop",
+								select: "_id address location name",
+							},
+						],
+					}).sort({ createdAt: 1, _id: -1 })
+					.limit(limit * 1)
+					.skip((page - 1) * limit);
+				const count = await Order.find({ status: status }).populate({
+					path: "user",
+					select: "_id name address phone email pic",
+				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+					.populate({
+						path: "products.productOwner",
+						select: "_id name address phone email sellerShop pic",
+						populate: [
+							{
+								path: "sellerShop",
+								select: "_id address location name",
+							},
+						],
+					}).sort({ createdAt: 1, _id: -1 }).count();
+				if (!order) {
+					return res.status(404).json({ error: [] })
+				} if (order) {
+					return res.status(200).json({ message: "your order updated history successfully fetch!", count, data: order })
+				}
+			}
+			const order = await Order.find({}).populate({
+				path: "user",
+				select: "_id name address phone email pic",
+			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate({
+					path: "products.productOwner",
+					select: "_id name address phone email sellerShop pic",
+					populate: [
+						{
+							path: "sellerShop",
+							select: "_id address location name",
+						},
+					],
+				}).sort({ createdAt: 1, _id: -1 })
+				.limit(limit * 1)
+				.skip((page - 1) * limit);
+			const count = await Order.find({}).populate({
+				path: "user",
+				select: "_id name address phone email pic",
+			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate({
+					path: "products.productOwner",
+					select: "_id name address phone email sellerShop pic",
+					populate: [
+						{
+							path: "sellerShop",
+							select: "_id address location name",
+						},
+					],
+				}).sort({ createdAt: 1, _id: -1 }).count();
+			if (!order) {
+				return res.status(404).json({ error: [] })
+			} if (order) {
+				return res.status(200).json({ message: "your order updated history successfully fetch!", count, data: order })
+			}
+
+		}
 		if (status) {
 			const order = await Order.find({ statusUpdatedBy: req?.user?._id, status: status }).populate({
 				path: "user",
