@@ -5,8 +5,8 @@ const User = require("../models/userModel");
 const BalanceHistory = require("../models/balanceHistoryModel");
 const orderAdd = async (req, res, next) => {
 	const { products, transaction_id, tx_ref } = req.body;
-	const latitude = req?.body?.location?.latitude;
-	const longitude = req?.body?.location?.longitude;
+	const latitude = req?.body?.location?.latitude || 0;
+	const longitude = req?.body?.location?.longitude || 0;
 	if (!latitude || !longitude) {
 		return res.status(400).json({ error: { location: "please provide area location latitude and longitude" } })
 	}
@@ -19,13 +19,13 @@ const orderAdd = async (req, res, next) => {
 			tx_ref,
 			products,
 			userType: role,
+			statusUpdatedBy: [req.user._id],
 			location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }
 		});
 		if (!created) {
 			return res.status(400).json({ error: { order: "something wrong!" } });
 		}
 		if (created) {
-
 			const orderCreated = await Order.findOne({ _id: created._id }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
@@ -212,13 +212,12 @@ const orderStatusUpdate = async (req, res, next) => {
 			return res.status(400).json({ error: { "status": "you have already progress order please update another status!" } })
 		}
 		// console.log(order)
-		if (!(req?.user?.isAdmin === true || req?.user?.role === 'rider')) {
+		if (!(req?.user?.isAdmin === true || req?.user?.role === 'rider' || 'seller')) {
 			return res.status(400).json({ error: { status: "you can perform only rider and admin permission required!" } })
 		}
 		// console.log(req.user)
-		if (req?.user?.role === 'rider' || req?.user?.isAdmin === true) {
+		if (req?.user?.isAdmin === true || req?.user?.role === 'rider' || 'seller') {
 			const roleBy = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
-			const roleAdmin = req?.user?.isAdmin === true && req?.user?._id;
 
 			const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
 			const NotificationSendBuyer = {
@@ -234,8 +233,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
 						status: status,
 						userType: roleBy,
-						statusUpdatedBy: req?.user?._id,
-						statusUpdatedByAdmin: roleAdmin,
+						$addToSet: { statusUpdatedBy: [req.user._id] },
 					}, { new: true }).populate({
 						path: "user",
 						select: "_id name address phone email pic",
@@ -252,18 +250,6 @@ const orderStatusUpdate = async (req, res, next) => {
 							],
 						});
 					for (let i = 0; i < updated?.products.length; i++) {
-						const NotificationSendSeller = {
-							sender: req?.user?._id,
-							product: [{
-								productOwner: updated?.products[i]?.productOwner?._id,
-								productId: updated?.products[i]?.productId?._id,
-								quantity: updated?.products[i]?.quantity,
-								price: updated?.products[i]?.price,
-							}],
-							receiver: [updated?.products[i]?.productOwner?._id],
-							message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${updated?.user?.name} Refund Amount is $${updated?.product[i]?.price}`,
-						}
-						const notificationSending = await Notification.create(NotificationSendSeller);
 						const balanceHistory = await BalanceHistory.create({
 							amount: updated?.products[i].price,
 							trans_pay: "amount_subtract",
@@ -273,6 +259,18 @@ const orderStatusUpdate = async (req, res, next) => {
 							status: 'approved',
 							transaction_id: withdrawTrans(10, updated?.products[i]?.productOwner?._id)
 						})
+						const NotificationSendSeller = {
+							sender: req?.user?._id,
+							product: [{
+								productOwner: updated?.products[i]?.productOwner?._id,
+								productId: updated?.products[i]?.productId?._id,
+								quantity: updated?.products[i]?.quantity,
+								price: updated?.products[i]?.price,
+							}],
+							receiver: [updated?.products[i]?.productOwner?._id],
+							message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${order?.user?.name}  Refund Amount is ${updated?.products[i]?.price}`,
+						}
+						await Notification.create(NotificationSendSeller);
 						// console.log(notificationSending)
 						// console.log(balanceHistory)
 						let updatedBalance;
@@ -280,14 +278,14 @@ const orderStatusUpdate = async (req, res, next) => {
 						//console.log(updatedBalance)
 						const updateTransaction = await MyBalance.findOneAndUpdate(
 							{
-								user: updated?.products[i].productOwner,
+								user: updated?.products[i].productOwner?._id,
 							},
 							{ $inc: { balance: -updatedBalance } },
 							{ new: true }
 						);
 						const buyerBalance = await MyBalance.findOneAndUpdate(
 							{
-								user: order?.user,
+								user: order?.user?._id,
 							},
 							{ $inc: { balance: buyerAmountPay } },
 							{ new: true }
@@ -300,8 +298,7 @@ const orderStatusUpdate = async (req, res, next) => {
 				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
 					status: status,
 					userType: roleBy,
-					statusUpdatedBy: req?.user?._id,
-					statusUpdatedByAdmin: roleAdmin,
+					$addToSet: { statusUpdatedBy: [req?.user?._id] },
 				}, { new: true }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
@@ -350,7 +347,7 @@ const orderStatusUpdate = async (req, res, next) => {
 							const createdNotification = await Notification.create(NotificationSendSeller);
 							const updateTransaction = await MyBalance.findOneAndUpdate(
 								{
-									user: order?.products[i].productOwner,
+									user: order?.products[i].productOwner?._id,
 								},
 								{ $inc: { balance: updatedBalance } },
 								{ new: true }
@@ -432,8 +429,45 @@ const allStatusOrder = async (req, res, next) => {
 
 const orderStatusUpdatedMyHistory = async (req, res, next) => {
 	try {
-		let { page = 1, limit = 10 } = req.query;
+		let { status, page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
+		if (status) {
+			const order = await Order.find({ statusUpdatedBy: req?.user?._id ,status:status}).populate({
+				path: "user",
+				select: "_id name address phone email pic",
+			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate({
+					path: "products.productOwner",
+					select: "_id name address phone email sellerShop pic",
+					populate: [
+						{
+							path: "sellerShop",
+							select: "_id address location name",
+						},
+					],
+				}).sort({ createdAt: 1, _id: -1 })
+				.limit(limit * 1)
+				.skip((page - 1) * limit);
+			const count = await Order.find({ statusUpdatedBy: req?.user?._id ,status:status}).populate({
+				path: "user",
+				select: "_id name address phone email pic",
+			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate({
+					path: "products.productOwner",
+					select: "_id name address phone email sellerShop pic",
+					populate: [
+						{
+							path: "sellerShop",
+							select: "_id address location name",
+						},
+					],
+				}).sort({ createdAt: 1, _id: -1 }).count();
+			if (!order) {
+				return res.status(404).json({ error: [] })
+			} if (order) {
+				return res.status(200).json({ message: "your order updated history successfully fetch!", count, data: order })
+			}
+		}
 		const order = await Order.find({ statusUpdatedBy: req?.user?._id }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
@@ -467,7 +501,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 		if (!order) {
 			return res.status(404).json({ error: [] })
 		} if (order) {
-			return res.status(200).json({ message: "your updated history successfully fetch!", count, data: order })
+			return res.status(200).json({ message: "your order updated history successfully fetch!", count, data: order })
 		}
 	}
 	catch (error) {

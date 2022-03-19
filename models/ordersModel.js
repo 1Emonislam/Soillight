@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const Schema = require('mongoose').Schema;
 const LocationSchema = new Schema({
-	type: {
-		type: String,
-		default: "Point"
-	},
-	coordinates: {
-		type: [Number],
-		index: "2dsphere"
-	}
+    type: {
+        type: String,
+        default: "Point"
+    },
+    coordinates: {
+        type: [Number],
+        index: "2dsphere"
+    }
 });
 const orderSchema = mongoose.Schema({
     user: {
@@ -16,7 +16,7 @@ const orderSchema = mongoose.Schema({
         ref: 'User',
         required: [true, "Please provide user ID"]
     },
-    location:LocationSchema,
+    location: LocationSchema,
     transaction_id: {
         type: String,
     },
@@ -25,22 +25,18 @@ const orderSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'cancelled','shipped', 'completed', 'progress', 'delivered'],
+        enum: ['pending', 'approved', 'cancelled', 'shipped', 'completed', 'progress', 'delivered'],
         default: 'pending',
     },
     userType: {
         type: String,
-        enum: ['admin', 'rider', 'seller', 'buyer','user'],
+        enum: ['admin', 'rider', 'seller', 'buyer', 'user'],
         default: 'user',
     },
-    statusUpdatedBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-    },
-    statusUpdatedByAdmin: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-    },
+    statusUpdatedBy: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+    }],
     products: [{
         productOwner: {
             type: Schema.Types.ObjectId,
