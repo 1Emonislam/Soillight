@@ -38,8 +38,8 @@ const login = async (req, res, next) => {
 }
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
-    const latitude = req?.body?.location?.latitude;
-    const longitude = req?.body?.location?.longitude;
+      const latitude = req?.body?.location?.latitude ||  0;
+    const longitude = req?.body?.location?.longitude || -0;
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -121,8 +121,8 @@ const registrationSeller = async (req, res, next) => {
 
 const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
-    const latitude = req?.body?.location?.latitude;
-    const longitude = req?.body?.location?.longitude;
+      const latitude = req?.body?.location?.latitude ||  0;
+    const longitude = req?.body?.location?.longitude || -0;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -186,8 +186,8 @@ const profileUpdate = async (req, res, next) => {
     }
     // console.log(req.body)
     let { name, email, role, phone, pic, address } = req.body;
-    const latitude = req?.body?.location?.latitude;
-    const longitude = req?.body?.location?.longitude;
+      const latitude = req?.body?.location?.latitude ||  0;
+    const longitude = req?.body?.location?.longitude || -0;
     // console.log(latitude,longitude)
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
