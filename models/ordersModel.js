@@ -51,10 +51,11 @@ const orderSchema = mongoose.Schema({
         price: {
             type: Number
         },
-        status: {
-            default: "progress"
-        }
     }],
+    status: {
+        type: String,
+        default: "progress"
+    }
 }, { timestamps: true })
 const Order = mongoose.model('Order', orderSchema);
 module.exports = Order;
