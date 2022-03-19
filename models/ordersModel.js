@@ -52,7 +52,7 @@ const orderSchema = mongoose.Schema({
             type: Number
         },
         status: {
-            default: progress
+            default: "progress"
         }
     }],
 }, { timestamps: true })
