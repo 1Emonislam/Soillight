@@ -78,6 +78,8 @@ const registrationBuyer = async (req, res, next) => {
 }
 const registrationSeller = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
+    const latitude = req?.body?.location?.latitude || 0;
+    const longitude = req?.body?.location?.longitude || 0;
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -98,7 +100,7 @@ const registrationSeller = async (req, res, next) => {
         return res.json({ error: { address: "Please fillup the Address!" } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'seller', password, address });
+        const created = await User.create({ name, phone, email, role: 'seller',location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address });
 
         if (!created) {
             return res.status(400).json({ error: { "seller": "Seller Registration failed!" } });
