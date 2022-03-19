@@ -293,7 +293,7 @@ const orderStatusUpdate = async (req, res, next) => {
 						message: `Order Delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
 					}
 					await Notification.create(NotificationSendBuyer);
-					return res.status(200).json({ message: "Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account!", data: updated });
+					return res.status(200).json({ message: `Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account! $${buyerAmountPay}`, data: updated });
 				}
 
 				const updated = await Order.findOneAndUpdate({ _id: req.params.id }, {
