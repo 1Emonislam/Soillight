@@ -218,6 +218,12 @@ const orderStatusUpdate = async (req, res, next) => {
 		// console.log(req.user)
 		if (req?.user?.role === 'rider' || req?.user?.isAdmin === true) {
 			if (order) {
+				const NotificationSendBuyer = {
+					sender: req?.user?._id,
+					product: [...order?.products],
+					receiver: [order?.user],
+					message: `Order Delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
+				}
 				const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
 				const roleBy = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
 				const roleAdmin = req?.user?.isAdmin === true && req?.user?._id;
@@ -285,13 +291,6 @@ const orderStatusUpdate = async (req, res, next) => {
 							{ new: true }
 						);
 					}
-
-					const NotificationSendBuyer = {
-						sender: req?.user?._id,
-						product: [...order?.products],
-						receiver: [order?.user],
-						message: `Order Delivered failed! Refund Balance. you have received money $${buyerAmountPay} `,
-					}
 					await Notification.create(NotificationSendBuyer);
 					return res.status(200).json({ message: `Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account! $${buyerAmountPay}`, data: updated });
 				}
@@ -318,14 +317,6 @@ const orderStatusUpdate = async (req, res, next) => {
 					});
 				if (updated) {
 					if (updated?.status === 'delivered') {
-						const NotificationSendBuyer = {
-							sender: req?.user?._id,
-							product: [...order?.products],
-							receiver: [order?.user],
-							message: `The Rider has delivered the order. if you have received The Order Then Please Confirm it. $${buyerAmountPay} `,
-						}
-						// console.log(order)
-
 						for (let i = 0; i < order?.products.length; i++) {
 							const NotificationSendSeller = {
 								sender: req?.user?._id,
@@ -383,6 +374,7 @@ const orderStatusUpdate = async (req, res, next) => {
 							}
 							const notificationSending = await Notification.create(NotificationSendSeller);
 						}
+						await Notification.create(NotificationSendBuyer);
 						return res.status(200).json({ message: `Order Status  Mark it ${status} From ${order?.user?.name}  Successfully Updated!`, data: updated })
 					}
 				}

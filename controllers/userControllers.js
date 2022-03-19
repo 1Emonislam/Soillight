@@ -38,7 +38,7 @@ const login = async (req, res, next) => {
 }
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
-      const latitude = req?.body?.location?.latitude ||  0;
+    const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || -0;
     email?.toLowerCase();
     function validateEmail(elementValue) {
@@ -57,7 +57,7 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved',location:{ type:"Point","coordinates":[Number(longitude),Number(latitude)]}, password, address });
+        const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved', location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address });
         if (!created) {
             return res.status(400).json({ error: { "buyer": "Buyer Registration failed!" } });
         }
@@ -121,7 +121,7 @@ const registrationSeller = async (req, res, next) => {
 
 const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
-      const latitude = req?.body?.location?.latitude ||  0;
+    const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || -0;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
@@ -163,7 +163,7 @@ const registrationRider = async (req, res, next) => {
         return res.json({ error: { "back_side_id": "Please fillup the license card  valided back side!" } });
     }
     try {
-        const created = await User.create({ name, email, role: 'rider', phone,location:{ type:"Point","coordinates":[Number(longitude),Number(latitude)]}, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
+        const created = await User.create({ name, email, role: 'rider', phone, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
         if (!created) {
             return res.status(400).json({ error: { "rider": "Rider Registration failed!" } });
         }
@@ -186,7 +186,7 @@ const profileUpdate = async (req, res, next) => {
     }
     // console.log(req.body)
     let { name, email, role, phone, pic, address } = req.body;
-      const latitude = req?.body?.location?.latitude ||  0;
+    const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || -0;
     // console.log(latitude,longitude)
     let verify_id = req?.body?.valid_id?.verify_id;
@@ -203,7 +203,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, role: role || req.user.role, phone, pic, address,location:{ type:"Point","coordinates":[Number(longitude),Number(latitude)]}
+                name, email, role: role || req.user.role, phone, pic, address, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
@@ -214,7 +214,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, role: role || req.user.role, pic, phone, address,location:{ type:"Point","coordinates":[Number(longitude),Number(latitude)]},
+                name, email, role: role || req.user.role, pic, phone, address, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
@@ -225,7 +225,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, phone, role: role || req.user.role, pic,location:{ type:"Point","coordinates":[Number(longitude),Number(latitude)]}, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, email, phone, role: role || req.user.role, pic, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
@@ -236,7 +236,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.isAdmin === true) {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, phone, role: 'admin', pic, address,location:{ type:"Point","coordinates":[Number(longitude),Number(latitude)]}, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, email, phone, role: 'admin', pic, address, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
@@ -347,7 +347,7 @@ const changePassword = async (req, res, next) => {
             const sendNotification = {
                 sender: req?.user?._id,
                 receiver: [user._id],
-                message: `Unfortunately ${data.name} Registration Rejected! Please provide to Valid Data`
+                message: `Password has been changes Check your Secure security`
             }
             await Notification.create(sendNotification)
             return res.status(200).json({ message: "Password Change successfully!", data: userSave, token: genToken(userSave._id) })
@@ -379,7 +379,7 @@ const userIDLicenseVerify = async (req, res, next) => {
     const arrCheck = ['true', 'false', true, false];
 
     if (!(arrCheck.includes(valid_id?.verify_id))) {
-        return res.status(400).json({ error: { verify: "Valid ID only accepts Boolean value!" } })
+        return res.status(400).json({ error: { verify: "Valid ID only accepts Boolean value!"} })
     }
     if (!(arrCheck.includes(license_card?.verify_card))) {
         return res.status(400).json({ error: { verify: "LICENSE CARD ID only accepts Boolean value!" } })

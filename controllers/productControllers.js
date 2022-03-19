@@ -1,5 +1,6 @@
 const Shop = require('../models/shopModel');
 const Product = require('../models/productModel');
+const Notification = require('../models/notificationMdels');
 const productCreate = async (req, res, next) => {
     const { name, category, subCategory, pack_type, serving_size, img, quantity, price } = req.body;
     if (!name) {
@@ -66,7 +67,7 @@ const productUpdate = async (req, res, next) => {
                 name, category, subCategory, pack_type, serving_size, img, quantity, price
             }, { new: true });
             if (!productUpdated) {
-                return res.status(400).json({ error: { "product": "Product not founds!" },data:[] })
+                return res.status(400).json({ error: { "product": "Product not founds!" }, data: [] })
             }
             if (productUpdated) {
                 return res.status(200).json({ message: "Product updated successfully!", data: productUpdated })
@@ -84,7 +85,7 @@ const productRemove = async (req, res, next) => {
         } else {
             const productRemove = await Product.findByIdAndRemove(req.params.id);
             if (!productRemove) {
-                return res.status(400).json({ error: { "product": "Product not founds!" },data:[] })
+                return res.status(400).json({ error: { "product": "Product not founds!" }, data: [] })
             }
             if (productRemove) {
                 return res.status(200).json({ message: "Product removed successfully!" })
@@ -124,6 +125,28 @@ const productStatusUpdate = async (req, res, next) => {
     }
 
     if (!(checkStatus.includes(status))) return res.status(400).json({ error: { "status": "please provide valid status credentials!" } })
+    const productCheck = await Product.findOne({ _id: req.params.id }).populate({
+        path: "user",
+        select: "_id name sellerShop",
+        populate: [
+            {
+                path: "sellerShop",
+                select: "_id address location name",
+            },
+        ],
+    });
+    if (!productCheck) {
+        return res.status(404).json({ error: { "product": "product not founds!" }, data: [] })
+    }
+    if (productCheck?.status === 'approved' && status === 'approved') {
+        return res.status(400).json({ error: { "status": "you have already approved product please update another status!" } })
+    }
+    if (productCheck?.status === 'cancelled' && status === 'cancelled') {
+        return res.status(400).json({ error: { "status": "you have already Cancelled product please update another status!" } })
+    }
+    if (productCheck?.status === 'pending' && status === 'pending') {
+        return res.status(400).json({ error: { "status": "you have already Pending product please update another status!" } })
+    }
     const product = await Product.findOneAndUpdate({ _id: req.params.id }, {
         status: status
     }, { new: true }).populate({
@@ -136,6 +159,22 @@ const productStatusUpdate = async (req, res, next) => {
             },
         ],
     });
-    return res.status(200).json({ message: "product status has been successfully updated!", data: product })
+    if (product?.status === 'approved') {
+        const NotificationSend = {
+            sender: req?.user?._id,
+            receiver: [product?.user],
+            message: `congratulations! Your product has been ${status}`,
+        }
+        Notification.create(NotificationSend)
+    }
+    if (product?.status === 'cancelled' || 'pending') {
+        const NotificationSend = {
+            sender: req?.user?._id,
+            receiver: [product?.user],
+            message: `Unfortunately! Your product has been ${status}`,
+        }
+        Notification.create(NotificationSend)
+    }
+    return res.status(200).json({ message: `product status has been successfully ${status}`, data: product })
 }
 module.exports = { productCreate, productUpdate, productRemove, getSignleProduct, productStatusUpdate }
