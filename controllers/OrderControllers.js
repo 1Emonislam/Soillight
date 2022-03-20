@@ -29,7 +29,7 @@ const orderAdd = async (req, res, next) => {
 			tx_ref,
 			products,
 			userType: role,
-			location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }
+			location:{latitude,longitude}, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
 		});
 		if (!created) {
 			return res.status(400).json({ error: { order: "something wrong!" } });

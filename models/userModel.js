@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const { Schema, model } = require("mongoose");
-const LocationSchema = new Schema({
+const geometrySchema = new Schema({
 	type: {
 		type: String,
 		default: "Point"
@@ -37,7 +37,15 @@ const userSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
-		location: LocationSchema,
+		location: {
+			latitude: {
+				type: String,
+			},
+			longitude: {
+				type: String,
+			}
+		},
+		geometry: geometrySchema,
 		email: {
 			type: String,
 			required: [true, "Please fillup the Email!"],

@@ -10,7 +10,7 @@ const shopRegister = async (req, res, next) => {
         if (req?.user?.isAdmin === true) {
             if (seller) {
                 const shopUpdated = await Shop.findOneAndUpdate({ user: req?.user?._id }, {
-                    name, phone, address, openDate, closeDate, email, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+                    name, phone, address, openDate, closeDate, email,location:{latitude,longitude}, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
                 }, { new: true });
                 return res.status(200).json({ message: "shop update successfully!", shopUpdated })
             }
@@ -30,13 +30,13 @@ const shopRegister = async (req, res, next) => {
         if ((req?.user?.role === 'seller')) {
             if (seller) {
                 const shopUpdated = await Shop.findOneAndUpdate({ user: req?.user?._id }, {
-                    name, phone, address, openDate, closeDate, email, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+                    name, phone, address, openDate, closeDate, email,location:{latitude,longitude}, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
                 }, { new: true });
                 return res.status(200).json({ message: "shop update successfully!", shopUpdated })
             }
             if (!seller) {
                 const created = await Shop.create({
-                    name, phone, address, openDate, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, closeDate, email, user: req?.user?._id
+                    name, phone, address, openDate, location:{latitude,longitude}, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, closeDate, email, user: req?.user?._id
                 })
                 if (!created) {
                     return res.status(400).json({ error: { "shop": "Shop Registration failed!" },data:[] })
@@ -71,7 +71,7 @@ const updateShop = async (req, res, next) => {
             if (!shop) return res.status(404).json({ error: { "shop": "shop not founds!" },data:[] })
             if (shop) {
                 const shopUpdated = await Shop.findByIdAndUpdate(req.params.id, {
-                    name, phone, address, openDate, closeDate, email, location: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+                    name, phone, address, openDate, closeDate, email,location:{latitude,longitude}, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
                 }, { new: true });
                 if (!shopUpdated) {
                     return res.status(400).json({ error: { "shop": "shop not founds!" },data:[] })

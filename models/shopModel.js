@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = require('mongoose').Schema;
-const LocationSchema = new Schema({
+const geometrySchema = new Schema({
     type: {
         type: String,
         default: "Point"
@@ -28,7 +28,15 @@ const shopSchema = mongoose.Schema({
         type: String,
         lowercase: true
     },
-    location: LocationSchema,
+    location: {
+        latitude: {
+            type: String,
+        },
+        longitude: {
+            type: String,
+        }
+    },
+    geometry: geometrySchema,
     user: {
         type: mongoose.Schema.Types.ObjectId,
         required: [true, "Please provide user ID"],

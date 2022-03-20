@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = require('mongoose').Schema;
-const LocationSchema = new Schema({
+const geometrySchema = new Schema({
     type: {
         type: String,
         default: "Point"
@@ -16,7 +16,15 @@ const orderSchema = mongoose.Schema({
         ref: 'User',
         required: [true, "Please provide user ID"]
     },
-    location: LocationSchema,
+    location: {
+        latitude: {
+            type: String,
+        },
+        longitude: {
+            type: String,
+        }
+    },
+    geometry: geometrySchema,
     transaction_id: {
         type: String,
     },
