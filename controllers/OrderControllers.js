@@ -5,8 +5,16 @@ const User = require("../models/userModel");
 const BalanceHistory = require("../models/balanceHistoryModel");
 const checkGeo = async (req, res, next) => {
 	try {
-		const rider = await User.find({ geometry: { $near: [-73.9667, 40.78], $maxDistance: 0.10 } })
-		res.send(rider)
+		const riderSend = [];
+		await User.aggregate().near({
+			near: [parseFloat(req.query.lng), parseFloat(req.query.lat)],
+			maxDistance: 100000,
+			spherical: true,
+			query: { role: 'rider', status: 'approved' },
+			distanceField: "dist.calculated"
+		}).then(doc => {
+			res.send(doc)
+		})
 	}
 	catch (error) {
 		next(error)
@@ -21,20 +29,7 @@ const checkGeo = async (req, res, next) => {
 
 
 /*
-	// 	$geoNear: {
-										// 		near: {
-										// 			'type': 'Point',
-										// 			'coordinates': [parseFloat(req.query.lng), parseFloat(req.query.lat)]
-										// 		},
-										// 		distanceField: "dist.calculated",
-										// 		maxDistance: 100000,
-										// 		query: { status: 'approved'},
-										// 		spherical: true
-										// 	},
-										// },
-										// ]).then((rider) => {
-										// 	res.status(200).json({ count: rider.length, rider });
-										// });
+	// 
 
 
 */
@@ -155,7 +150,7 @@ const orderSearch = async (req, res, next) => {
 			.sort({ createdAt: 1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ user: req?.user?._id,  currentStatus: status  }).sort({ createdAt: 1, _id: -1 }).count();
+		const count = await Order.find({ user: req?.user?._id, currentStatus: status }).sort({ createdAt: 1, _id: -1 }).count();
 		return res.status(200).json({ count, data: order });
 	} catch (error) {
 		next(error);
@@ -169,7 +164,7 @@ const adminSeenOrdersSearch = async (req, res, next) => {
 	if (req?.user?.isAdmin === true) {
 		let { status, page = 1, limit = 10 } = req.query;
 		// console.log(status)
-		const keyword = { currentStatus: status  };
+		const keyword = { currentStatus: status };
 		const keyword2 = req.query?.search ? {
 			$or: [
 				{ name: { $regex: req.query.search?.toLowerCase(), $options: "i" } },
@@ -707,7 +702,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					}).sort({ createdAt: 1, _id: -1 })
 					.limit(limit * 1)
 					.skip((page - 1) * limit);
-				const count = await Order.find({ statusUpdatedBy: req.user._id,  currentStatus: status }).populate({
+				const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -784,7 +779,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					}).sort({ createdAt: 1, _id: -1 })
 					.limit(limit * 1)
 					.skip((page - 1) * limit);
-				const count = await Order.find({ statusUpdatedBy: req.user._id,currentStatus: status }).populate({
+				const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
