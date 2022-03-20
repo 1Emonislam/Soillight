@@ -4,6 +4,9 @@ const Notification = require("../models/notificationMdels");
 const User = require("../models/userModel");
 const BalanceHistory = require("../models/balanceHistoryModel");
 const orderAdd = async (req, res, next) => {
+	if (!(req?.user?._id)) {
+		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
+	}
 	const { products, transaction_id, tx_ref } = req.body;
 	const latitude = req?.body?.location?.latitude || 0;
 	const longitude = req?.body?.location?.longitude || 0;
@@ -32,6 +35,7 @@ const orderAdd = async (req, res, next) => {
 		}
 		if (created) {
 			const orderCreated = await Order.findOneAndUpdate({ _id: created._id }, {
+				currentStatus: 'progress',
 				buyerUpdatedStatus: 'progress',
 				sellerUpdatedStatus: 'progress',
 				riderUpdatedStatus: 'progress',
@@ -66,17 +70,24 @@ const orderAdd = async (req, res, next) => {
 					message: `You have received New Order From ${orderCreated?.user?.name} Click to view Details order Amount ${"$", orderCreated?.products[i]?.price}`,
 				}
 				const notificationSending = await Notification.create(NotificationSendSeller);
-				// console.log(notificationSending)
+				//console.log(notificationSending)
 
 			}
 			const NotificationSendBuyer = {
 				sender: req?.user?._id,
 				product: [...products],
 				receiver: [req.user._id],
-				message: `Thank You For Placing The order. Your Purchase Has Been Confirmed Paid ${"$", buyerAmountPay}. View Status `,
+				message: `Thank You For Placing The order. Your Purchase Has Been Confirmed Paid ${"$", buyerAmountPay}.`,
 			};
 			await Notification.create(NotificationSendBuyer);
-			return res.status(200).json({ message: "order successfully!", data: orderCreated });
+			const NotificationSendRider = {
+				sender: req?.user?._id,
+				product: [...products],
+				receiver: [...riderArr],
+				message: `You have Recieved New Order From Buyer ${req?.user?.name} order paid amount is ${"$", buyerAmountPay}.`,
+			};
+			await Notification.create(NotificationSendRider);
+			return res.status(201).json({ message: "order successfully!", data: orderCreated });
 		}
 
 	} catch (error) {
@@ -85,6 +96,9 @@ const orderAdd = async (req, res, next) => {
 };
 
 const orderSearch = async (req, res, next) => {
+	if (!(req?.user?._id)) {
+		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
+	}
 	let { status, page = 1, limit = 10 } = req.query;
 	limit = parseInt(limit);
 	try {
@@ -114,6 +128,9 @@ const orderSearch = async (req, res, next) => {
 	}
 };
 const adminSeenOrdersSearch = async (req, res, next) => {
+	if (!(req?.user?._id)) {
+		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
+	}
 	// console.log(req.query)
 	if (req?.user?.isAdmin === true) {
 		let { status, page = 1, limit = 10 } = req.query;
@@ -151,6 +168,9 @@ const adminSeenOrdersSearch = async (req, res, next) => {
 };
 
 const singleOrder = async (req, res, next) => {
+	if (!(req?.user?._id)) {
+		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
+	}
 	if (req?.user?.isAdmin === true) {
 		const order = await Order.findOne({ _id: req.params.id })
 			.populate({
@@ -176,7 +196,9 @@ const singleOrder = async (req, res, next) => {
 
 const orderStatusUpdate = async (req, res, next) => {
 	let { status } = req.body;
-	// console.log(req.user)
+	if (!(req?.user?._id)) {
+		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
+	}
 	const statusArr = ['cancelled', 'completed', 'progress', 'delivered'];
 	const valided = statusArr.includes(status);
 	if (!valided) return res.status(400).json({ error: { status: "please provide valid status credentials!" } })
@@ -235,24 +257,28 @@ const orderStatusUpdate = async (req, res, next) => {
 					if (req?.user?.role === 'buyer') {
 						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 							buyerUpdatedStatus: status,
+							currentStatus: status,
 							$addToSet: { statusUpdatedBy: [req.user._id] },
 						}, { new: true })
 					}
 					if (req?.user?.role === 'seller') {
 						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 							sellerUpdatedStatus: status,
+							currentStatus: status,
 							$addToSet: { statusUpdatedBy: [req.user._id] },
 						}, { new: true })
 					}
 					if (req?.user?.role === 'rider') {
 						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 							riderUpdatedStatus: status,
+							currentStatus: status,
 							$addToSet: { statusUpdatedBy: [req.user._id] },
 						}, { new: true })
 					}
 					if (req?.user?.isAdmin === 'admin') {
 						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 							adminUpdatedStatus: status,
+							currentStatus: status,
 							$addToSet: { statusUpdatedBy: [req.user._id] },
 						}, { new: true })
 					}
@@ -319,24 +345,28 @@ const orderStatusUpdate = async (req, res, next) => {
 				if (req?.user?.role === 'buyer') {
 					const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 						buyerUpdatedStatus: status,
+						currentStatus: status,
 						$addToSet: { statusUpdatedBy: [req.user._id] },
 					}, { new: true })
 				}
 				if (req?.user?.role === 'seller') {
 					const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 						sellerUpdatedStatus: status,
+						currentStatus: status,
 						$addToSet: { statusUpdatedBy: [req.user._id] },
 					}, { new: true })
 				}
 				if (req?.user?.role === 'rider') {
 					const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 						riderUpdatedStatus: status,
+						currentStatus: status,
 						$addToSet: { statusUpdatedBy: [req.user._id] },
 					}, { new: true })
 				}
 				if (req?.user?.isAdmin === 'admin') {
 					const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 						adminUpdatedStatus: status,
+						currentStatus: status,
 						$addToSet: { statusUpdatedBy: [req.user._id] },
 					}, { new: true })
 				}
@@ -432,7 +462,7 @@ const allStatusOrder = async (req, res, next) => {
 	try {
 		let { status, page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
-		const order = await Order.find({ status: status }).populate({
+		const order = await Order.find({ currentStatus: status }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -448,7 +478,7 @@ const allStatusOrder = async (req, res, next) => {
 			}).sort({ createdAt: 1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ status: status }).populate({
+		const count = await Order.find({ currentStatus: status }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
 		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -476,7 +506,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 		limit = parseInt(limit);
 		if (req?.user?.isAdmin === true) {
 			if (status) {
-				const order = await Order.find({ status: status }).populate({
+				const order = await Order.find({ currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -492,7 +522,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					}).sort({ createdAt: 1, _id: -1 })
 					.limit(limit * 1)
 					.skip((page - 1) * limit);
-				const count = await Order.find({ status: status }).populate({
+				const count = await Order.find({ currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -552,7 +582,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 		//admin end status
 		if (req?.user?.role === 'rider') {
 			if (status) {
-				const order = await Order.find({ statusUpdatedBy: req.user._id, "riderUpdatedStatus": status }).populate({
+				const order = await Order.find({ statusUpdatedBy: req.user._id, "riderUpdatedStatus": status, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -568,7 +598,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					}).sort({ createdAt: 1, _id: -1 })
 					.limit(limit * 1)
 					.skip((page - 1) * limit);
-				const count = await Order.find({ statusUpdatedBy: req.user._id, "riderUpdatedStatus": status }).populate({
+				const count = await Order.find({ statusUpdatedBy: req.user._id, "riderUpdatedStatus": status, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -588,7 +618,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					return res.status(200).json({ message: "your order updated history successfully fetch!", count, data: order })
 				}
 			}
-			const order = await Order.find({ statusUpdatedBy: req.user._id, "riderUpdatedStatus": "progress" }).populate({
+			const order = await Order.find({ statusUpdatedBy: req.user._id, "riderUpdatedStatus": "progress", currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -604,7 +634,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				}).sort({ createdAt: 1, _id: -1 })
 				.limit(limit * 1)
 				.skip((page - 1) * limit);
-			const count = await Order.find({ statusUpdatedBy: req.user._id, "riderUpdatedStatus": 'progress' }).populate({
+			const count = await Order.find({ statusUpdatedBy: req.user._id, "riderUpdatedStatus": 'progress', currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -627,7 +657,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 		}
 		if (req?.user?.role === 'seller') {
 			if (status) {
-				const order = await Order.find({ statusUpdatedBy: req.user._id, "sellerUpdatedStatus": status }).populate({
+				const order = await Order.find({ statusUpdatedBy: req.user._id, "sellerUpdatedStatus": status, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -643,7 +673,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					}).sort({ createdAt: 1, _id: -1 })
 					.limit(limit * 1)
 					.skip((page - 1) * limit);
-				const count = await Order.find({ statusUpdatedBy: req.user._id, "sellerUpdatedStatus": status }).populate({
+				const count = await Order.find({ statusUpdatedBy: req.user._id, "sellerUpdatedStatus": status, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -664,7 +694,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				}
 			}
 
-			const order = await Order.find({ statusUpdatedBy: req.user._id, "sellerUpdatedStatus": 'progress' }).populate({
+			const order = await Order.find({ statusUpdatedBy: req.user._id, "sellerUpdatedStatus": 'progress', currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -680,7 +710,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				}).sort({ createdAt: 1, _id: -1 })
 				.limit(limit * 1)
 				.skip((page - 1) * limit);
-			const count = await Order.find({ statusUpdatedBy: req.user._id, "sellerUpdatedStatus": 'progress' }).populate({
+			const count = await Order.find({ statusUpdatedBy: req.user._id, "sellerUpdatedStatus": 'progress', currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -704,7 +734,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 		if (req?.user?.role === 'buyer') {
 
 			if (status) {
-				const order = await Order.find({ statusUpdatedBy: req.user._id, "buyerUpdatedStatus": status }).populate({
+				const order = await Order.find({ statusUpdatedBy: req.user._id, "buyerUpdatedStatus": status, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -720,7 +750,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					}).sort({ createdAt: 1, _id: -1 })
 					.limit(limit * 1)
 					.skip((page - 1) * limit);
-				const count = await Order.find({ statusUpdatedBy: req.user._id, "buyerUpdatedStatus": status }).populate({
+				const count = await Order.find({ statusUpdatedBy: req.user._id, "buyerUpdatedStatus": status, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
 				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -740,7 +770,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					return res.status(200).json({ message: "your order updated history successfully fetch!", count, data: order })
 				}
 			}
-			const order = await Order.find({ statusUpdatedBy: req.user._id, "buyerUpdatedStatus": "progress" }).populate({
+			const order = await Order.find({ statusUpdatedBy: req.user._id, "buyerUpdatedStatus": "progress", currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
@@ -756,7 +786,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				}).sort({ createdAt: 1, _id: -1 })
 				.limit(limit * 1)
 				.skip((page - 1) * limit);
-			const count = await Order.find({ statusUpdatedBy: req.user._id, "buyerUpdatedStatus": 'progress' }).populate({
+			const count = await Order.find({ statusUpdatedBy: req.user._id, "buyerUpdatedStatus": 'progress', currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
 			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")

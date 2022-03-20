@@ -3,7 +3,7 @@ const User = require('../models/userModel')
 const shopRegister = async (req, res, next) => {
     const { name, phone, address, openDate, closeDate, email } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
-    const longitude = req?.body?.location?.longitude || -0;
+    const longitude = req?.body?.location?.longitude|| 0;
     const seller = await Shop.findOne({ user: req?.user?._id });
     // console.log(req.user)
     try {
@@ -62,7 +62,7 @@ const shopRegister = async (req, res, next) => {
 const updateShop = async (req, res, next) => {
     const { name, phone, address, openDate, closeDate, email } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
-    const longitude = req?.body?.location?.longitude || -0;
+    const longitude = req?.body?.location?.longitude|| 0;
     try {
         if (!(req?.user?.role === 'seller' || req?.user?.isAdmin === true)) {
             return res.status(400).json({ error: { "shop": "Permission denied! Buyers do not update the store." } })

@@ -31,6 +31,10 @@ const orderSchema = mongoose.Schema({
     tx_ref: {
         type: String,
     },
+    currentStatus: {
+        type: String,
+        default: 'progress'
+    },
     buyerUpdatedStatus: {
         type: String,
         default: "progress"
