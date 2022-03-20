@@ -3,6 +3,14 @@ const MyBalance = require("../models/myBalance");
 const Notification = require("../models/notificationMdels");
 const User = require("../models/userModel");
 const BalanceHistory = require("../models/balanceHistoryModel");
+const checkGeo = async (req, res, next) => {
+	try {
+
+	}
+	catch (error) {
+		next(error)
+	}
+}
 const orderAdd = async (req, res, next) => {
 	if (!(req?.user?._id)) {
 		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
@@ -22,7 +30,6 @@ const orderAdd = async (req, res, next) => {
 		}
 	}
 	try {
-		const role = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
 		const created = await Order.create({
 			user: req?.user?._id,
 			transaction_id,
@@ -814,4 +821,4 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 }
 
 
-module.exports = { orderAdd, allStatusOrder, orderStatusUpdate, orderSearch, singleOrder, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
+module.exports = {checkGeo, orderAdd, allStatusOrder, orderStatusUpdate, orderSearch, singleOrder, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };

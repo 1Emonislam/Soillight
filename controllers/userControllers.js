@@ -175,7 +175,7 @@ const registrationRider = async (req, res, next) => {
             })
             created.my_balance = balance._id;
             await created.save();
-            const userRes = await User.findOne({ _id: created._id }).select("-password");
+            const userRes = await User.findOne({ _id: created._id }).select("-password").select("-adminShop").select("-sellerShop");
             return res.status(200).json({ message: "Rider Registration successfully!", data: userRes, token: genToken(created._id) })
         }
     } catch (error) {
@@ -210,8 +210,8 @@ const profileUpdate = async (req, res, next) => {
             if (!updatedCheck) {
                 return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
             } if (updatedCheck) {
-                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
-                return res.status(200).json({ message: "Buyer profile updated successfully!", data: resData, token: genToken(resData._id) })
+                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-adminShop").select("-sellerShop")
+                return res.status(200).json({ message: "Buyer profile updated successfully!", data: resData, token: genToken(updatedCheck._id) })
             }
         }
         if (req?.user?.role === 'seller') {
@@ -221,7 +221,7 @@ const profileUpdate = async (req, res, next) => {
             if (!updatedCheck) {
                 return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
             } if (updatedCheck) {
-                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
+                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-adminShop")
                 return res.status(200).json({ message: "Seller profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }
@@ -232,7 +232,7 @@ const profileUpdate = async (req, res, next) => {
             if (!updatedCheck) {
                 return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
             } if (updatedCheck) {
-                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
+                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-password").select("-adminShop").select("-sellerShop")
                 return res.status(200).json({ message: "Rider profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }
@@ -243,7 +243,7 @@ const profileUpdate = async (req, res, next) => {
             if (!updatedCheck) {
                 return res.status(304).json({ error: { admin: "Rider profile update failed!" } })
             } if (updatedCheck) {
-                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password")
+                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-sellerShop")
                 return res.status(200).json({ message: "Admin profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }

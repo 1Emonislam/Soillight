@@ -35,6 +35,12 @@ const productCreate = async (req, res, next) => {
                     return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })
                 }
                 if (productCreated) {
+                    const NotificationSend = {
+                        sender: req?.user?._id,
+                        receiver: [req.user._id],
+                        message: `Congratulations! The product is approved!.`,
+                    };
+                    await Notification.create(NotificationSend);
                     return res.status(200).json({ message: "Product submission successfully! The product is approved!." })
                 }
             }
@@ -46,7 +52,13 @@ const productCreate = async (req, res, next) => {
                     return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })
                 }
                 if (productCreated) {
-                    return res.status(200).json({ message: "Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered." })
+                    const NotificationSend = {
+                        sender: req?.user?._id,
+                        receiver: [req.user._id],
+                        message: `Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered.`,
+                    };
+                    await Notification.create(NotificationSend);
+                    return res.status(200).json({ message: "Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered.",data:productCreated })
                 }
             } else {
                 return res.status(400).json({ error: { "product": "Permission denied! You can perform only seller!" } })
@@ -69,7 +81,14 @@ const productUpdate = async (req, res, next) => {
             if (!productUpdated) {
                 return res.status(400).json({ error: { "product": "Product not founds!" }, data: [] })
             }
+            const productOwner = await Product.findOne({ _id: req.params.id }).populate("user", "_id name")
             if (productUpdated) {
+                const NotificationSend = {
+                    sender: req?.user?._id,
+                    receiver: [productOwner?.user?._id],
+                    message: `Your ${productOwner?.name} product updated successfully!`,
+                };
+                await Notification.create(NotificationSend);
                 return res.status(200).json({ message: "Product updated successfully!", data: productUpdated })
             }
         }
@@ -87,8 +106,15 @@ const productRemove = async (req, res, next) => {
             if (!productRemove) {
                 return res.status(400).json({ error: { "product": "Product not founds!" }, data: [] })
             }
+            const productOwner = await Product.findOne({ _id: req.params.id }).populate("user", "_id name")
             if (productRemove) {
-                return res.status(200).json({ message: "Product removed successfully!" })
+                const NotificationSend = {
+                    sender: req?.user?._id,
+                    receiver: [productOwner?.user?._id],
+                    message: `Unfortunately Your ${productOwner?.name} Product Has Been Removed!`,
+                };
+                await Notification.create(NotificationSend);
+                return res.status(200).json({ message: `Product ${productOwner?.name} removed successfully!` })
             }
         }
     }
@@ -162,15 +188,15 @@ const productStatusUpdate = async (req, res, next) => {
     if (product?.status === 'approved') {
         const NotificationSend = {
             sender: req?.user?._id,
-            receiver: [product?.user],
-            message: `congratulations! Your product has been ${status}`,
+            receiver: [product?.user?._id],
+            message: `Congratulations! Your product has been ${status}`,
         }
         Notification.create(NotificationSend)
     }
     if (product?.status === 'cancelled' || 'pending') {
         const NotificationSend = {
             sender: req?.user?._id,
-            receiver: [product?.user],
+            receiver: [product?.user?._id],
             message: `Unfortunately! Your product has been ${status}`,
         }
         Notification.create(NotificationSend)

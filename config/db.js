@@ -10,7 +10,6 @@
 // }
 // module.exports = dbConnect;
 
-
 const mongoose = require("mongoose");
 const dbConnect = async (req, res) => {
 	const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hmdql.mongodb.net/soilight?`;
