@@ -31,13 +31,21 @@ const orderSchema = mongoose.Schema({
     tx_ref: {
         type: String,
     },
-    status: {
+    buyerUpdatedStatus: {
         type: String,
+        default: "progress"
     },
-    userType: {
+    sellerUpdatedStatus: {
         type: String,
-        enum: ['admin', 'rider', 'seller', 'buyer', 'user'],
-        default: 'user',
+        default: "progress"
+    },
+    riderUpdatedStatus: {
+        type: String,
+        default: "progress"
+    },
+    adminUpdatedStatus: {
+        type: String,
+        default: "progress"
     },
     statusUpdatedBy: [{
         type: Schema.Types.ObjectId,
@@ -60,10 +68,7 @@ const orderSchema = mongoose.Schema({
             type: Number
         },
     }],
-    status: {
-        type: String,
-        default: "progress"
-    }
+
 }, { timestamps: true })
 const Order = mongoose.model('Order', orderSchema);
 module.exports = Order;
