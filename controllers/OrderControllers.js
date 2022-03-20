@@ -136,7 +136,7 @@ const orderSearch = async (req, res, next) => {
 	let { status, page = 1, limit = 10 } = req.query;
 	limit = parseInt(limit);
 	try {
-		const order = await Order.find({ user: req?.user?._id, status: status })
+		const order = await Order.find({ user: req?.user?._id, currentStatus: status })
 			.populate({
 				path: "user",
 				select: "_id name address phone email pic",
@@ -155,7 +155,7 @@ const orderSearch = async (req, res, next) => {
 			.sort({ createdAt: 1, _id: -1 })
 			.limit(limit * 1)
 			.skip((page - 1) * limit);
-		const count = await Order.find({ user: req?.user?._id, status: status }).sort({ createdAt: 1, _id: -1 }).count();
+		const count = await Order.find({ user: req?.user?._id,  currentStatus: status  }).sort({ createdAt: 1, _id: -1 }).count();
 		return res.status(200).json({ count, data: order });
 	} catch (error) {
 		next(error);
@@ -169,7 +169,7 @@ const adminSeenOrdersSearch = async (req, res, next) => {
 	if (req?.user?.isAdmin === true) {
 		let { status, page = 1, limit = 10 } = req.query;
 		// console.log(status)
-		const keyword = { status: status };
+		const keyword = { currentStatus: status  };
 		const keyword2 = req.query?.search ? {
 			$or: [
 				{ name: { $regex: req.query.search?.toLowerCase(), $options: "i" } },
