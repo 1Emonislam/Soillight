@@ -1,18 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = require('mongoose').Schema;
 const balanceHistorySchema = mongoose.Schema({
-    balanceAddedOwner: {
+    balanceReceiver: [{
         type: Schema.Types.ObjectId,
         ref: "User",
-    },
-    balancePayBuyer: {
+    }],
+    balanceSender:[ {
         type: Schema.Types.ObjectId,
         ref: "User",
-    },
-    productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product"
-    },
+    }],
     amount: {
         type: Number,
         required: [true, 'please provide withdraw amount!']

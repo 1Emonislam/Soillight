@@ -3,41 +3,12 @@ const MyBalance = require("../models/myBalance");
 const Notification = require("../models/notificationMdels");
 const User = require("../models/userModel");
 const BalanceHistory = require("../models/balanceHistoryModel");
-const checkGeo = async (req, res, next) => {
-	try {
-		const riderSend = [];
-		await User.aggregate().near({
-			near: [parseFloat(req.query.lng), parseFloat(req.query.lat)],
-			maxDistance: 100000,
-			spherical: true,
-			query: { role: 'rider', status: 'approved' },
-			distanceField: "dist.calculated"
-		}).then(doc => {
-			res.send(doc)
-		})
-	}
-	catch (error) {
-		next(error)
-	}
 
-}
-
-
-
-
-
-
-
-/*
-	// 
-
-
-*/
 const orderAdd = async (req, res, next) => {
 	if (!(req?.user?._id)) {
 		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
 	}
-	const { products, transaction_id, tx_ref } = req.body;
+	const { products, maxDistance, transaction_id, tx_ref } = req.body;
 	const latitude = req?.body?.location?.latitude || 0;
 	const longitude = req?.body?.location?.longitude || 0;
 	const productOwner = [];
@@ -45,12 +16,17 @@ const orderAdd = async (req, res, next) => {
 		productOwner.unshift(products[i]?.productOwner)
 	}
 	const riderArr = [];
-	const riders = await User.find({ role: 'rider', status: 'approved' });
-	if (riders) {
-		for (let r = 0; r < riders.length; r++) {
-			riderArr.unshift(riders[r]._id)
+	await User.aggregate().near({
+		near: [parseFloat(longitude), parseFloat(latitude)],
+		maxDistance: Number(maxDistance) || 100000,
+		spherical: true,
+		query: { role: 'rider', status: 'approved' },
+		distanceField: "dist.calculated"
+	}).then(riders => {
+		for (let r = 0; r < riders?.length; r++) {
+			riderArr.unshift(riders[r]?._id)
 		}
-	}
+	});
 	try {
 		const created = await Order.create({
 			user: req?.user?._id,
@@ -113,7 +89,7 @@ const orderAdd = async (req, res, next) => {
 				sender: req?.user?._id,
 				product: [...products],
 				receiver: [...riderArr],
-				message: `You have Recieved New Order From Buyer ${req?.user?.name} order paid amount is ${"$", buyerAmountPay}.`,
+				message: `You have Recieved New Order From Buyer ${req?.user?.name} order paid amount is ${"$", buyerAmountPay}. Collect order products`,
 			};
 			await Notification.create(NotificationSendRider);
 			return res.status(201).json({ message: "order successfully!", data: orderCreated });
@@ -236,6 +212,7 @@ const orderStatusUpdate = async (req, res, next) => {
 			for (var s = ''; s.length < length; s += `${id}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01`.charAt(Math.random() * 62 | 0));
 			return s;
 		}
+
 		const order = await Order.findOne({ _id: req.params.id }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
@@ -252,16 +229,17 @@ const orderStatusUpdate = async (req, res, next) => {
 				],
 			});
 		if (!order) return res.status(400).json({ error: { "order": "order emty" } });
-		if (order?.status === 'cancelled' && status === 'cancelled') {
+		if (order?.currentStatus === 'cancelled' && status === 'cancelled') {
 			return res.status(400).json({ error: { "status": "you have already Cancelled order please update another status!" } })
 		}
-		if (order?.status === 'delivered' && status === 'delivered') {
+		if (order?.currentStatus === 'delivered' && status === 'delivered') {
+
 			return res.status(400).json({ error: { "status": "you have already Delivered order please update another status!" } })
 		}
-		if (order?.status === 'completed' && status === 'completed') {
+		if (order?.currentStatus === 'completed' && status === 'completed') {
 			return res.status(400).json({ error: { "status": "you have already Completed order please update another status!" } })
 		}
-		if (order?.status === 'progress' && status === 'progress') {
+		if (order?.currentStatus === 'progress' && status === 'progress') {
 			return res.status(400).json({ error: { "status": "you have already progress order please update another status!" } })
 		}
 		// console.log(order)
@@ -269,20 +247,29 @@ const orderStatusUpdate = async (req, res, next) => {
 			return res.status(400).json({ error: { status: "you can perform only rider and admin permission required!" } })
 		}
 		// console.log(req.user)
+		// console.log(order)
 		if (req?.user?.isAdmin === true || req?.user?.role === 'rider' || 'seller') {
-			const roleBy = req?.user?.isAdmin === true ? 'admin' : req?.user?.role;
-
 			const buyerAmountPay = order?.products?.reduce((perv, curr) => (perv + Number(curr?.price)), 0)
+			const productOwnerArr = [];
+			for (let i = 0; i < order?.products.length; i++) {
+				productOwnerArr.unshift(order?.products[i]?.productOwner)
+			}
 			const NotificationSendBuyer = {
 				sender: req?.user?._id,
 				product: [...order?.products],
-				receiver: [order?.user],
+				receiver: [order?.user?._id],
+				message: `The Rider Has Deliverd The Order If You Have Recieved The Order Then Please Confirm It. Order amount is ${"$", buyerAmountPay} `,
+			}
+			const NotificationOrderCancelled = {
+				sender: req?.user?._id,
+				product: [...order?.products],
+				receiver: [order?.user?._id],
 				message: `Order Delivered failed! Refund Balance. you have received money ${"$", buyerAmountPay} `,
 			}
 
 			if (order) {
 				//admin approved
-				if (order?.status === 'delivered' && status === 'cancelled') {
+				if (order?.currentStatus === 'delivered' && status === 'cancelled') {
 					if (req?.user?.role === 'buyer') {
 						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 							buyerUpdatedStatus: status,
@@ -330,9 +317,8 @@ const orderStatusUpdate = async (req, res, next) => {
 						const balanceHistory = await BalanceHistory.create({
 							amount: updated?.products[i].price,
 							trans_pay: "amount_subtract",
-							balancePayBuyer: updated?.products[i]?.user?._id,
-							productId: updated?.products[i]?.productId?._id,
-							balanceAddedOwner: updated?.products[i]?.productOwner?._id,
+							balanceSender: [updated?.user?._id],
+							balanceReceiver: [updated?.products[i]?.productOwner?._id],
 							status: 'approved',
 							transaction_id: withdrawTrans(10, updated?.products[i]?.productOwner?._id)
 						})
@@ -345,30 +331,36 @@ const orderStatusUpdate = async (req, res, next) => {
 								price: updated?.products[i]?.price,
 							}],
 							receiver: [updated?.products[i]?.productOwner?._id],
-							message: `Order Cancelled: Refund Balance to Buyer account. If you have any problems with your account balance, please contact customer support. Buyer ${order?.user?.name}  Refund Amount is ${"$", updated?.products[i]?.price}`,
+							message: `Order Cancelled: Refund Balance to Buyer account. ${order?.user?.name}  Refund Amount is ${"$", updated?.products[i]?.price}`,
 						}
+						// console.log(updated)
 						await Notification.create(NotificationSendSeller);
 						// console.log(notificationSending)
 						// console.log(balanceHistory)
-						let updatedBalance;
-						updatedBalance = updated?.products[i].price;
-						//console.log(updatedBalance)
 						const updateTransaction = await MyBalance.findOneAndUpdate(
 							{
-								user: updated?.products[i].productOwner?._id,
+								user: updated?.products[i]?.productOwner?._id,
 							},
-							{ $inc: { balance: -updatedBalance } },
-							{ new: true }
-						);
-						const buyerBalance = await MyBalance.findOneAndUpdate(
-							{
-								user: order?.user?._id,
-							},
-							{ $inc: { balance: buyerAmountPay } },
+							{ $inc: { balance: -updated?.products[i].price } },
 							{ new: true }
 						);
 					}
-					await Notification.create(NotificationSendBuyer);
+					const buyerBalance = await MyBalance.findOneAndUpdate(
+						{
+							user: updated?.user?._id,
+						},
+						{ $inc: { balance: buyerAmountPay } },
+						{ new: true }
+					);
+					const balanceHistoryAdd = await BalanceHistory.create({
+						amount: buyerAmountPay,
+						trans_pay: "amount_added",
+						balanceSender: [...productOwnerArr],
+						balanceReceiver: [updated?.user?._id],
+						status: 'approved',
+						transaction_id: withdrawTrans(10, updated?.user?._id)
+					})
+					await Notification.create(NotificationOrderCancelled);
 					return res.status(200).json({ message: `Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account! ${"$", buyerAmountPay}`, data: updated });
 				}
 				if (req?.user?.role === 'buyer') {
@@ -415,47 +407,42 @@ const orderStatusUpdate = async (req, res, next) => {
 						],
 					});
 				if (updated) {
-					if (updated?.status === 'delivered') {
-						for (let i = 0; i < order?.products.length; i++) {
+					if (updated?.currentStatus === 'delivered') {
+						for (let i = 0; i < updated?.products.length; i++) {
 							const NotificationSendSeller = {
 								sender: req?.user?._id,
 								product: [{
-									productOwner: order?.products[i]?.productOwner?._id,
-									productId: order?.products[i]?.productId?._id,
-									quantity: order?.products[i]?.quantity,
-									price: order?.products[i]?.price,
+									productOwner: updated?.products[i]?.productOwner?._id,
+									productId: updated?.products[i]?.productId?._id,
+									quantity: updated?.products[i]?.quantity,
+									price: updated?.products[i]?.price,
 								}],
-								receiver: [order?.products[i]?.productOwner?._id],
-								message: `Rider Mark it Delivery as Completed From ${order?.user?.name} Click to view Details order Amount is ${"$", order?.products[i]?.price}`,
+								receiver: [updated?.products[i]?.productOwner?._id],
+								message: `Rider Mark it Delivery as Completed From ${updated?.user?.name} Click to view Details order Amount is ${"$", updated?.products[i]?.price}`,
 							}
 							const notificationSending = await Notification.create(NotificationSendSeller);
 							// console.log(notificationSending)
 							//added balance history
 							const balanceHistory = await BalanceHistory.create({
-								amount: order?.products[i].price,
+								amount: updated?.products[i].price,
 								trans_pay: "amount_added",
-								balancePayBuyer: order?.products[i]?.user?._id,
-								productId: order?.products[i]?.productId?._id,
-								balanceAddedOwner: order?.products[i]?.productOwner?._id,
+								balanceSender: [updated?.user?._id],
+								balanceReceiver: [updated?.products[i]?.productOwner?._id],
 								status: 'approved',
-								transaction_id: withdrawTrans(10, order?.products[i]?.productOwner?._id)
+								transaction_id: withdrawTrans(10, updated?.products[i]?.productOwner?._id)
 							})
 							// console.log(balanceHistory)
 							//balance added
-							let updatedBalance;
-							updatedBalance = order?.products[i].price;
 							const createdNotification = await Notification.create(NotificationSendSeller);
 							const updateTransaction = await MyBalance.findOneAndUpdate(
 								{
-									user: order?.products[i].productOwner?._id,
+									user: updated?.products[i].productOwner?._id,
 								},
-								{ $inc: { balance: updatedBalance } },
+								{ $inc: { balance: updated?.products[i].price } },
 								{ new: true }
 							);
 						}
-
 						await Notification.create(NotificationSendBuyer);
-
 						return res.status(200).json({ message: `Order Successfully Delivered! Automatic Added Seller Balance Transaction Completed! Amount is ${"$", buyerAmountPay}`, data: updated });
 
 					} else {
@@ -469,7 +456,7 @@ const orderStatusUpdate = async (req, res, next) => {
 									price: order?.products[i]?.price,
 								}],
 								receiver: [order?.products[i]?.productOwner?._id],
-								message: `Rider Mark it ${status} From ${order?.user?.name} Click to view Details order Amount ${"$", order?.products[i]?.price}`,
+								message: `${req?.user?.role}  ${req?.user?.name} Mark it ${status} From ${order?.user?.name} Click to view Details order Amount ${"$", order?.products[i]?.price}`,
 							}
 							const notificationSending = await Notification.create(NotificationSendSeller);
 						}
@@ -842,5 +829,4 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 	}
 }
 
-
-module.exports = { checkGeo, orderAdd, allStatusOrder, orderStatusUpdate, orderSearch, singleOrder, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
+module.exports = { orderAdd, allStatusOrder, orderStatusUpdate, orderSearch, singleOrder, adminSeenOrdersSearch, orderStatusUpdatedMyHistory };
