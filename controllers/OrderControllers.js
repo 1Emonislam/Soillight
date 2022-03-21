@@ -363,6 +363,101 @@ const orderStatusUpdate = async (req, res, next) => {
 					await Notification.create(NotificationOrderCancelled);
 					return res.status(200).json({ message: `Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account! ${"$", buyerAmountPay}`, data: updated });
 				}
+				if (order?.currentStatus === 'cancelled' && status === 'delivered') {
+					if (req?.user?.role === 'buyer') {
+						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
+							buyerUpdatedStatus: status,
+							currentStatus: status,
+							$addToSet: { statusUpdatedBy: [req.user._id] },
+						}, { new: true })
+					}
+					if (req?.user?.role === 'seller') {
+						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
+							sellerUpdatedStatus: status,
+							currentStatus: status,
+							$addToSet: { statusUpdatedBy: [req.user._id] },
+						}, { new: true })
+					}
+					if (req?.user?.role === 'rider') {
+						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
+							riderUpdatedStatus: status,
+							currentStatus: status,
+							$addToSet: { statusUpdatedBy: [req.user._id] },
+						}, { new: true })
+					}
+					if (req?.user?.isAdmin === 'admin') {
+						const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
+							adminUpdatedStatus: status,
+							currentStatus: status,
+							$addToSet: { statusUpdatedBy: [req.user._id] },
+						}, { new: true })
+					}
+					const updated = await Order.findOne({ _id: req.params.id }).populate({
+						path: "user",
+						select: "_id name address phone email pic",
+					})
+						.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+						.populate({
+							path: "products.productOwner",
+							select: "_id name address phone email sellerShop pic",
+							populate: [
+								{
+									path: "sellerShop",
+									select: "_id address location name",
+								},
+							],
+						});
+					for (let i = 0; i < updated?.products.length; i++) {
+						const balanceHistory = await BalanceHistory.create({
+							amount: updated?.products[i].price,
+							trans_pay: "amount_added",
+							balanceSender: [updated?.user?._id],
+							balanceReceiver: [updated?.products[i]?.productOwner?._id],
+							status: 'approved',
+							transaction_id: withdrawTrans(10, updated?.products[i]?.productOwner?._id)
+						})
+						const NotificationSendSeller = {
+							sender: req?.user?._id,
+							product: [{
+								productOwner: updated?.products[i]?.productOwner?._id,
+								productId: updated?.products[i]?.productId?._id,
+								quantity: updated?.products[i]?.quantity,
+								price: updated?.products[i]?.price,
+							}],
+							receiver: [updated?.products[i]?.productOwner?._id],
+							message: `Order Delivered: Refund Balance to seller Account.  Buyer ${order?.user?.name} from Refund Amount is ${"$", updated?.products[i]?.price}`,
+						}
+						// console.log(updated)
+						const balanceHistoryAdd = await BalanceHistory.create({
+							amount:updated?.products[i]?.price,
+							trans_pay: "amount_subtract",
+							balanceSender: [updated?.user?._id],
+							balanceReceiver: [updated?.products[i]?.productOwner?._id],
+							status: 'approved',
+							transaction_id: withdrawTrans(10, updated?.products[i]?.productOwner?._id)
+						})
+						await Notification.create(NotificationSendSeller);
+						// console.log(notificationSending)
+						// console.log(balanceHistory)
+						const updateTransaction = await MyBalance.findOneAndUpdate(
+							{
+								user: updated?.products[i]?.productOwner?._id,
+							},
+							{ $inc: { balance: updated?.products[i].price } },
+							{ new: true }
+						);
+					}
+					const buyerBalance = await MyBalance.findOneAndUpdate(
+						{
+							user: updated?.user?._id,
+						},
+						{ $inc: { balance: -buyerAmountPay } },
+						{ new: true }
+					);
+					
+					await Notification.create(NotificationOrderCancelled);
+					return res.status(200).json({ message: `Order Successfully Delivered ! Automatic added Seller Balance Refund to seller Account! amount is ${"$", buyerAmountPay}`, data: updated });
+				}
 				if (req?.user?.role === 'buyer') {
 					const updatedBuyer = await Order.findOneAndUpdate({ _id: req.params.id }, {
 						buyerUpdatedStatus: status,
