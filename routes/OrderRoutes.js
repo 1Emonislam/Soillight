@@ -1,5 +1,5 @@
 const express = require("express");
-const { orderAdd,orderSearch, adminSeenOrdersSearch, singleOrder, orderStatusUpdate, orderStatusUpdatedMyHistory, allStatusOrder, checkGeo } = require("../controllers/OrderControllers");
+const { orderAdd,orderSearch, adminSeenOrdersSearch, singleOrder, orderStatusUpdate, orderStatusUpdatedMyHistory, allStatusOrder } = require("../controllers/OrderControllers");
 const { protect } = require("../middlewares/authMiddleware");
 const router = express.Router();
 router.route("/products/order").post(protect, orderAdd);

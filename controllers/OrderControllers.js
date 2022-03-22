@@ -258,13 +258,13 @@ const orderStatusUpdate = async (req, res, next) => {
 				sender: req?.user?._id,
 				product: [...order?.products],
 				receiver: [order?.user?._id],
-				message: `The Rider Has Deliverd The Order If You Have Recieved The Order Then Please Confirm It. Order amount is ${"$", buyerAmountPay} `,
+				message: ` ${req?.user?.name} ${req?.user?.role} Has Deliverd The Order If You Have Recieved The Order Then Please Confirm It. Order amount is ${"$", buyerAmountPay} `,
 			}
 			const NotificationOrderCancelled = {
 				sender: req?.user?._id,
 				product: [...order?.products],
 				receiver: [order?.user?._id],
-				message: `Order Delivered failed! Refund Balance. you have received money ${"$", buyerAmountPay} `,
+				message: `${req?.user?.role} ${req?.user?.name} Mark it Order Delivered failed! Refund Balance. you have received money ${"$", buyerAmountPay} `,
 			}
 
 			if (order) {
@@ -331,7 +331,7 @@ const orderStatusUpdate = async (req, res, next) => {
 								price: updated?.products[i]?.price,
 							}],
 							receiver: [updated?.products[i]?.productOwner?._id],
-							message: `Order Cancelled: Refund Balance to Buyer account. ${order?.user?.name}  Refund Amount is ${"$", updated?.products[i]?.price}`,
+							message: `${req?.user?.role} ${req?.user?.name} Mark it Order Cancelled: Refund Balance to Buyer account. ${order?.user?.name}  Refund Amount is ${"$", updated?.products[i]?.price}`,
 						}
 						// console.log(updated)
 						await Notification.create(NotificationSendSeller);
@@ -361,7 +361,7 @@ const orderStatusUpdate = async (req, res, next) => {
 						transaction_id: withdrawTrans(10, updated?.user?._id)
 					})
 					await Notification.create(NotificationOrderCancelled);
-					return res.status(200).json({ message: `Order Successfully Cancelled ! Automatic Subtract Seller Balance Refund to Buyer Account! ${"$", buyerAmountPay}`, data: updated });
+					return res.status(200).json({ message: `${req?.user?.role} ${req?.user?.name} Mark it Order Cancelled! Automatic Subtract Seller Balance Refund to Buyer Account! ${"$", buyerAmountPay}`, data: updated });
 				}
 				if (order?.currentStatus === 'cancelled' && status === 'delivered') {
 					if (req?.user?.role === 'buyer') {
@@ -425,11 +425,11 @@ const orderStatusUpdate = async (req, res, next) => {
 								price: updated?.products[i]?.price,
 							}],
 							receiver: [updated?.products[i]?.productOwner?._id],
-							message: `Order Delivered: Refund Balance to seller Account.  Buyer ${order?.user?.name} from Refund Amount is ${"$", updated?.products[i]?.price}`,
+							message: `${req?.user?.role} ${req?.user?.name} Mark it Order Delivered: Refund Balance to seller Account.  Buyer ${order?.user?.name} from Refund Amount is ${"$", updated?.products[i]?.price}`,
 						}
 						// console.log(updated)
 						const balanceHistoryAdd = await BalanceHistory.create({
-							amount:updated?.products[i]?.price,
+							amount: updated?.products[i]?.price,
 							trans_pay: "amount_subtract",
 							balanceSender: [updated?.user?._id],
 							balanceReceiver: [updated?.products[i]?.productOwner?._id],
@@ -454,7 +454,7 @@ const orderStatusUpdate = async (req, res, next) => {
 						{ $inc: { balance: -buyerAmountPay } },
 						{ new: true }
 					);
-					
+
 					await Notification.create(NotificationOrderCancelled);
 					return res.status(200).json({ message: `Order Successfully Delivered ! Automatic added Seller Balance Refund to seller Account! amount is ${"$", buyerAmountPay}`, data: updated });
 				}
@@ -513,7 +513,7 @@ const orderStatusUpdate = async (req, res, next) => {
 									price: updated?.products[i]?.price,
 								}],
 								receiver: [updated?.products[i]?.productOwner?._id],
-								message: `Rider Mark it Delivery as Completed From ${updated?.user?.name} Click to view Details order Amount is ${"$", updated?.products[i]?.price}`,
+								message: `${req?.user?.role} ${req?.user?.name} Mark it Delivery as Completed From ${updated?.user?.name} Click to view Details order Amount is ${"$", updated?.products[i]?.price}`,
 							}
 							const notificationSending = await Notification.create(NotificationSendSeller);
 							// console.log(notificationSending)
