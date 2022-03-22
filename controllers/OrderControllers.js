@@ -144,10 +144,6 @@ const adminSeenOrdersSearch = async (req, res, next) => {
 		const keyword2 = req.query?.search ? {
 			$or: [
 				{ currentStatus: { $regex: req.query.search?.toLowerCase(), $options: "i" } },
-				{ buyerUpdatedStatus: { $regex: req.query.search?.toLowerCase(), $options: "i" }, },
-				{ sellerUpdatedStatus: { $regex: req.query.search?.toLowerCase(), $options: "i" }, },
-				{ riderUpdatedStatus: { $regex: req.query.search?.toLowerCase(), $options: "i" }, },
-				{ adminUpdatedStatus: { $regex: req.query.search?.toLowerCase(), $options: "i" }, },
 			],
 		} : {};
 		limit = parseInt(limit);
