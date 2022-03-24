@@ -107,27 +107,52 @@ const orderSearch = async (req, res, next) => {
 	let { status, page = 1, limit = 10 } = req.query;
 	limit = parseInt(limit);
 	try {
-		const order = await Order.find({ user: req?.user?._id, currentStatus: status })
-			.populate({
-				path: "user",
-				select: "_id name address phone email pic",
-			})
-			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
-			.populate({
-				path: "products.productOwner",
-				select: "_id name address phone email sellerShop pic",
-				populate: [
-					{
-						path: "sellerShop",
-						select: "_id address location name",
-					},
-				],
-			})
-			.sort({ createdAt: 1, _id: -1 })
-			.limit(limit * 1)
-			.skip((page - 1) * limit);
-		const count = await Order.find({ user: req?.user?._id, currentStatus: status }).sort({ createdAt: 1, _id: -1 }).count();
-		return res.status(200).json({ count, data: order });
+		if (status) {
+			const order = await Order.find({ user: req?.user?._id, currentStatus: status })
+				.populate({
+					path: "user",
+					select: "_id name address phone email pic",
+				})
+				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate({
+					path: "products.productOwner",
+					select: "_id name address phone email sellerShop pic",
+					populate: [
+						{
+							path: "sellerShop",
+							select: "_id address location name",
+						},
+					],
+				})
+				.sort({ createdAt: 1, _id: -1 })
+				.limit(limit * 1)
+				.skip((page - 1) * limit);
+			const count = await Order.find({ user: req?.user?._id, currentStatus: status }).sort({ createdAt: 1, _id: -1 }).count();
+			return res.status(200).json({ count, data: order });
+		} if (!status) {
+			const order = await Order.find({ user: req?.user?._id })
+				.populate({
+					path: "user",
+					select: "_id name address phone email pic",
+				})
+				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate({
+					path: "products.productOwner",
+					select: "_id name address phone email sellerShop pic",
+					populate: [
+						{
+							path: "sellerShop",
+							select: "_id address location name",
+						},
+					],
+				})
+				.sort({ createdAt: 1, _id: -1 })
+				.limit(limit * 1)
+				.skip((page - 1) * limit);
+			const count = await Order.find({ user: req?.user?._id }).sort({ createdAt: 1, _id: -1 }).count();
+			return res.status(200).json({ count, data: order });
+		}
+
 	} catch (error) {
 		next(error);
 	}
