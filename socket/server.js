@@ -41,7 +41,7 @@ const socketServer = async () => {
 	io.on("connection", (socket) => {
 		// You can do something like emitting an event hare.
 		// I don't want to do anything when a new user is connect there.
-
+		
 		socket.on("disconnect", async () => {
 			const user = socket.request.user;
 			const currentEpochTime = Date.now();

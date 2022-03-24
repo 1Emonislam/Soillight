@@ -51,15 +51,15 @@ const registrationBuyer = async (req, res, next) => {
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
     if (userExist) {
-        return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
+        return res.status(302).json({ error: { "email": "Already exists! please login!" } })
     }
     if (phoneExist) {
-        return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
+        return res.status(302).json({ error: { "phone": "This phone number is linked to another account, please enter another number." } })
     }
     try {
         const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved', location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address })
         if (!created) {
-            return res.status(400).json({ error: { "buyer": "Buyer Registration failed!" } });
+            return res.status(400).json({ error: { "email": "Buyer Registration failed!" } });
         }
         if (created) {
             const balance = await MyBlance.create({
@@ -91,10 +91,10 @@ const registrationSeller = async (req, res, next) => {
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
     if (userExist) {
-        return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
+        return res.status(302).json({ error: { "email": "Already exists! please login!" } })
     }
     if (phoneExist) {
-        return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
+        return res.status(302).json({ error: { "phone": "This phone number is linked to another account, please enter another number." } })
     }
     if (!address) {
         return res.json({ error: { address: "Please fillup the Address!" } })
@@ -103,7 +103,7 @@ const registrationSeller = async (req, res, next) => {
         const created = await User.create({ name, phone, email, role: 'seller', location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address });
 
         if (!created) {
-            return res.status(400).json({ error: { "seller": "Seller Registration failed!" } });
+            return res.status(400).json({ error: { "email": "Seller Registration failed!" } });
         }
         if (created) {
             const balance = await MyBlance.create({
@@ -144,10 +144,10 @@ const registrationRider = async (req, res, next) => {
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
     if (userExist) {
-        return res.status(302).json({ error: { "buyer": "Already exists! please login!" } })
+        return res.status(302).json({ error: { "email": "Already exists! please login!" } })
     }
     if (phoneExist) {
-        return res.status(302).json({ error: { "buyer": "This phone number is linked to another account, please enter another number." } })
+        return res.status(302).json({ error: { "phone": "This phone number is linked to another account, please enter another number." } })
     }
     if (!address) {
         return res.json({ error: { address: "Please fillup the Address!" } })
@@ -167,7 +167,7 @@ const registrationRider = async (req, res, next) => {
     try {
         const created = await User.create({ name, email, role: 'rider', phone, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
         if (!created) {
-            return res.status(400).json({ error: { "rider": "Rider Registration failed!" } });
+            return res.status(400).json({ error: { "email": "Rider Registration failed!" } });
         }
         if (created) {
             const balance = await MyBlance.create({
@@ -208,7 +208,7 @@ const profileUpdate = async (req, res, next) => {
                 name, email, role: role || req.user.role, phone, pic, address, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
             }, { new: true });
             if (!updatedCheck) {
-                return res.status(304).json({ error: { buyer: "Buyer profile update failed!" } })
+                return res.status(304).json({ error: { email: "Buyer profile update failed!" } })
             } if (updatedCheck) {
                 const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-adminShop").select("-sellerShop")
                 return res.status(200).json({ message: "Buyer profile updated successfully!", data: resData, token: genToken(updatedCheck._id) })
@@ -219,7 +219,7 @@ const profileUpdate = async (req, res, next) => {
                 name, email, role: role || req.user.role, pic, phone, address, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
             }, { new: true });
             if (!updatedCheck) {
-                return res.status(304).json({ error: { seller: "Seller profile update failed!" } })
+                return res.status(304).json({ error: { email: "Seller profile update failed!" } })
             } if (updatedCheck) {
                 const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-adminShop")
                 return res.status(200).json({ message: "Seller profile updated successfully!", data: resData, token: genToken(resData._id) })
@@ -230,7 +230,7 @@ const profileUpdate = async (req, res, next) => {
                 name, email, phone, role: role || req.user.role, pic, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
-                return res.status(304).json({ error: { rider: "Rider profile update failed!" } })
+                return res.status(304).json({ error: { email: "Rider profile update failed!" } })
             } if (updatedCheck) {
                 const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-password").select("-adminShop").select("-sellerShop")
                 return res.status(200).json({ message: "Rider profile updated successfully!", data: resData, token: genToken(resData._id) })
@@ -241,7 +241,7 @@ const profileUpdate = async (req, res, next) => {
                 name, email, phone, role: 'admin', pic, address, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
-                return res.status(304).json({ error: { admin: "Rider profile update failed!" } })
+                return res.status(304).json({ error: { email: "Rider profile update failed!" } })
             } if (updatedCheck) {
                 const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-sellerShop")
                 return res.status(200).json({ message: "Admin profile updated successfully!", data: resData, token: genToken(resData._id) })
@@ -258,13 +258,13 @@ const userApproved = async (req, res, next) => {
     try {
         if (!(req?.user?.isAdmin === true)) {
             if (req?.user?.role === 'buyer') {
-                return res.status(400).json({ error: { "buyer": "Buyer permission denied! only perform Admin!" } })
+                return res.status(400).json({ error: { "email": "Buyer permission denied! only perform Admin!" } })
             }
             if (req?.user?.role === 'rider') {
-                return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
+                return res.status(400).json({ error: { "email": "Rider permission denied! only perform Admin!" } })
             }
             if (req?.user?.role === 'seller') {
-                return res.status(400).json({ error: { "seller": "Seller permission denied! only perform Admin!" } })
+                return res.status(400).json({ error: { "email": "Seller permission denied! only perform Admin!" } })
             }
         }
         if (req?.user?.isAdmin === true) {
@@ -297,13 +297,13 @@ const userRejected = async (req, res, next) => {
     try {
         if (!(req?.user?.isAdmin === true)) {
             if (req?.user?.role === 'buyer') {
-                return res.status(400).json({ error: { "buyer": "Buyer permission denied! only perform Admin!" } })
+                return res.status(400).json({ error: { "email": "Buyer permission denied! only perform Admin!" } })
             }
             if (req?.user?.role === 'rider') {
-                return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
+                return res.status(400).json({ error: { "email": "Rider permission denied! only perform Admin!" } })
             }
             if (req?.user?.role === 'seller') {
-                return res.status(400).json({ error: { "seller": "Seller permission denied! only perform Admin!" } })
+                return res.status(400).json({ error: { "email": "Seller permission denied! only perform Admin!" } })
             }
         }
         if (req?.user?.isAdmin === true) {
@@ -370,13 +370,13 @@ const profileView = async (req, res, next) => {
 const userIDLicenseVerify = async (req, res, next) => {
     if (!(req?.user?.isAdmin === true)) {
         if (req?.user?.role === 'buyer') {
-            return res.status(400).json({ error: { "buyer": "Buyer permission denied! only perform Admin!" } })
+            return res.status(400).json({ error: { "email": "Buyer permission denied! only perform Admin!" } })
         }
         if (req?.user?.role === 'rider') {
-            return res.status(400).json({ error: { "rider": "Rider permission denied! only perform Admin!" } })
+            return res.status(400).json({ error: { "email": "Rider permission denied! only perform Admin!" } })
         }
         if (req?.user?.role === 'seller') {
-            return res.status(400).json({ error: { "seller": "Seller permission denied! only perform Admin!" } })
+            return res.status(400).json({ error: { "email": "Seller permission denied! only perform Admin!" } })
         }
     }
     const valid_id = req?.body?.valid_id;
@@ -384,17 +384,17 @@ const userIDLicenseVerify = async (req, res, next) => {
     const arrCheck = ['true', 'false', true, false];
 
     if (!(arrCheck.includes(valid_id?.verify_id))) {
-        return res.status(400).json({ error: { verify: "Valid ID only accepts Boolean value!" } })
+        return res.status(400).json({ error: { verify_id: "Valid ID only accepts Boolean value!" } })
     }
     if (!(arrCheck.includes(license_card?.verify_card))) {
-        return res.status(400).json({ error: { verify: "LICENSE CARD ID only accepts Boolean value!" } })
+        return res.status(400).json({ error: { verify_card: "LICENSE CARD ID only accepts Boolean value!" } })
     }
     try {
         const verify = await User.findOneAndUpdate({ _id: req.params?.id?.trim() }, {
             valid_id, license_card
         }, { new: true });
         if (!verify) {
-            return res.status(400).json({ error: { verify: "updated failed! please try again!" } })
+            return res.status(400).json({ error: { license_card: "updated failed! please try again!" } })
         }
         if (verify?.valid_id?.valid_id === true && valid_id) {
             const sendNotification = {

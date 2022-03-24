@@ -611,7 +611,6 @@ const allStatusOrder = async (req, res, next) => {
 }
 
 const orderStatusUpdatedMyHistory = async (req, res, next) => {
-	// console.log(req.user)
 	try {
 		let { status, page = 1, limit = 10 } = req.query;
 		limit = parseInt(limit);
