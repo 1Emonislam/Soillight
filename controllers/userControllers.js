@@ -51,7 +51,7 @@ const registrationBuyer = async (req, res, next) => {
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
     if (userExist) {
-        return res.status(302).json({ error: { "email": "Already exists! please login!" } })
+        return res.status(302).json({ error: { "email": "Email Already exists!" } })
     }
     if (phoneExist) {
         return res.status(302).json({ error: { "phone": "This phone number is linked to another account, please enter another number." } })
