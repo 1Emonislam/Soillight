@@ -9,7 +9,7 @@ const giveAReview = async (req, res, next) => {
     try {
         // console.log(req?.params?.id)
         const product = await Product.findOne({ _id: req?.params?.id });
-        // console.log(product)
+        //console.log(product)
         if (product) {
             const productReviewed = await ProductReview.findOne({ user: req?.user?._id, product: req.params.id })
             if (productReviewed) {

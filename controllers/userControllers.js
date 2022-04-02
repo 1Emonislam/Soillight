@@ -3,6 +3,7 @@ const ProductReview = require('../models/productReviewModel');
 const MyBlance = require('../models/myBalance');
 const Notification = require('../models/notificationMdels');
 const { genToken } = require('../utils/genToken');
+const { sendOtpVia, verifyOtp } = require('../utils/otp');
 const singleUser = async (req, res, next) => {
     const { id } = req.params;
     try {
@@ -18,18 +19,29 @@ const singleUser = async (req, res, next) => {
 }
 
 const login = async (req, res, next) => {
-    let { email, password } = req.body;
+    let { email, phone, password } = req.body;
     email?.toLowerCase();
-    const user = await User.findOne({ email });
+    const user = email ? await User.findOne({ email }) : await User.findOne({ phone });
+    // console.log(user)
     try {
         if (!user) {
             return res.status(400).json({ error: { "email": "Could not find user" } })
         }
+        if (user?.phoneVerified === false) {
+            const send = await sendOtpVia(user?.phone);
+            // console.log(send)
+            if (send?.sent === false) {
+                return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, token: genToken(user?._id), sent: false })
+            }
+            if (send?.sent === true) {
+                return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", token: genToken(user?._id), sent: true })
+            }
+        }
         if (!(user && (await user.matchPassword(password)))) {
             return res.status(400).json({ error: { "password": "Password invalid! please provide valid password!" } });
         } else if (user && (await user.matchPassword(password))) {
-            const userExists = await User.findOne({ email }).select("-password");
-            return res.status(200).json({ message: "Login Successfully!", data: userExists, token: genToken(user._id) });
+            const userExists = await User.findOne({ _id: user?._id }).select("-password");
+            return res.status(200).json({ message: "Login Successfully!", data: userExists, token: genToken(userExists._id) });
         }
     }
     catch (error) {
@@ -39,7 +51,7 @@ const login = async (req, res, next) => {
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
-    const longitude = req?.body?.location?.longitude|| 0;
+    const longitude = req?.body?.location?.longitude || 0;
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -48,8 +60,25 @@ const registrationBuyer = async (req, res, next) => {
     if (!(validateEmail(email))) {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
+    function checkPassword(password) {
+        var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        return re.test(password);
+    }
+    if (!(checkPassword(password))) {
+        return res.status(400).json({ error: { password: "password should contain min 8 letter password, with at least a symbol, upper and lower case" } })
+    }
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
+    if (userExist?.phoneVerified || phoneExist?.phoneVerified === false) {
+        const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
+        // console.log(send)
+        if (send?.sent === false) {
+            return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, token: genToken(userExist?._id || phoneExist?._id), sent: false })
+        }
+        if (send?.sent === true) {
+            return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", token: genToken(userExist?._id || phoneExist?._id), sent: true })
+        }
+    }
     if (userExist) {
         return res.status(302).json({ error: { "email": "Email Already exists!" } })
     }
@@ -57,7 +86,7 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(302).json({ error: { "phone": "This phone number is linked to another account, please enter another number." } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'buyer', status: 'approved', location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address })
+        const created = await User.create({ name, phone, email, role: 'buyer', location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address })
         if (!created) {
             return res.status(400).json({ error: { "email": "Buyer Registration failed!" } });
         }
@@ -67,8 +96,14 @@ const registrationBuyer = async (req, res, next) => {
             })
             created.my_balance = balance._id;
             await created.save();
+            const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
-            return res.status(200).json({ message: "Buyer Registration successfully!", data: userRes, token: genToken(created._id) })
+            if (send?.sent === false) {
+                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id), data: userRes }, sent: false })
+            }
+            if (send?.sent === true) {
+                return res.status(200).json({ message: "Verify Your Phone Number. Otp Sending Successfully!", data: userRes, token: genToken(created._id), sent: true })
+            }
         }
     }
     catch (error) {
@@ -88,8 +123,25 @@ const registrationSeller = async (req, res, next) => {
     if (!(validateEmail(email))) {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
+    function checkPassword(password) {
+        var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        return re.test(password);
+    }
+    if (!(checkPassword(password))) {
+        return res.status(400).json({ error: { password: "password should contain min 8 letter password, with at least a symbol, upper and lower case" } })
+    }
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
+    if (userExist?.phoneVerified || phoneExist?.phoneVerified === false) {
+        const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
+        // console.log(send)
+        if (send?.sent === false) {
+            return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, token: genToken(userExist?._id || phoneExist?._id), sent: false })
+        }
+        if (send?.sent === true) {
+            return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", token: genToken(userExist?._id || phoneExist?._id), sent: true })
+        }
+    }
     if (userExist) {
         return res.status(302).json({ error: { "email": "Email Already exists! " } })
     }
@@ -111,8 +163,14 @@ const registrationSeller = async (req, res, next) => {
             })
             created.my_balance = balance._id;
             await created.save();
+            const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
-            return res.status(200).json({ message: "Seller Registration successfully!", data: userRes, token: genToken(created._id) })
+            if (send?.sent === false) {
+                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id), data: userRes }, sent: false })
+            }
+            if (send?.sent === true) {
+                return res.status(200).json({ message: "Verify Your Phone Number. Otp Sending Successfully!", data: userRes, token: genToken(created._id), sent: true })
+            }
         }
     }
     catch (error) {
@@ -124,7 +182,7 @@ const registrationSeller = async (req, res, next) => {
 const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
-    const longitude = req?.body?.location?.longitude|| 0;
+    const longitude = req?.body?.location?.longitude || 0;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -141,8 +199,25 @@ const registrationRider = async (req, res, next) => {
     if (!(validateEmail(email))) {
         return res.status(400).json({ error: { email: "Email Invalid! Please provide a valid Email!" } })
     }
+    function checkPassword(password) {
+        var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        return re.test(password);
+    }
+    if (!(checkPassword(password))) {
+        return res.status(400).json({ error: { password: "password should contain min 8 letter password, with at least a symbol, upper and lower case" } })
+    }
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
+    if (userExist?.phoneVerified || phoneExist?.phoneVerified === false) {
+        const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
+        // console.log(send)
+        if (send?.sent === false) {
+            return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, token: genToken(userExist?._id || phoneExist?._id), sent: false })
+        }
+        if (send?.sent === true) {
+            return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", token: genToken(userExist?._id || phoneExist?._id), sent: true })
+        }
+    }
     if (userExist) {
         return res.status(302).json({ error: { "email": "Email Already exists! " } })
     }
@@ -175,21 +250,27 @@ const registrationRider = async (req, res, next) => {
             })
             created.my_balance = balance._id;
             await created.save();
-            const userRes = await User.findOne({ _id: created._id }).select("-password").select("-adminShop").select("-sellerShop");
-            return res.status(200).json({ message: "Rider Registration successfully!", data: userRes, token: genToken(created._id) })
+            const send = await sendOtpVia(created?.phone);
+            const userRes = await User.findOne({ _id: created._id }).select("-password");
+            if (send?.sent === false) {
+                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id), data: userRes }, sent: false })
+            }
+            if (send?.sent === true) {
+                return res.status(200).json({ message: "Verify Your Phone Number. Otp Sending Successfully!", data: userRes, token: genToken(created._id), sent: true })
+            }
         }
     } catch (error) {
         next(error)
     }
 }
 const profileUpdate = async (req, res, next) => {
-    if (!req?.user) {
-        return res.status(400).json({ error: { "email": "permission denied! Please provide valid credentials and try again!" } })
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
     }
     // console.log(req.body)
     let { name, email, role, phone, pic, address } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
-    const longitude = req?.body?.location?.longitude|| 0;
+    const longitude = req?.body?.location?.longitude || 0;
     // console.log(latitude,longitude)
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
@@ -200,7 +281,7 @@ const profileUpdate = async (req, res, next) => {
     let id1 = req?.body?.valid_id?.id;
     let id2 = req?.body?.license_card?.id;
     try {
-        if (!(req?.user?.isAdmin === true || (req?.user?.role === 'seller' || 'buyer' || 'rider' || 'admin') )) {
+        if (!(req?.user?.isAdmin === true || (req?.user?.role === 'seller' || 'buyer' || 'rider' || 'admin'))) {
             return res.status(400).json({ error: { "role": "profile update permission denied! please switch to another role!" } })
         }
         if (req?.user?.role === 'buyer') {
@@ -210,7 +291,7 @@ const profileUpdate = async (req, res, next) => {
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Buyer profile update failed!" } })
             } if (updatedCheck) {
-                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-adminShop").select("-sellerShop")
+                const resData = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop").select("-sellerShop")
                 return res.status(200).json({ message: "Buyer profile updated successfully!", data: resData, token: genToken(updatedCheck._id) })
             }
         }
@@ -221,7 +302,7 @@ const profileUpdate = async (req, res, next) => {
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Seller profile update failed!" } })
             } if (updatedCheck) {
-                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-adminShop")
+                const resData = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop")
                 return res.status(200).json({ message: "Seller profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }
@@ -232,7 +313,7 @@ const profileUpdate = async (req, res, next) => {
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Rider profile update failed!" } })
             } if (updatedCheck) {
-                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-password").select("-adminShop").select("-sellerShop")
+                const resData = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop").select("-sellerShop")
                 return res.status(200).json({ message: "Rider profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }
@@ -243,7 +324,7 @@ const profileUpdate = async (req, res, next) => {
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Rider profile update failed!" } })
             } if (updatedCheck) {
-                const resData = await User.findOne({ _id: updatedCheck._id }).select("-password").select("-sellerShop")
+                const resData = await User.findOne({ _id: req?.user?._id }).select("-password").select("-sellerShop")
                 return res.status(200).json({ message: "Admin profile updated successfully!", data: resData, token: genToken(resData._id) })
             }
         }
@@ -254,6 +335,9 @@ const profileUpdate = async (req, res, next) => {
 
 const userApproved = async (req, res, next) => {
     // console.log(req.user.isAdmin)
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
+    }
     const { id } = req.params;
     try {
         if (!(req?.user?.isAdmin === true)) {
@@ -293,6 +377,9 @@ const userApproved = async (req, res, next) => {
     }
 }
 const userRejected = async (req, res, next) => {
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
+    }
     const { id } = req.params;
     try {
         if (!(req?.user?.isAdmin === true)) {
@@ -331,6 +418,9 @@ const userRejected = async (req, res, next) => {
     }
 }
 const changePassword = async (req, res, next) => {
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
+    }
     const { oldPass, newPass, confirmPass } = req.body;
     // console.log(req.body)
     // console.log(req.user._id)
@@ -358,9 +448,12 @@ const changePassword = async (req, res, next) => {
 
 }
 const profileView = async (req, res, next) => {
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
+    }
     try {
         const user = await User.findById(req.user._id);
-        if (!user) return res.status(404).json({ error: { email: "doesn't exists" } })
+        if (!user) return res.status(404).json({ error: { email: "doesn't exists" }, data: {} })
         return res.status(200).json({ data: user })
     }
     catch (error) {
@@ -368,6 +461,9 @@ const profileView = async (req, res, next) => {
     }
 }
 const userIDLicenseVerify = async (req, res, next) => {
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
+    }
     if (!(req?.user?.isAdmin === true)) {
         if (req?.user?.role === 'buyer') {
             return res.status(400).json({ error: { "email": "Buyer permission denied! only perform Admin!" } })
@@ -419,4 +515,63 @@ const userIDLicenseVerify = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, changePassword };
+
+const verifyPhone = async (req, res, next) => {
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
+    }
+    const { otp } = req.body;
+    if (!otp) {
+        return res.status(400).json({ error: { "otp": "please provide valid otp code!", verify: false } })
+    }
+    try {
+        const check = await verifyOtp(req?.user?.phone, otp);
+        if (check === false) {
+            return res.status(400).json({ error: { "otp": "Otp Verification Failed!", token: genToken(req?.user?._id), verify: false } })
+        } if (check === true) {
+            if (req?.user?.role === 'buyer') {
+                const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                    phoneVerified: true,
+                    status: 'approved'
+                }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
+                return res.status(200).json({ message: "Otp Verification Successfully! Phone Number Verified", verify: true, token: genToken(data?._id), data: data })
+            }
+            if (req?.user?.role === 'seller') {
+                const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                    phoneVerified: true
+                }, { new: true }).select("-password").select("-adminShop")
+                return res.status(200).json({ message: "Otp Verification Successfully! Phone Number Verified", verify: true, token: genToken(data?._id), data: data })
+            }
+            if (req?.user?.role === 'rider') {
+                const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                    phoneVerified: true
+                }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
+                return res.status(200).json({ message: "Otp Verification Successfully! Phone Number Verified", verify: true, token: genToken(data?._id), data: data })
+            }
+            if (req?.user?.isAdmin === true) {
+                const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                    phoneVerified: true
+                }, { new: true }).select("-password").select("-adminShop")
+                return res.status(200).json({ message: "Otp Verification Successfully! Phone Number Verified", verify: true, token: genToken(data?._id), data: data })
+            }
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const NotificationTest = async (req, res, next) => {
+    try { 
+        // console.log(io)
+        const lastWeek = new Date(new Date() - 7 * 60 * 60 * 24 * 1000);
+        const today = new Date();
+        const notificationToday = await Notification.find({ timestamp: { $gte: today }, receiver: req.user._id });
+        const notificationLastWeak = await Notification.find({ timestamp: { $gte: lastWeek }, receiver: req.user._id });
+        return res.status(200).json({ today: { today: today, data: notificationToday }, lastWeek: { lastWeek: lastWeek, data: notificationLastWeak } })
+       
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = { NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, changePassword, verifyPhone };

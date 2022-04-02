@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
-
+const Notification = require('../models/notificationMdels')
 const socketServer = async () => {
 	// Apply middlewares
 	// io.use(wrap(auth));
@@ -39,10 +39,12 @@ const socketServer = async () => {
 	});
 
 	io.on("connection", (socket) => {
+		console.log('user Connected')
 		// You can do something like emitting an event hare.
 		// I don't want to do anything when a new user is connect there.
 		
 		socket.on("disconnect", async () => {
+			console.log('user disconnected')
 			const user = socket.request.user;
 			const currentEpochTime = Date.now();
 			user.socketId = null;

@@ -56,6 +56,7 @@ const userSchema = new Schema(
 			required: [true, "Please fillup the Password!"],
 		},
 		socketId: String,
+		lastOnline: Date,
 		valid_id: {
 			id: {
 				type: String,

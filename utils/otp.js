@@ -1,6 +1,5 @@
 const {TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN,SERVICE_ID} = process.env;
 const twilio = require("twilio")(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN);
-
 /**
  * Send OTP via email or sms.
  *
@@ -31,7 +30,7 @@ const twilio = require("twilio")(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN);
  */
 async function verifyOtp(to, otp) {
 	try {
-		const checkedResult = await twilio.verify.services(SERVICE_ID).verificationChecks.create({ to, code: otp.toString() });
+		const checkedResult = await twilio.verify.services(SERVICE_ID).verificationChecks.create({ to, code: otp?.toString() });
 		if (checkedResult && checkedResult.status === "approved") {
 			return true;
 		} else {

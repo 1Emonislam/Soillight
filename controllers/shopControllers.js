@@ -31,7 +31,7 @@ const shopRegister = async (req, res, next) => {
                     message: `Welcome To The ${name} Shop Account. Your Shop Has Been Registrered.`,
                 };
                 await Notification.create(NotificationSend);
-                return res.status(200).json({ message: `Shop Registration Successfully! Your '${name}' shop is approved!`, data: created });
+                return res.status(200).json({ message: `Shop Registration successfully Verify Your Phone Number. Otp sending...! Your '${name}' shop is approved!`, data: created });
             }
         }
         if ((req?.user?.role === 'seller')) {
@@ -67,7 +67,7 @@ const shopRegister = async (req, res, next) => {
                         message: `Welcome To The ${name} Shop Account. Your Shop Has Been Registrered.`,
                     };
                     await Notification.create(NotificationSend);
-                    return res.status(200).json({ message: `Shop Registration Successfully! Your '${name}' shop is Under Review. You will receive Confirmation Soon.`, data: created });
+                    return res.status(200).json({ message: `Shop Registration successfully Verify Your Phone Number. Otp sending...! Your '${name}' shop is Under Review. You will receive Confirmation Soon.`, data: created });
                 }
             }
         } else {

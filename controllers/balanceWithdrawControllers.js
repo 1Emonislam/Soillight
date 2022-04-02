@@ -1,7 +1,17 @@
 const BalanceWithdraw = require('../models/balanceWithdrawModels');
+const User = require('../models/userModel');
 const BankLinked = require('../models/bankLinkedModel');
 const MyBalance = require('../models/myBalance');
 const Notification = require('../models/notificationMdels');
+const myBalanceGet = (req, res, next) => {
+    try {
+        const myBalance = await User.findOne({ _id: req?.user?._id }).select("my_balance");
+        return res.status(200).json({ data: myBalance })
+    }
+    catch (error) {
+        next(error)
+    }
+}
 const balanceWithdraw = async (req, res, next) => {
     const { amount, tax } = req.body;
     try {
@@ -154,4 +164,4 @@ const getWithdrawSingle = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { balanceWithdraw, getWithdrawSingle, withdrawTransAcction, withdrawStatusByHistory };
+module.exports = {myBalanceGet, balanceWithdraw, getWithdrawSingle, withdrawTransAcction, withdrawStatusByHistory };
