@@ -5,7 +5,7 @@ const MyBalance = require('../models/myBalance');
 const Notification = require('../models/notificationMdels');
 const myBalanceGet =async (req, res, next) => {
     try {
-        const myBalance = await User.findOne({ _id: req?.user?._id }).select("my_balance");
+        const myBalance = await User.findOne({ _id: req?.user?._id }).select("my_balance").populate("my_balance")
         return res.status(200).json({ data: myBalance })
     }
     catch (error) {
