@@ -19,11 +19,16 @@ const singleUser = async (req, res, next) => {
 }
 const resendOtp = async (req, res, next) => {
     try {
-        if (!req?.user?.phone) {
+        const phone = req?.body?.phone;
+        const ifValided = await User.findOne({ phone: phone || req?.user?.phone });
+        if (!ifValided) {
+            return res.status(400).json({ error: { phone: 'Provide valid user credentials!' } })
+        }
+        if (!(phone || req?.user?.phone)) {
             return res.status(400).json({ error: { phone: 'Resend otp sending Phone Number is Required' } })
         }
-        if (req?.user?.phone) {
-            const send = await sendOtpVia(req?.user?.phone);
+        if (phone || req?.user?.phone) {
+            const send = await sendOtpVia(phone || req?.user?.phone);
             // console.log(send)
             if (send?.sent === false) {
                 return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!" }, token: genToken(req?.user?._id), sent: false })
@@ -592,4 +597,4 @@ const NotificationTest = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = {resendOtp, NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, changePassword, verifyPhone };
+module.exports = { resendOtp, NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, changePassword, verifyPhone };
