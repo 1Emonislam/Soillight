@@ -17,7 +17,25 @@ const singleUser = async (req, res, next) => {
         next(error)
     }
 }
-
+const resendOtp = async (req, res, next) => {
+    try {
+        if (!req?.user?.phone) {
+            return res.status(400).json({ error: { phone: 'Resend otp sending Phone Number is Required' } })
+        }
+        if (req?.user?.phone) {
+            const send = await sendOtpVia(req?.user?.phone);
+            // console.log(send)
+            if (send?.sent === false) {
+                return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!" }, token: genToken(req?.user?._id), sent: false })
+            } if (send?.sent === true) {
+                return res.status(200).json({ message: "Resend Otp Sending Successfully!", token: genToken(req?.user?._id), sent: true })
+            }
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
 const login = async (req, res, next) => {
     let { email, phone, password } = req.body;
     email?.toLowerCase();
@@ -561,17 +579,17 @@ const verifyPhone = async (req, res, next) => {
     }
 }
 const NotificationTest = async (req, res, next) => {
-    try { 
+    try {
         // console.log(io)
         const lastWeek = new Date(new Date() - 7 * 60 * 60 * 24 * 1000);
         const today = new Date();
         const notificationToday = await Notification.find({ timestamp: { $gte: today }, receiver: req.user._id });
         const notificationLastWeak = await Notification.find({ timestamp: { $gte: lastWeek }, receiver: req.user._id });
         return res.status(200).json({ today: { today: today, data: notificationToday }, lastWeek: { lastWeek: lastWeek, data: notificationLastWeak } })
-       
+
     }
     catch (error) {
         next(error)
     }
 }
-module.exports = { NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, changePassword, verifyPhone };
+module.exports = {resendOtp, NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, changePassword, verifyPhone };

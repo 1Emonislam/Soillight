@@ -1,8 +1,9 @@
 const express = require('express');
-const { registrationSeller, registrationBuyer, registrationRider, login, profileUpdate, singleUser, userApproved, userRejected, changePassword, profileView, userIDLicenseVerify, verifyPhone, NotificationTest } = require('../controllers/userControllers');
+const { registrationSeller, registrationBuyer, registrationRider, login, profileUpdate, singleUser, userApproved, userRejected, changePassword, profileView, userIDLicenseVerify, verifyPhone, NotificationTest, resendOtp } = require('../controllers/userControllers');
 const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.route('/users').put(protect, profileUpdate).get(protect, profileView)
+router.route('/otp/resend').post(protect, resendOtp)
 router.route('/users/login').post(login);
 router.route('/users/:id').get(protect, singleUser)
 router.route('/users/buyer').post(registrationBuyer);
