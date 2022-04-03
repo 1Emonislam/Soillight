@@ -14,6 +14,7 @@ const subscriptionSchema = mongoose.Schema({
         require: [true, "Transaction is required!"]
     },
     tx_ref: {
+        type: String,
         require: [true, "Tax Ref is required!"]
     },
     subscriber: {
