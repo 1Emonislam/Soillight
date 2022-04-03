@@ -33,6 +33,7 @@ const orderRoutes = require("./routes/OrderRoutes");
 const bankLinkedRoutes = require('./routes/bankLinkedRoutes');
 const balanceWithdrawRoutes = require('./routes/balanceWithdrawRoutes');
 const balanceHistoryRoutes = require('./routes/balanceHistoryRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const Notification = require("./models/notificationMdels");
 const User = require("./models/userModel");
 //middleware
@@ -57,6 +58,7 @@ app.use("/", orderRoutes);
 app.use('/', bankLinkedRoutes)
 app.use('/', balanceWithdrawRoutes)
 app.use('/', balanceHistoryRoutes)
+app.use('/', subscriptionRoutes)
 serverApp.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });
