@@ -9,6 +9,13 @@ const subscriptionSchema = mongoose.Schema({
         type: Date,
         require: [true, "Duration is required!"]
     },
+    transaction_id: {
+        type: String,
+        require: [true, "Transaction is required!"]
+    },
+    tx_ref: {
+        require: [true, "Tax Ref is required!"]
+    },
     subscriber: {
         type: mongoose.Schema.Types.ObjectId,
         required: [true, "Please provide user ID"],
