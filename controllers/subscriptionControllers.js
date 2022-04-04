@@ -1,15 +1,19 @@
 const Notification = require('../models/notificationMdels');
-const Subscription = require('./../models/subscriptionModel')
+const Subscription = require('./../models/subscriptionModel');
+const User = require('./../models/subscriptionModel');
 const subscriptionAdd = async (req, res, next) => {
     if (!req?.user?._id) {
         return res.status(400).json({ error: { subscriber: "permision denied! please provide valid credentials!" } })
     }
     const { amount, duration, transaction_id, tx_ref } = req.body;
+    const user = await User.findOne({ _id: req.user._id })
     try {
         const subs = await Subscription.create({
             amount, duration, transaction_id, status: 'approved', tx_ref, subscriber: req.user._id
         })
         if (subs) {
+            user.subscription = subs?._id;
+            await user.save();
             const sendNotification = {
                 sender: req?.user?._id,
                 receiver: [subs.subscriber],

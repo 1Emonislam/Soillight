@@ -6,7 +6,7 @@ const subscriptionSchema = mongoose.Schema({
         require: [true, "Amount is required!"]
     },
     duration: {
-        type: Date,
+        type: String,
         require: [true, "Duration is required!"]
     },
     status:{

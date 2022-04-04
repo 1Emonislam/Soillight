@@ -3,7 +3,7 @@ const { registrationSeller, registrationBuyer, registrationRider, login, profile
 const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.route('/users').put(protect, profileUpdate).get(protect, profileView)
-router.route('/forget-pass').post(protect,ForgetPassword)
+router.route('/forget-pass').post(ForgetPassword)
 router.route('/otp-verify').post(protect,otpVerifyForgetPass)
 router.route('/reset-pass').put(protect,resetPassword)
 router.route('/change-pass').put(protect,changedPassword)

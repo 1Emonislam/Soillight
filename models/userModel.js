@@ -85,6 +85,11 @@ const userSchema = new Schema(
 				type: String,
 			},
 		},
+		subscription:{
+			type: Schema.Types.ObjectId,
+			ref: "Subscription",
+			default:null
+		},
 		my_balance: {
 			type: Schema.Types.ObjectId,
 			ref: "MyBalance",
