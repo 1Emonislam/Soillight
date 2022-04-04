@@ -37,7 +37,7 @@ const resendOtp = async (req, res, next) => {
     }
 }
 const login = async (req, res, next) => {
-    let { email, phone, password } = req.body;
+    let { email, phone, password, role } = req.body;
     email?.toLowerCase();
     const user = email ? await User.findOne({ email }) : await User.findOne({ phone });
     // console.log(user)
@@ -58,6 +58,32 @@ const login = async (req, res, next) => {
         if (!(user && (await user.matchPassword(password)))) {
             return res.status(400).json({ error: { "password": "Password invalid! please provide valid password!" } });
         } else if (user && (await user.matchPassword(password))) {
+            if (role) {
+                if (role?.trim() === 'buyer') {
+                    const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                        role: role
+                    }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
+                    return res.status(200).json({ message: "Switch Mode Buyer", data: data, token: genToken(data?._id), data: data })
+                }
+                if (role?.trim() === 'seller') {
+                    const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                        role: role
+                    }, { new: true }).select("-password").select("-adminShop")
+                    return res.status(200).json({ message: "Switch Mode Seller", data: data, token: genToken(data?._id), data: data })
+                }
+                if (role?.trim() === 'rider') {
+                    const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                        role: role
+                    }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
+                    return res.status(200).json({ message: "Switch Mode Rider", data: data, token: genToken(data?._id), data: data })
+                }
+                if (req?.user?.isAdmin === true) {
+                    const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                        role: role
+                    }, { new: true }).select("-password").select("-sellerShop")
+                    return res.status(200).json({ message: "Switch Mode Admin", data: data, token: genToken(data?._id), data: data })
+                }
+            }
             const userExists = await User.findOne({ _id: user?._id }).select("-password");
             return res.status(200).json({ message: "Login Successfully!", data: userExists, token: genToken(userExists._id) });
         }
@@ -435,36 +461,6 @@ const userRejected = async (req, res, next) => {
         next(error)
     }
 }
-const changePassword = async (req, res, next) => {
-    if (!req?.user?._id) {
-        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
-    }
-    const { oldPass, newPass, confirmPass } = req.body;
-    // console.log(req.body)
-    // console.log(req.user._id)
-    const user = await User.findOne({ _id: req.user?._id })
-    if (!(newPass === confirmPass)) {
-        return res.status(400).json({ error: { "password": "New password and Confirm password do not matched!" } })
-    }
-    if (!(await user?.matchPassword(oldPass))) {
-        return res.status(400).json({ error: { "password": "Old password do not matched!" } })
-    } if (await user.matchPassword(oldPass)) {
-        user.password = newPass;
-        const userSave = await user.save();
-        if (!(user === userSave)) {
-            return res.status(400).json({ error: { "password": "Password Change failed!" } })
-        } if (user === userSave) {
-            const sendNotification = {
-                sender: req?.user?._id,
-                receiver: [user._id],
-                message: `Password has been changes Check your Secure security`
-            }
-            await Notification.create(sendNotification)
-            return res.status(200).json({ message: "Password Change successfully!", data: userSave, token: genToken(userSave._id) })
-        }
-    }
-
-}
 const profileView = async (req, res, next) => {
     if (!req?.user?._id) {
         return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
@@ -569,7 +565,7 @@ const verifyPhone = async (req, res, next) => {
             if (req?.user?.isAdmin === true) {
                 const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                     phoneVerified: true
-                }, { new: true }).select("-password").select("-adminShop")
+                }, { new: true }).select("-password").select("-sellerShop")
                 return res.status(200).json({ message: "Otp Verification Successfully! Phone Number Verified", verify: true, token: genToken(data?._id), data: data })
             }
         }
@@ -592,4 +588,107 @@ const NotificationTest = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { resendOtp, NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, changePassword, verifyPhone };
+
+const changedPassword = async (req, res) => {
+    // console.log(req.body)
+    const { oldPassword, password, password2 } = req.body;
+    const user = await User.findOne({ _id: req?.user?._id });
+    if (!(oldPassword && (await user.matchPassword(oldPassword)))) {
+        return res.status(404).json({ error: "old password does not match!" });
+    }
+    if (!(password === password2)) {
+        return res.status(403).json({ error: "new password and confirm password are not the same!" });
+    }
+    function checkPassword(password) {
+        var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        return re.test(password);
+    }
+    if (!(checkPassword(password))) {
+        return res.status(400).json({ error: { password: "password should contain min 8 letter password, with at least a symbol, upper and lower case" } })
+    }
+    if (oldPassword && (await user.matchPassword(oldPassword))) {
+        user.password = password || user.password;
+        const updatedPassword = await user.save();
+        if (!updatedPassword) {
+            return res.status(400).json({ error: "password change failed, please try again!" });
+        } else {
+            const resData = await User.findOne({ _id: user?._id }).select("-password");
+            return res.status(200).json({
+                message: "password has been changes successfully!", user: resData
+            });
+        }
+    }
+}
+
+const ForgetPassword = async (req, res, next) => {
+    if (!req?.user?.phone) {
+        return res.status(400).json({ error: { phone: "Please provide valid user credentials. Phone Number is Required!" } })
+    }
+    try {
+        const send = await sendOtpVia(req?.user?.phone);
+        if (send?.sent === false) {
+            return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!" }, token: genToken(req?.user?._id), sent: false })
+        } if (send?.sent === true) {
+            return res.status(200).json({ message: "Resend Otp Sending Successfully!", token: genToken(req?.user?._id), sent: true })
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+const otpVerifyForgetPass = async (req, res, next) => {
+    const { otp } = req.body;
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
+    }
+    if (!otp) {
+        return res.status(400).json({ error: { "otp": "please provide valid otp code!", verify: false } })
+    }
+    try {
+        const check = await verifyOtp(req?.user?.phone, otp);
+        if (check === false) {
+            return res.status(400).json({ error: { "otp": "Otp Verification Failed!", token: genToken(req?.user?._id), verify: false } })
+        } if (check === true) {
+            return res.status(200).json({ message: 'Redirect To Reset Password', token: genToken(req?.user?._id), verify: true })
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const resetPassword = async (req, res, next) => {
+    const { password, password2 } = req.body;
+    if (!req?.user?._id) {
+        return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
+    }
+    if (password !== password2) {
+        return res.status(400).json({ error: { password: "New Password And Confirm Password doesn't match!" } })
+    }
+    try {
+        const user = await User.findOne({ _id: req?.user?._id });
+        user.password = password;
+        await user.save();
+        if (req?.user?.role === 'buyer') {
+            const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop").select("-sellerShop")
+            return res.status(200).json({ message: "Password Reset Successfully", verify: true, token: genToken(data?._id), data: data })
+        }
+        if (req?.user?.role === 'seller') {
+            const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop")
+            return res.status(200).json({ message: "Password Reset Successfully", verify: true, token: genToken(data?._id), data: data })
+        }
+        if (req?.user?.role === 'rider') {
+            const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop").select("-sellerShop")
+            return res.status(200).json({ message: "Password Reset Successfully", verify: true, token: genToken(data?._id), data: data })
+        }
+        if (req?.user?.isAdmin === true) {
+            const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-sellerShop")
+            return res.status(200).json({ message: "Password Reset Successfully", verify: true, token: genToken(data?._id), data: data })
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { otpVerifyForgetPass, ForgetPassword, resetPassword, changedPassword, resendOtp, NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify,verifyPhone };
