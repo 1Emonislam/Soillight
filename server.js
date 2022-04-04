@@ -34,8 +34,9 @@ const bankLinkedRoutes = require('./routes/bankLinkedRoutes');
 const balanceWithdrawRoutes = require('./routes/balanceWithdrawRoutes');
 const balanceHistoryRoutes = require('./routes/balanceHistoryRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
-const Notification = require("./models/notificationMdels");
 const User = require("./models/userModel");
+const categoryCollectionRoutes = require("./routes/categoryCollectionRoutes")
+const Notification = require("./models/notificationMdels");
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -59,6 +60,7 @@ app.use('/', bankLinkedRoutes)
 app.use('/', balanceWithdrawRoutes)
 app.use('/', balanceHistoryRoutes)
 app.use('/', subscriptionRoutes)
+app.use('/', categoryCollectionRoutes)
 serverApp.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });
