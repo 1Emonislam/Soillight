@@ -20,6 +20,7 @@ const protect = async (req, res, next) => {
 		}
 	} else {
 		console.log("Hey");
+		console.log(token)
 		return res.status(400).json({ error: { token: "no token!" } });
 	}
 };

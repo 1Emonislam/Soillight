@@ -5,8 +5,8 @@ const router = express.Router();
 router.route('/users').put(protect, profileUpdate).get(protect, profileView)
 router.route('/forget-pass').post(protect,ForgetPassword)
 router.route('/otp-verify').post(protect,otpVerifyForgetPass)
-router.route('/reset-pass').post(protect,resetPassword)
-router.route('/change-pass').post(protect,changedPassword)
+router.route('/reset-pass').put(protect,resetPassword)
+router.route('/change-pass').put(protect,changedPassword)
 router.route('/otp/resend').post(protect, resendOtp)
 router.route('/users/login').post(login);
 router.route('/users/:id').get(protect, singleUser)

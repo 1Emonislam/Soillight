@@ -60,25 +60,25 @@ const login = async (req, res, next) => {
         } else if (user && (await user.matchPassword(password))) {
             if (role) {
                 if (role === 'buyer') {
-                    const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                    const data = await User.findOneAndUpdate({ _id: user._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
                     return res.status(200).json({ message: "Switch Mode Buyer",role:data?.role, data: data, token: genToken(data?._id)})
                 }
                 if (role === 'seller') {
-                    const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                    const data = await User.findOneAndUpdate({ _id:user._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop")
                     return res.status(200).json({ message: "Switch Mode Seller",role:data?.role, data: data, token: genToken(data?._id)})
                 }
                 if (role === 'rider') {
-                    const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                    const data = await User.findOneAndUpdate({ _id:user._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
                     return res.status(200).json({ message: "Switch Mode Rider",role:data?.role, data: data, token: genToken(data?._id)})
                 }
                 if (req?.user?.isAdmin === true) {
-                    const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
+                    const data = await User.findOneAndUpdate({ _id: user._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-sellerShop")
                     return res.status(200).json({ message: "Switch Mode Admin",role:data?.role, data: data, token: genToken(data?._id)})
@@ -622,6 +622,9 @@ const changedPassword = async (req, res) => {
 
 const ForgetPassword = async (req, res, next) => {
     const {phone} = req.body;
+    if(req?.user?.phone?.toString() !== phone?.toString()){
+        return res.status(400).json({ error: { phone: "User not exists!. Phone Number doesn't match" } })
+    }
     if (!req?.user?.phone) {
         return res.status(400).json({ error: { phone: "Please provide valid user credentials. Phone Number is Required!" } })
     }
