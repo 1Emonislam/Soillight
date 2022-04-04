@@ -63,25 +63,25 @@ const login = async (req, res, next) => {
                     const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Buyer", data: data, token: genToken(data?._id), data: data })
+                    return res.status(200).json({ message: "Switch Mode Buyer",role:data.role, data: data, token: genToken(data?._id)})
                 }
                 if (role?.trim() === 'seller') {
                     const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop")
-                    return res.status(200).json({ message: "Switch Mode Seller", data: data, token: genToken(data?._id), data: data })
+                    return res.status(200).json({ message: "Switch Mode Seller",role:data.role, data: data, token: genToken(data?._id)})
                 }
                 if (role?.trim() === 'rider') {
                     const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Rider", data: data, token: genToken(data?._id), data: data })
+                    return res.status(200).json({ message: "Switch Mode Rider",role:data.role, data: data, token: genToken(data?._id)})
                 }
                 if (req?.user?.isAdmin === true) {
                     const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Admin", data: data, token: genToken(data?._id), data: data })
+                    return res.status(200).json({ message: "Switch Mode Admin",role:data.role, data: data, token: genToken(data?._id)})
                 }
             }
             const userExists = await User.findOne({ _id: user?._id }).select("-password");
@@ -621,11 +621,12 @@ const changedPassword = async (req, res) => {
 }
 
 const ForgetPassword = async (req, res, next) => {
+    const {phone} = req.body;
     if (!req?.user?.phone) {
         return res.status(400).json({ error: { phone: "Please provide valid user credentials. Phone Number is Required!" } })
     }
     try {
-        const send = await sendOtpVia(req?.user?.phone);
+        const send = await sendOtpVia(phone || req?.user?.phone);
         if (send?.sent === false) {
             return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!" }, token: genToken(req?.user?._id), sent: false })
         } if (send?.sent === true) {
