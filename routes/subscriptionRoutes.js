@@ -3,6 +3,6 @@ const { subscriptionAdd, mySubscriptionAllGet, singleSubscriptionGet } = require
 const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.route('/subscription-add').post(protect, subscriptionAdd);
-router.route('/my-subscription').post(protect, mySubscriptionAllGet);
-router.route('/subscription/:id').post(protect, singleSubscriptionGet);
+router.route('/my-subscription').get(protect, mySubscriptionAllGet);
+router.route('/subscription/:id').get(protect, singleSubscriptionGet);
 module.exports = router;
