@@ -10,7 +10,7 @@ const singleUser = async (req, res, next) => {
         const finding = await ProductReview.find({ user: id });
         let totalRate = finding?.length;
         let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
-        const user = await User.findOne({ _id: id }).populate("sellerShop", "-user").populate("subscription");
+        const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
         return res.status(200).json({ totalRate, avgRating, data: user })
     }
     catch (error) {
@@ -62,29 +62,29 @@ const login = async (req, res, next) => {
                 if (role === 'buyer') {
                     const data = await User.findOneAndUpdate({ _id: user._id }, {
                         role: role
-                    }, { new: true }).populate("subscription").select("-password").select("-adminShop").select("-sellerShop")
+                    }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
                     return res.status(200).json({ message: "Switch Mode Buyer",role:data?.role, data: data, token: genToken(data?._id)})
                 }
                 if (role === 'seller') {
                     const data = await User.findOneAndUpdate({ _id:user._id }, {
                         role: role
-                    }, { new: true }).populate("subscription").select("-password").select("-adminShop")
+                    }, { new: true }).select("-password").select("-adminShop")
                     return res.status(200).json({ message: "Switch Mode Seller",role:data?.role, data: data, token: genToken(data?._id)})
                 }
                 if (role === 'rider') {
                     const data = await User.findOneAndUpdate({ _id:user._id }, {
                         role: role
-                    }, { new: true }).populate("subscription").select("-password").select("-adminShop").select("-sellerShop")
+                    }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
                     return res.status(200).json({ message: "Switch Mode Rider",role:data?.role, data: data, token: genToken(data?._id)})
                 }
                 if (req?.user?.isAdmin === true) {
                     const data = await User.findOneAndUpdate({ _id: user._id }, {
                         role: role
-                    }, { new: true }).populate("subscription").select("-password").select("-sellerShop")
+                    }, { new: true }).select("-password").select("-sellerShop")
                     return res.status(200).json({ message: "Switch Mode Admin",role:data?.role, data: data, token: genToken(data?._id)})
                 }
             }
-            const userExists = await User.findOne({ _id: user?._id }).populate("subscription").select("-password");
+            const userExists = await User.findOne({ _id: user?._id }).select("-password");
             return res.status(200).json({ message: "Login Successfully!", data: userExists, token: genToken(userExists._id) });
         }
     }
@@ -411,7 +411,7 @@ const userApproved = async (req, res, next) => {
             const finding = await ProductReview.find({ user: id });
             let totalRate = finding?.length;
             let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
-            const user = await User.findOne({ _id: id }).populate("sellerShop", "-user").populate("subscription");
+            const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
             return res.status(200).json({ totalRate, avgRating, data: user })
 
         }
@@ -453,7 +453,7 @@ const userRejected = async (req, res, next) => {
             const finding = await ProductReview.find({ user: id });
             let totalRate = finding?.length;
             let avgRating = finding?.reduce((acc, item) => item.rating + acc, 0) / finding?.length;
-            const user = await User.findOne({ _id: id }).populate("sellerShop", "-user").populate("subscription");
+            const user = await User.findOne({ _id: id }).populate("sellerShop", "-user");
             return res.status(200).json({ totalRate, avgRating, data: user })
         }
     }
@@ -466,7 +466,7 @@ const profileView = async (req, res, next) => {
         return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
     }
     try {
-        const user = await User.findOne({_id:req.user._id}).populate("subscription");
+        const user = await User.findOne({_id:req.user._id});
         if (!user) return res.status(404).json({ error: { email: "doesn't exists" }, data: {} })
         return res.status(200).json({ data: user })
     }
@@ -553,19 +553,19 @@ const verifyPhone = async (req, res, next) => {
             if (req?.user?.role === 'seller') {
                 const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                     phoneVerified: true
-                }, { new: true }).populate("subscription").select("-password").select("-adminShop")
+                }, { new: true }).select("-password").select("-adminShop")
                 return res.status(200).json({ message: "Otp Verification Successfully! Phone Number Verified", verify: true, token: genToken(data?._id), data: data })
             }
             if (req?.user?.role === 'rider') {
                 const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                     phoneVerified: true
-                }, { new: true }).populate("subscription").select("-password").select("-adminShop").select("-sellerShop")
+                }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
                 return res.status(200).json({ message: "Otp Verification Successfully! Phone Number Verified", verify: true, token: genToken(data?._id), data: data })
             }
             if (req?.user?.isAdmin === true) {
                 const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                     phoneVerified: true
-                }, { new: true }).populate("subscription").select("-password").select("-sellerShop")
+                }, { new: true }).select("-password").select("-sellerShop")
                 return res.status(200).json({ message: "Otp Verification Successfully! Phone Number Verified", verify: true, token: genToken(data?._id), data: data })
             }
         }
