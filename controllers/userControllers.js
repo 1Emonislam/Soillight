@@ -48,11 +48,14 @@ const login = async (req, res, next) => {
         if (user?.phoneVerified === false) {
             const send = await sendOtpVia(user?.phone);
             // console.log(send)
+            const data = await User.findOneAndUpdate({ _id: user._id }, {
+                role: role
+            }, { new: true });
             if (send?.sent === false) {
-                return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, token: genToken(user?._id), sent: false })
+                return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, message: `Switch Mode ${data?.role}`, role: data?.role,token: genToken(data?._id), sent: false })
             }
             if (send?.sent === true) {
-                return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", token: genToken(user?._id), sent: true })
+                return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!",message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(user?._id), sent: true })
             }
         }
         if (!(user && (await user.matchPassword(password)))) {
@@ -63,25 +66,25 @@ const login = async (req, res, next) => {
                     const data = await User.findOneAndUpdate({ _id: user._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Buyer",role:data?.role, data: data, token: genToken(data?._id)})
+                    return res.status(200).json({ message: "Switch Mode Buyer", role: data?.role, data: data, token: genToken(data?._id) })
                 }
                 if (role === 'seller') {
-                    const data = await User.findOneAndUpdate({ _id:user._id }, {
+                    const data = await User.findOneAndUpdate({ _id: user._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop")
-                    return res.status(200).json({ message: "Switch Mode Seller",role:data?.role, data: data, token: genToken(data?._id)})
+                    return res.status(200).json({ message: "Switch Mode Seller", role: data?.role, data: data, token: genToken(data?._id) })
                 }
                 if (role === 'rider') {
-                    const data = await User.findOneAndUpdate({ _id:user._id }, {
+                    const data = await User.findOneAndUpdate({ _id: user._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Rider",role:data?.role, data: data, token: genToken(data?._id)})
+                    return res.status(200).json({ message: "Switch Mode Rider", role: data?.role, data: data, token: genToken(data?._id) })
                 }
                 if (req?.user?.isAdmin === true) {
                     const data = await User.findOneAndUpdate({ _id: user._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Admin",role:data?.role, data: data, token: genToken(data?._id)})
+                    return res.status(200).json({ message: "Switch Mode Admin", role: data?.role, data: data, token: genToken(data?._id) })
                 }
             }
             const userExists = await User.findOne({ _id: user?._id }).select("-password");
@@ -466,7 +469,7 @@ const profileView = async (req, res, next) => {
         return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
     }
     try {
-        const user = await User.findOne({_id:req.user._id});
+        const user = await User.findOne({ _id: req.user._id });
         if (!user) return res.status(404).json({ error: { email: "doesn't exists" }, data: {} })
         return res.status(200).json({ data: user })
     }
@@ -621,9 +624,9 @@ const changedPassword = async (req, res) => {
 }
 
 const ForgetPassword = async (req, res, next) => {
-    const {phone} = req.body;
-    const userCheck = await User.findOne({phone:phone});
-    if(!userCheck){
+    const { phone } = req.body;
+    const userCheck = await User.findOne({ phone: phone });
+    if (!userCheck) {
         return res.status(400).json({ error: { phone: "User not exists!. Phone Number doesn't match" } })
     }
     try {
@@ -681,11 +684,11 @@ const resetPassword = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop").select("-sellerShop")
-            return res.status(200).json({ message: "Password Reset Successfully",token: genToken(data?._id), data: data })
+            return res.status(200).json({ message: "Password Reset Successfully", token: genToken(data?._id), data: data })
         }
         if (req?.user?.isAdmin === true) {
             const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-sellerShop")
-            return res.status(200).json({ message: "Password Reset Successfully",  token: genToken(data?._id), data: data })
+            return res.status(200).json({ message: "Password Reset Successfully", token: genToken(data?._id), data: data })
         }
     }
     catch (error) {
@@ -693,4 +696,4 @@ const resetPassword = async (req, res, next) => {
     }
 }
 
-module.exports = { otpVerifyForgetPass, ForgetPassword, resetPassword, changedPassword, resendOtp, NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify,verifyPhone };
+module.exports = { otpVerifyForgetPass, ForgetPassword, resetPassword, changedPassword, resendOtp, NotificationTest, login, registrationSeller, profileView, registrationBuyer, userApproved, userRejected, registrationRider, profileUpdate, singleUser, userIDLicenseVerify, verifyPhone };
