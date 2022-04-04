@@ -4,7 +4,7 @@ const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.route('/users').put(protect, profileUpdate).get(protect, profileView)
 router.route('/forget-pass').post(protect,ForgetPassword)
-router.route('/opt-verify').post(protect,otpVerifyForgetPass)
+router.route('/otp-verify').post(protect,otpVerifyForgetPass)
 router.route('/reset-pass').post(protect,resetPassword)
 router.route('/change-pass').post(protect,changedPassword)
 router.route('/otp/resend').post(protect, resendOtp)

@@ -59,29 +59,29 @@ const login = async (req, res, next) => {
             return res.status(400).json({ error: { "password": "Password invalid! please provide valid password!" } });
         } else if (user && (await user.matchPassword(password))) {
             if (role) {
-                if (role?.trim() === 'buyer') {
+                if (role === 'buyer') {
                     const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Buyer",role:data.role, data: data, token: genToken(data?._id)})
+                    return res.status(200).json({ message: "Switch Mode Buyer",role:data?.role, data: data, token: genToken(data?._id)})
                 }
-                if (role?.trim() === 'seller') {
+                if (role === 'seller') {
                     const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop")
-                    return res.status(200).json({ message: "Switch Mode Seller",role:data.role, data: data, token: genToken(data?._id)})
+                    return res.status(200).json({ message: "Switch Mode Seller",role:data?.role, data: data, token: genToken(data?._id)})
                 }
-                if (role?.trim() === 'rider') {
+                if (role === 'rider') {
                     const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-adminShop").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Rider",role:data.role, data: data, token: genToken(data?._id)})
+                    return res.status(200).json({ message: "Switch Mode Rider",role:data?.role, data: data, token: genToken(data?._id)})
                 }
                 if (req?.user?.isAdmin === true) {
                     const data = await User.findOneAndUpdate({ _id: req?.user?._id }, {
                         role: role
                     }, { new: true }).select("-password").select("-sellerShop")
-                    return res.status(200).json({ message: "Switch Mode Admin",role:data.role, data: data, token: genToken(data?._id)})
+                    return res.status(200).json({ message: "Switch Mode Admin",role:data?.role, data: data, token: genToken(data?._id)})
                 }
             }
             const userExists = await User.findOne({ _id: user?._id }).select("-password");
