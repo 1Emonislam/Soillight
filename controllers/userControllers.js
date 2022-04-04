@@ -675,19 +675,19 @@ const resetPassword = async (req, res, next) => {
         await user.save();
         if (req?.user?.role === 'buyer') {
             const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop").select("-sellerShop")
-            return res.status(200).json({ message: "Password Reset Successfully", verify: true, token: genToken(data?._id), data: data })
+            return res.status(200).json({ message: "Password Reset Successfully", token: genToken(data?._id), data: data })
         }
         if (req?.user?.role === 'seller') {
             const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop")
-            return res.status(200).json({ message: "Password Reset Successfully", verify: true, token: genToken(data?._id), data: data })
+            return res.status(200).json({ message: "Password Reset Successfully", token: genToken(data?._id), data: data })
         }
         if (req?.user?.role === 'rider') {
             const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-adminShop").select("-sellerShop")
-            return res.status(200).json({ message: "Password Reset Successfully", verify: true, token: genToken(data?._id), data: data })
+            return res.status(200).json({ message: "Password Reset Successfully",token: genToken(data?._id), data: data })
         }
         if (req?.user?.isAdmin === true) {
             const data = await User.findOne({ _id: req?.user?._id }).select("-password").select("-sellerShop")
-            return res.status(200).json({ message: "Password Reset Successfully", verify: true, token: genToken(data?._id), data: data })
+            return res.status(200).json({ message: "Password Reset Successfully",  token: genToken(data?._id), data: data })
         }
     }
     catch (error) {
