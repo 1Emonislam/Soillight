@@ -169,7 +169,7 @@ const latestProducts = async (req, res, next) => {
                 { name: { $regex: req.query.search?.trim(), $options: "i" } },
             ], status: status || 'approved'
         } : { status: 'approved' };
-        if (!(search || status)) {
+        if (!(req.query?.search || status)) {
             const result = await Product.find(keyword).populate({
                 path: "user",
                 select: "_id name sellerShop",
@@ -183,7 +183,7 @@ const latestProducts = async (req, res, next) => {
             const count = await Product.find(keyword).count();
             return res.json({ count: count, data: result })
         }
-        if (search || status) {
+        if (req.query?.search || status) {
             const result = await Product.find(keyword).populate({
                 path: "user",
                 select: "_id name sellerShop",
@@ -193,7 +193,7 @@ const latestProducts = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).limit(limit * 1).skip((page - 1) * limit);
+            }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find(keyword).count();
             return res.json({ count: count, data: result })
         }
