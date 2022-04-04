@@ -58,7 +58,7 @@ const searchSellerBuyerRider = async (req, res, next) => {
     } : { role: role };
     try {
         const count = await User.find(keyword).count();
-        const users = await User.find(keyword).limit(limit * 1).skip((page - 1) * limit).sort([['date', -1]]).select("-password").select("-adminShop")
+        const users = await User.find(keyword).limit(limit * 1).skip((page - 1) * limit).sort("-createdAt").select("-password").select("-adminShop")
         return res.status(200).json({ count,data: users })
     }
     catch (error) {
@@ -77,8 +77,8 @@ const newSearchSellerRiderBuyer = async (req, res, next) => {
                 { email: { $regex: req.query.search, $options: "i" }, },
             ], role: role
         } : { role: role };
-        const data = await User.find(keyword).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit)
-        const count = await User.find(keyword).sort([['date', -1]]).count();
+        const data = await User.find(keyword).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit)
+        const count = await User.find(keyword).sort("-createdAt").count();
         return res.status(200).json({ count,data: data})
 
     } catch (error) {
@@ -96,8 +96,8 @@ const searchStatusBySellerRiderBuyer = async (req, res, next) => {
                 { email: { $regex: req.query.search, $options: "i" }, },
             ], role: role, status: status
         } : { role: role, status: status };
-        const data = await User.find(keyword).sort([['date', -1]]).limit(limit * 1).skip((page - 1) * limit)
-        const count = await User.find(keyword).sort([['date', -1]]).count();
+        const data = await User.find(keyword).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit)
+        const count = await User.find(keyword).sort("-createdAt").count();
         return res.status(200).json({count, data: data })
 
     } catch (error) {
