@@ -9,6 +9,10 @@ const subscriptionSchema = mongoose.Schema({
         type: Date,
         require: [true, "Duration is required!"]
     },
+    status:{
+        type: String,
+        default:'pending'
+    },
     transaction_id: {
         type: String,
         require: [true, "Transaction is required!"]
