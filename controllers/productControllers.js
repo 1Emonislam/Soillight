@@ -127,7 +127,7 @@ const getSignleProduct = async (req, res, next) => {
     try {
         const product = await Product.findOne({ _id: req.params.id }).populate({
             path: "user",
-            select: "_id name sellerShop",
+            select: "_id name sellerShop pic",
             populate: [
                 {
                     path: "sellerShop",
@@ -153,7 +153,7 @@ const productStatusUpdate = async (req, res, next) => {
     if (!(checkStatus.includes(status))) return res.status(400).json({ error: { "status": "please provide valid status credentials!" } })
     const productCheck = await Product.findOne({ _id: req.params.id }).populate({
         path: "user",
-        select: "_id name sellerShop",
+        select: "_id name sellerShop pic",
         populate: [
             {
                 path: "sellerShop",
@@ -177,7 +177,7 @@ const productStatusUpdate = async (req, res, next) => {
         status: status
     }, { new: true }).populate({
         path: "user",
-        select: "_id name sellerShop",
+        select: "_id name sellerShop pic",
         populate: [
             {
                 path: "sellerShop",
