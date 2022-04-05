@@ -23,14 +23,32 @@ const bankLinkedSchema = mongoose.Schema({
         type: String,
         required: [true, 'please provide bank Routing Number!']
     },
-    location: {
-        latitude: {
-            type: String,
-        },
-        longitude: {
-            type: String,
-        }
-    },
+    	location: {
+			latitude: {
+				type: Number,
+				default: 0,
+			},
+			longitude: {
+				type: Number,
+				default: 0
+			},
+			address: {
+				type: String,
+				default: 'N/A'
+			},
+			houseNumber: {
+				type: String,
+				default: 'N/A'
+			},
+			floor: {
+				type: String,
+				default: 'N/A'
+			},
+			information: {
+				type: String,
+				default: 'N/A'
+			}
+		},
     bank_name: {
         type: String,
         default: 'N/A'

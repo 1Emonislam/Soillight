@@ -33,7 +33,7 @@ const orderAdd = async (req, res, next) => {
 			transaction_id,
 			tx_ref,
 			products,
-			location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+			location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
 		});
 		if (!created) {
 			return res.status(400).json({ error: { order: "something wrong!" } });

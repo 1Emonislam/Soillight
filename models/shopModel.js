@@ -30,10 +30,28 @@ const shopSchema = mongoose.Schema({
     },
     location: {
         latitude: {
-            type: String,
+            type: Number,
+            default: 0,
         },
         longitude: {
+            type: Number,
+            default: 0
+        },
+        address: {
             type: String,
+            default: 'N/A'
+        },
+        houseNumber: {
+            type: String,
+            default: 'N/A'
+        },
+        floor: {
+            type: String,
+            default: 'N/A'
+        },
+        information: {
+            type: String,
+            default: 'N/A'
         }
     },
     geometry: geometrySchema,

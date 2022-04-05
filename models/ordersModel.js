@@ -16,14 +16,32 @@ const orderSchema = mongoose.Schema({
         ref: 'User',
         required: [true, "Please provide user ID"]
     },
-    location: {
-        latitude: {
-            type: String,
-        },
-        longitude: {
-            type: String,
-        }
-    },
+    	location: {
+			latitude: {
+				type: Number,
+				default: 0,
+			},
+			longitude: {
+				type: Number,
+				default: 0
+			},
+			address: {
+				type: String,
+				default: 'N/A'
+			},
+			houseNumber: {
+				type: String,
+				default: 'N/A'
+			},
+			floor: {
+				type: String,
+				default: 'N/A'
+			},
+			information: {
+				type: String,
+				default: 'N/A'
+			}
+		},
     geometry: geometrySchema,
     transaction_id: {
         type: String,

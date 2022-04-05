@@ -52,10 +52,10 @@ const login = async (req, res, next) => {
                 role: role
             }, { new: true });
             if (send?.sent === false) {
-                return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, message: `Switch Mode ${data?.role}`, role: data?.role,token: genToken(data?._id), sent: false })
+                return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(data?._id), sent: false })
             }
             if (send?.sent === true) {
-                return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!",message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(user?._id), sent: true })
+                return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(user?._id), sent: true })
             }
         }
         if (!(user && (await user.matchPassword(password)))) {
@@ -95,10 +95,15 @@ const login = async (req, res, next) => {
         next(error)
     }
 }
+
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
+    const address1 = req?.body?.location?.address;
+    const houseNumber = req?.body?.location?.houseNumber;
+    const floor = req?.body?.location?.floor;
+    const information = req?.body?.location?.information;
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -133,7 +138,7 @@ const registrationBuyer = async (req, res, next) => {
         return res.status(302).json({ error: { "phone": "This phone number is linked to another account, please enter another number." } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'buyer', location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address })
+        const created = await User.create({ name, phone, email, role: 'buyer', location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address })
         if (!created) {
             return res.status(400).json({ error: { "email": "Buyer Registration failed!" } });
         }
@@ -162,6 +167,10 @@ const registrationSeller = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
+    const address1 = req?.body?.location?.address;
+    const houseNumber = req?.body?.location?.houseNumber;
+    const floor = req?.body?.location?.floor;
+    const information = req?.body?.location?.information;
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -199,7 +208,7 @@ const registrationSeller = async (req, res, next) => {
         return res.json({ error: { address: "Please fillup the Address!" } })
     }
     try {
-        const created = await User.create({ name, phone, email, role: 'seller', location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address });
+        const created = await User.create({ name, phone, email, role: 'seller', location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address });
 
         if (!created) {
             return res.status(400).json({ error: { "email": "Seller Registration failed!" } });
@@ -230,6 +239,10 @@ const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
+    const address1 = req?.body?.location?.address;
+    const houseNumber = req?.body?.location?.houseNumber;
+    const floor = req?.body?.location?.floor;
+    const information = req?.body?.location?.information;
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
     let front_side_id = req?.body?.valid_id?.front_side_id;
@@ -287,7 +300,7 @@ const registrationRider = async (req, res, next) => {
         return res.json({ error: { "back_side_id": "Please fillup the license card  valided back side!" } });
     }
     try {
-        const created = await User.create({ name, email, role: 'rider', phone, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
+        const created = await User.create({ name, email, role: 'rider', phone, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, password, address, valid_id: { verify_id, back_side_id, front_side_id, id: id1 }, license_card: { verify_card, id: id2, back_side_card, front_side_card } });
         if (!created) {
             return res.status(400).json({ error: { "email": "Rider Registration failed!" } });
         }
@@ -318,6 +331,10 @@ const profileUpdate = async (req, res, next) => {
     let { name, email, role, phone, pic, address } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
+    const address1 = req?.body?.location?.address;
+    const houseNumber = req?.body?.location?.houseNumber;
+    const floor = req?.body?.location?.floor;
+    const information = req?.body?.location?.information;
     // console.log(latitude,longitude)
     let verify_id = req?.body?.valid_id?.verify_id;
     let back_side_id = req?.body?.valid_id?.back_side_id;
@@ -333,7 +350,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, role: role || req.user.role, phone, pic, address, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+                name, email, role: role || req.user.role, phone, pic, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Buyer profile update failed!" } })
@@ -344,7 +361,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, role: role || req.user.role, pic, phone, address, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+                name, email, role: role || req.user.role, pic, phone, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Seller profile update failed!" } })
@@ -355,7 +372,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, phone, role: role || req.user.role, pic, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, email, phone, role: role || req.user.role, pic, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Rider profile update failed!" } })
@@ -366,7 +383,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.isAdmin === true) {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, phone, role: 'admin', pic, address, location: { latitude, longitude }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, email, phone, role: 'admin', pic, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Rider profile update failed!" } })
