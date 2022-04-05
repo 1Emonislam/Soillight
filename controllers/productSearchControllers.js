@@ -262,7 +262,10 @@ const othersSellerProducts = async (req, res, next) => {
             ],
         }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find({ user: req?.params.id, status: 'approved' }).sort("-createdAt").count();
-        return res.json({ count: count, data: result })
+        const numReviews = await result?.length;
+        const rating = await result?.reduce((acc, item) => item.rating + acc, 0) / result?.length;
+        // console.log(result.length,numReviews,rating)
+        return res.json({ count: count, numReviews, rating, data: result })
     }
     catch (error) {
         next(error)
