@@ -251,42 +251,18 @@ const othersSellerProducts = async (req, res, next) => {
     let { page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     try {
-        if (status) {
-            const result = await Product.find({ user: req?.params.id, status:  'approved' }).populate({
-                path: "user",
-                select: "_id name sellerShop",
-                populate: [
-                    {
-                        path: "sellerShop",
-                        select: "_id address location name",
-                    },
-                ],
-            }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({ user: req?.params.id, status: 'approved' }).populate({
-                path: "user",
-                select: "_id name sellerShop",
-                populate: [
-                    {
-                        path: "sellerShop",
-                        select: "_id address location name",
-                    },
-                ],
-            }).sort("-createdAt").count();
-            return res.json({ count: count, data: result })
-        } else {
-            const result = await Product.find({user: req?.params.id, status: 'approved'}).populate({
-                path: "user",
-                select: "_id name sellerShop",
-                populate: [
-                    {
-                        path: "sellerShop",
-                        select: "_id address location name",
-                    },
-                ],
-            }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({ user: req?.params.id, status: 'approved' }).sort("-createdAt").count();
-            return res.json({ count: count, data: result })
-        }
+        const result = await Product.find({ user: req?.params.id, status: 'approved' }).populate({
+            path: "user",
+            select: "_id name pic sellerShop",
+            populate: [
+                {
+                    path: "sellerShop",
+                    select: "_id address location name",
+                },
+            ],
+        }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
+        const count = await Product.find({ user: req?.params.id, status: 'approved' }).sort("-createdAt").count();
+        return res.json({ count: count, data: result })
     }
     catch (error) {
         next(error)
@@ -325,4 +301,4 @@ const allProductGet = async (req, res, next) => {
     }
 }
 
-module.exports = {othersSellerProducts, productSearch, categoriesSearch, latestProducts, myProducts, allProductGet };
+module.exports = { othersSellerProducts, productSearch, categoriesSearch, latestProducts, myProducts, allProductGet };
