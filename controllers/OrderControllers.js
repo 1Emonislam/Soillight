@@ -8,9 +8,13 @@ const orderAdd = async (req, res, next) => {
 	if (!(req?.user?._id)) {
 		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
 	}
-	const { products, maxDistance, transaction_id, tx_ref } = req.body;
+	const { products, maxDistance,address, transaction_id, tx_ref } = req.body;
 	const latitude = req?.body?.location?.latitude || 0;
 	const longitude = req?.body?.location?.longitude || 0;
+	const address1 = req?.body?.location?.address;
+    const houseNumber = req?.body?.location?.houseNumber;
+    const floor = req?.body?.location?.floor;
+    const information = req?.body?.location?.information;
 	const productOwner = [];
 	for (let i = 0; i < products.length; i++) {
 		productOwner.unshift(products[i]?.productOwner)
@@ -33,7 +37,7 @@ const orderAdd = async (req, res, next) => {
 			transaction_id,
 			tx_ref,
 			products,
-			location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+			location: { latitude, longitude, address: address1 || address, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
 		});
 		if (!created) {
 			return res.status(400).json({ error: { order: "something wrong!" } });
