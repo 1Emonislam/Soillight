@@ -11,11 +11,11 @@ const categoryCollectionAdd = async (req, res, next) => {
     try {
         if (categoryId) {
             const created = await SubCategory.create({ name: subcategoryName, img: subcategoryImage, category: categoryId });
-            return res.status(201).json({ message: 'you have created new category', data: created });
+            return res.status(201).json({ message: 'you have created new category', data: created }).populate("category");
         }
         if (!categoryId) {
             const created = await Category.create({ name: categoryName, img: categoryImage });
-            const resData  = await Category.findOne({_id:created?._id}).populate("category")
+            const resData = await Category.findOne({ _id: created?._id })
             return res.status(201).json({ message: 'you have created new subcategory', data: resData });
         }
     }
