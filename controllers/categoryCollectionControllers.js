@@ -1,13 +1,21 @@
-const CategoryCollection = require("../models/categoryCollectionModel");
-
+const Category = require("../models/categoryModel");
+const SubCategory = require("../models/subCategory");
 const categoryCollectionAdd = async (req, res, next) => {
-    const { category, subCategory } = req.body;
+    //category
+    const categoryName = req.body?.category?.name;
+    const categoryImage = req.body?.category?.img;
+    const categoryId = req.body?.category?.categoryId;
+    //sub category 
+    const subcategoryName = req.body?.subCategory?.name;
+    const subcategoryImage = req.body?.subCategory?.img;
     try {
-        const created = await CategoryCollection.create({ category, subCategory, user: req?.user?._id });
-        if (created) {
-            return res.status(201).json({ message: 'you have successfully new Category', data: created });
-        } if (!created) {
-            return res.status(400).json({ error: { category: 'category creation failed!' } })
+        if (categoryId) {
+            const created = await SubCategory.create({ name: subcategoryName, img: subcategoryImage, category: categoryId });
+            return res.status(201).json({ message: 'you have created new category', data: created });
+        }
+        if (!categoryId) {
+            const created = await Category.create({ name: categoryName, img: categoryImage });
+            return res.status(201).json({ message: 'you have created new subcategory', data: created });
         }
     }
     catch (error) {
@@ -15,15 +23,54 @@ const categoryCollectionAdd = async (req, res, next) => {
     }
 }
 const categoryCollectionRemove = async (req, res, next) => {
+    const { categoryId, subCategoryId } = req.body;
     try {
-        await CategoryCollection.findOneAndRemove({ _id: req.params.id }, function (err) {
-            if (err) {
-                return res.status(200).json({ error: { category: "category removed failed!" } })
+        const issue = {}
+        let message = {};
+        if (categoryId, subCategoryId) {
+            await Category.findOneAndRemove({ _id: categoryId }, function (err) {
+                if (err) {
+                    issue.category = 'category removed failed!'
+                }
+                if (!err) {
+                    message.message = "Category Removed!"
+                }
+            });
+            await SubCategory.findOneAndRemove({ _id: subCategoryId, category: categoryId }, function (err) {
+                if (err) {
+                    issue.subCategory = 'SubCategory removed failed!'
+                }
+                if (!err) {
+                    message.message = "Removed category and subCategory!"
+                }
+            });
+            if (Object.keys(issue)?.length) {
+                return res.status(400).json({ error: issue })
             }
-            if (!err) {
-                return res.status(200).json({ message: "You have successfully Removed!" })
+            if (Object.keys(message)?.length) {
+                return res.status(200).json({ message: message?.message })
             }
-        });
+        }
+        if (categoryId) {
+            await Category.findOneAndRemove({ _id: categoryId }, function (err) {
+                if (err) {
+                    return res.status(400).json({ category: 'Category removed failed!' })
+                }
+                if (!err) {
+                    return res.status(200).json({ message: "Category Removed!" })
+                }
+            });
+        }
+        if (subCategoryId) {
+            await SubCategory.findOneAndRemove({ _id: subCategoryId }, function (err) {
+                if (err) {
+                    return res.status(400).json({ category: 'SubCategory removed failed!' })
+                }
+                if (!err) {
+                    return res.status(200).json({ message: "Sub Category Removed!" })
+                }
+            });
+        }
     }
     catch (error) {
         next(error)
@@ -31,15 +78,25 @@ const categoryCollectionRemove = async (req, res, next) => {
 }
 const categoryCollectionUpdate = async (req, res, next) => {
     try {
-        const { category, subCategory } = req.body;
-        const updated = await CategoryCollection.findByIdAndUpdate({ _id: req.params.id }, {
-            category, subCategory
-        }, { new: true })
-        if (!updated) {
-            return res.status(400).json({ error: { category: "Category updated failed!" } })
+        const categoryName = req.body?.category?.name;
+        const categoryImage = req.body?.category?.img;
+        //sub category 
+        const subcategoryName = req.body?.subCategory?.name;
+        const subcategoryImage = req.body?.subCategory?.img;
+        const categoryId = req.body?.category?.categoryId;
+        const subCategoryId = req.body?.subCategory?.subCategoryId;
+        if (categoryId, subCategoryId) {
+            const update = await Category.findOneAndUpdate({ _id: categoryId }, { name: categoryName, img: categoryImage }, { new: true });
+            const subUpdate = await SubCategory.findOneAndUpdate({ _id: subCategoryId, category: categoryId }, { name: subcategoryName, img: subcategoryImage, category: categoryId }, { new: true });
+            return res.status(201).json({ message: 'category and sub getegory update successfully!', cetagory: update, subCategory: subUpdate });
         }
-        if (updated) {
-            return res.status(200).json({ message: "You have successfully updated!" })
+        if (subCategoryId) {
+            const update = await SubCategory.findOneAndUpdate({ _id: subCategoryId }, { name: subcategoryName, img: subcategoryImage }, { new: true });
+            return res.status(201).json({ message: 'category update successfully!', data: update });
+        }
+        if (categoryId) {
+            const update = await SubCategory.findOneAndUpdate({ _id: categoryId }, { name: categoryName, img: categoryImage }, { new: true });
+            return res.status(200).json({ message: 'subcategory update successfully!', data: update });
         }
     }
     catch (error) {
@@ -48,7 +105,7 @@ const categoryCollectionUpdate = async (req, res, next) => {
 }
 const categoryCollectionGet = async (req, res, next) => {
     try {
-        const data = await CategoryCollection.find({});
+        const data = await SubCategory.find({});
         return res.status(200).json({ data: data })
     }
     catch (error) {

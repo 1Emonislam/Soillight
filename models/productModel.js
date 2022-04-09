@@ -6,16 +6,15 @@ const productSchema = mongoose.Schema({
         trim: true,
         required: [true, 'Please write a unique product name!']
     },
-
     category: {
-        type: String,
-        trim: true,
-        required: [true, 'Please select a category!']
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true
     },
     subCategory: {
-        type: String,
-        trim: true,
-        required: [true, 'Please select a sub category!']
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'SubCategory',
+        required: false
     },
     pack_type: {
         type: String,
@@ -41,7 +40,7 @@ const productSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please select a product Image!']
     },
-    shop:{
+    shop: {
         type: Schema.Types.ObjectId,
         ref: 'Shop'
     },

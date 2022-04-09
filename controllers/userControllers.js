@@ -107,7 +107,7 @@ const registrationBuyer = async (req, res, next) => {
     email?.toLowerCase();
 /* function validatePhone(elementValue) {
         const re = /^(?:(?:(?:\+?234(?:\h1)?|01)\h*)?(?:\(\d{3}\)|\d{3})|\d{4})(?:\W*\d{3})?\W*\d{4}$/
-        return re.test(elementValue);
+        return re.test(elementValue);       
     }
     function validatePhoneBD(elementValue) {
         const regExp = /(^(\+88|0088)?(01){1}[3456789]{1}(\d){8})$/;
