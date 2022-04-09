@@ -14,7 +14,7 @@ const productSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
+            }).populate("category").populate("subCategory").sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({ status: 'approved' }).populate({
                 path: "user",
                 select: "_id name sellerShop pic",
@@ -24,7 +24,7 @@ const productSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).sort("-createdAt").count();
+            }).populate("category").populate("subCategory").sort("-createdAt").count();
             return res.json({ count: count, data: result })
         }
         if (search) {
@@ -43,17 +43,8 @@ const productSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find(keyword).populate({
-                path: "user",
-                select: "_id name sellerShop pic",
-                populate: [
-                    {
-                        path: "sellerShop",
-                        select: "_id address location name",
-                    },
-                ],
-            }).count();
+            }).populate("category").populate("subCategory").limit(limit * 1).skip((page - 1) * limit);
+            const count = await Product.find(keyword).count();
             if (count === 0) {
                 return res.status(404).json({ error: { "product": "Search not found 404!" }, data: [] })
             }
@@ -71,18 +62,9 @@ const productSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).limit(limit * 1).skip((page - 1) * limit);
+            }).populate("category").populate("subCategory").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({
                 $or: [{ name: KeyWordRegExp }, { category: KeyWordRegExp }, { subCategory: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },], status: 'approved'
-            }).populate({
-                path: "user",
-                select: "_id name sellerShop pic",
-                populate: [
-                    {
-                        path: "sellerShop",
-                        select: "_id address location name",
-                    },
-                ],
             }).count();
             if (count === 0) {
                 return res.status(404).json({ error: { "product": "Search not found 404!" }, data: [] })
@@ -95,42 +77,15 @@ const productSearch = async (req, res, next) => {
     }
 }
 const categoriesSearch = async (req, res, next) => {
-    let { category, page = 1, limit = 10 } = req.query;
+    let { category, subCategory, page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
-    category = category?.trim();
-    const KeyWordRegExp = new RegExp(category, "i");
+    category = new RegExp(category, "i");
+    subCategory = new RegExp(subCategory, "i");
     try {
-        if (category) {
-            const result = await Product.find({
-                $or: [{ category: KeyWordRegExp }], status: 'approved'
-            }).populate("user", "_id pic").populate({
-                path: "user",
-                select: "_id name sellerShop pic",
-                populate: [
-                    {
-                        path: "sellerShop",
-                        select: "_id address location name",
-                    },
-                ],
-            }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({
-                $or: [{ category: KeyWordRegExp }], status: 'approved'
-            }).populate({
-                path: "user",
-                select: "_id name sellerShop pic",
-                populate: [
-                    {
-                        path: "sellerShop",
-                        select: "_id address location name",
-                    },
-                ],
-            })
-            return res.json({ count: count, data: result })
-        }
         if (category && subCategory) {
             const result = await Product.find({
-                $or: [{ category: KeyWordRegExp }, { subCategory: KeyWordRegExp },], status: 'approved'
-            }).populate("user", "_id pic").populate({
+                status: 'approved'
+            }).populate({ path: 'category', match: { name: { $regex: category } } }).populate({ path: 'subCategory', match: { name: { $regex: subCategory } } }).populate("user", "_id pic").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -141,8 +96,8 @@ const categoriesSearch = async (req, res, next) => {
                 ],
             }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({
-                $or: [{ category: KeyWordRegExp }, { subCategory: KeyWordRegExp }], status: 'approved'
-            }).populate({
+                status: 'approved'
+            }).populate({ path: 'category', match: { name: { $regex: category } } }).populate({ path: 'subCategory', match: { name: { $regex: subCategory } } }).populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -154,6 +109,61 @@ const categoriesSearch = async (req, res, next) => {
             })
             return res.json({ count: count, data: result })
         }
+        if (category) {
+            const result = await Product.find({
+                status: 'approved'
+            }).populate({ path: 'category', match: { name: { $regex: category } } }).populate("subCategory").populate("user", "_id pic").populate({
+                path: "user",
+                select: "_id name sellerShop pic",
+                populate: [
+                    {
+                        path: "sellerShop",
+                        select: "_id address location name",
+                    },
+                ],
+            }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
+            const count = await Product.find({
+                status: 'approved'
+            }).populate({ path: 'category', match: { name: { $regex: category } } }).populate("subCategory").populate({
+                path: "user",
+                select: "_id name sellerShop pic",
+                populate: [
+                    {
+                        path: "sellerShop",
+                        select: "_id address location name",
+                    },
+                ],
+            })
+            return res.json({ count: count, data: result })
+        }
+        if (subCategory) {
+            const result = await Product.find({
+                status: 'approved'
+            }).populate({ path: 'subCategory', match: { name: { $regex: subCategory } } }).populate("category").populate("user", "_id pic").populate({
+                path: "user",
+                select: "_id name sellerShop pic",
+                populate: [
+                    {
+                        path: "sellerShop",
+                        select: "_id address location name",
+                    },
+                ],
+            }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
+            const count = await Product.find({
+                status: 'approved'
+            }).populate({ path: 'subCategory', match: { name: { $regex: subCategory } } }).populate("category").populate({
+                path: "user",
+                select: "_id name sellerShop pic",
+                populate: [
+                    {
+                        path: "sellerShop",
+                        select: "_id address location name",
+                    },
+                ],
+            })
+            return res.json({ count: count, data: result })
+        }
+
     }
     catch (error) {
         next(error)
@@ -170,7 +180,7 @@ const latestProducts = async (req, res, next) => {
             ], status: status || 'approved'
         } : { status: 'approved' };
         if (!(req.query?.search || status)) {
-            const result = await Product.find(keyword).populate({
+            const result = await Product.find(keyword).populate("category").populate("subCategory").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -184,7 +194,7 @@ const latestProducts = async (req, res, next) => {
             return res.json({ count: count, data: result })
         }
         if (req.query?.search || status) {
-            const result = await Product.find(keyword).populate({
+            const result = await Product.find(keyword).populate("category").populate("subCategory").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -207,7 +217,7 @@ const myProducts = async (req, res, next) => {
     limit = parseInt(limit);
     try {
         if (status) {
-            const result = await Product.find({ user: req?.user?._id, status: status }).populate({
+            const result = await Product.find({ user: req?.user?._id, status: status }).populate("category").populate("subCategory").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -217,7 +227,7 @@ const myProducts = async (req, res, next) => {
                     },
                 ],
             }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({ user: req?.user?._id, status: status }).populate({
+            const count = await Product.find({ user: req?.user?._id, status: status }).populate("category").populate("subCategory").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -229,7 +239,7 @@ const myProducts = async (req, res, next) => {
             }).sort("-createdAt").count();
             return res.json({ count: count, data: result })
         } else {
-            const result = await Product.find({ user: req?.user?._id }).populate({
+            const result = await Product.find({ user: req?.user?._id }).populate("category").populate("subCategory").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -251,7 +261,7 @@ const othersSellerProducts = async (req, res, next) => {
     let { page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     try {
-        const result = await Product.find({ user: req?.params.id, status: 'approved' }).populate({
+        const result = await Product.find({ user: req?.params.id, status: 'approved' }).populate("category").populate("subCategory").populate({
             path: "user",
             select: "_id name pic sellerShop",
             populate: [
@@ -261,7 +271,7 @@ const othersSellerProducts = async (req, res, next) => {
                 },
             ],
         }).sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
-        const count = await Product.find({ user: req?.params.id, status: 'approved' }).sort("-createdAt").count();
+        const count = await Product.find({ user: req?.params.id, status: 'approved' }).populate("category").populate("subCategory").sort("-createdAt").count();
         const numReviews = await result?.length;
         const rating = await result?.reduce((acc, item) => item.rating + acc, 0) / result?.length;
         // console.log(result.length,numReviews,rating)
@@ -284,7 +294,7 @@ const allProductGet = async (req, res, next) => {
                 { name: { $regex: req.query.search, $options: "i" } },
             ], status: status
         } : { status: status };
-        const product = await Product.find(keyword).populate({
+        const product = await Product.find(keyword).populate("category").populate("subCategory").populate({
             path: "user",
             select: "_id name sellerShop pic",
             populate: [
@@ -295,7 +305,6 @@ const allProductGet = async (req, res, next) => {
             ],
         }).sort({ "createdAt": 1, _id: -1 }).limit(limit * 1).skip((page - 1) * limit);
         const count = await Product.find(keyword).count();
-
         return res.status(200).json({ "message": "product data successfully fetch!", count, data: product })
 
     }
