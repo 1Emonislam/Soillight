@@ -105,12 +105,35 @@ const categoryCollectionUpdate = async (req, res, next) => {
     }
 }
 const categoryCollectionGet = async (req, res, next) => {
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
+    const keyword = req.query.search ? {
+        $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+        ],
+    } : {};
     try {
-        const data = await SubCategory.find({}).populate("category");
+        const data = await Category.find(keyword).populate("category").limit(limit * 1).skip((page - 1) * limit);
+        return res.status(200).json({ count: data?.length, data: data })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const subCategoryAndCategoryCollectionGet = async (req, res, next) => {
+    let { page = 1, limit = 10 } = req.query;
+    limit = parseInt(limit);
+    const keyword = req.query.search ? {
+        $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+        ],
+    } : {};
+    try {
+        const data = await SubCategory.find(keyword).populate("category").limit(limit * 1).skip((page - 1) * limit);;
         return res.status(200).json({ data: data })
     }
     catch (error) {
         next(error)
     }
 }
-module.exports = { categoryCollectionGet, categoryCollectionAdd, categoryCollectionRemove, categoryCollectionUpdate }
+module.exports = { subCategoryAndCategoryCollectionGet, categoryCollectionGet, categoryCollectionAdd, categoryCollectionRemove, categoryCollectionUpdate }
