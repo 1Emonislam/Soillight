@@ -4,10 +4,10 @@ const categoryCollectionAdd = async (req, res, next) => {
     //category
     const categoryName = req.body?.category?.name;
     const categoryImage = req.body?.category?.img;
-    const categoryId = req.body?.category?.categoryId;
     //sub category 
     const subcategoryName = req.body?.subCategory?.name;
     const subcategoryImage = req.body?.subCategory?.img;
+    const categoryId = req.body?.subCategory?.categoryId;
     try {
         if (categoryId) {
             const created = await SubCategory.create({ name: subcategoryName, img: subcategoryImage, category: categoryId });
