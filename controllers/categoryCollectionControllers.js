@@ -114,7 +114,7 @@ const categoryCollectionGet = async (req, res, next) => {
         ],
     } : {};
     try {
-        const data = await Category.find(keyword).populate("category").limit(limit * 1).skip((page - 1) * limit);
+        const data = await Category.find(keyword).limit(limit * 1).skip((page - 1) * limit);
         return res.status(200).json({ count: data?.length, data: data })
     }
     catch (error) {
