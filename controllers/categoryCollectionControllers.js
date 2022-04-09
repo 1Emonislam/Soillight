@@ -89,15 +89,15 @@ const categoryCollectionUpdate = async (req, res, next) => {
         if (categoryId && subCategoryId) {
             const update = await Category.findOneAndUpdate({ _id: categoryId }, { name: categoryName, img: categoryImage }, { new: true });
             const subUpdate = await SubCategory.findOneAndUpdate({ _id: subCategoryId, category: categoryId }, { name: subcategoryName, img: subcategoryImage, category: categoryId }, { new: true }).populate("category");
-            return res.status(201).json({ message: 'category and sub getegory update successfully!', cetagory: update, subCategory: subUpdate });
+            return res.status(201).json({ message: 'Category and sub getegory update successfully!', cetagory: update, subCategory: subUpdate });
         }
         if (subCategoryId) {
             const update = await SubCategory.findOneAndUpdate({ _id: subCategoryId }, { name: subcategoryName, img: subcategoryImage }, { new: true }).populate("category");
-            return res.status(201).json({ message: 'category update successfully!', data: update });
+            return res.status(201).json({ message: 'Sub Category update successfully!', data: update });
         }
         if (categoryId) {
-            const update = await SubCategory.findOneAndUpdate({ _id: categoryId }, { name: categoryName, img: categoryImage }, { new: true });
-            return res.status(200).json({ message: 'subcategory update successfully!', data: update });
+            const update = await Category.findOneAndUpdate({ _id: categoryId }, { name: categoryName, img: categoryImage }, { new: true });
+            return res.status(200).json({ message: 'Category update successfully!', data: update });
         }
     }
     catch (error) {
