@@ -11,7 +11,8 @@ const categoryCollectionAdd = async (req, res, next) => {
     try {
         if (categoryId) {
             const created = await SubCategory.create({ name: subcategoryName, img: subcategoryImage, category: categoryId });
-            return res.status(201).json({ message: 'you have created new Sub Category', data: created }).populate("category");
+            const resData = await SubCategory.findOne({_id:created._id}).populate("category");
+            return res.status(201).json({ message: 'you have created new Sub Category', data: resData })
         }
         if (!categoryId) {
             const created = await Category.create({ name: categoryName, img: categoryImage });
