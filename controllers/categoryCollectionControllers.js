@@ -11,7 +11,7 @@ const categoryCollectionAdd = async (req, res, next) => {
     try {
         if (categoryId) {
             const created = await SubCategory.create({ name: subcategoryName, img: subcategoryImage, category: categoryId });
-            const resData = await SubCategory.findOne({_id:created._id}).populate("category");
+            const resData = await SubCategory.findOne({ _id: created._id }).populate("category");
             return res.status(201).json({ message: 'you have created new Sub Category', data: resData })
         }
         if (!categoryId) {
@@ -122,14 +122,24 @@ const categoryCollectionGet = async (req, res, next) => {
     }
 }
 const subCategoryAndCategoryCollectionGet = async (req, res, next) => {
-    let { page = 1, limit = 10 } = req.query;
+    let { category, page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     const keyword = req.query.search ? {
         $or: [
             { name: { $regex: req.query.search, $options: "i" } },
         ],
     } : {};
+    const keyword2 = req.query.search ? {
+        $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+        ],
+        category: category
+    } : { category: category };
     try {
+        if (category) {
+            const data = await SubCategory.find(keyword2).populate("category").limit(limit * 1).skip((page - 1) * limit);;
+            return res.status(200).json({ data: data })
+        }
         const data = await SubCategory.find(keyword).populate("category").limit(limit * 1).skip((page - 1) * limit);;
         return res.status(200).json({ data: data })
     }
