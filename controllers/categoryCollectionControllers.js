@@ -130,9 +130,6 @@ const subCategoryAndCategoryCollectionGet = async (req, res, next) => {
         ],
     } : {};
     const keyword2 = req.query?.category ? {
-        $or: [
-            { name: { $regex: req.query.search, $options: "i" } },
-        ],
         category: category
     } : { category: category };
     try {
