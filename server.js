@@ -76,10 +76,10 @@ io.on('connection', async (socket) => {
 			try {
 				const decoded = jwt.verify(token, process.env.JWT_SECRET);
 				const user = await User.findOne({ _id: decoded.id }).select("-password");
-				console.log(user)
+				// console.log(user)
 				if (user) {
 					req.user = user;
-					console.log(req.user)
+					// console.log(req.user)
 					next();
 				} else {
 					req.user = null
@@ -108,13 +108,20 @@ io.on('connection', async (socket) => {
 		}
 	});
 
+	io.use(async (socket, next) => {
+		try {
+			const lastWeek = new Date(new Date() - 7 * 60 * 60 * 24 * 1000);
+			const today = new Date();
+			const notificationToday = await Notification.find({ timestamp: { $gte: today }, receiver: socket.request?.user?._id });
+			const notificationLastWeak = await Notification.find({ timestamp: { $gte: lastWeek }, receiver: socket.request?.user?._id});
+			const notificationObj = { today: { todayDate: today, data: notificationToday }, lastWeek: { lastWeekDate: lastWeek, data: notificationLastWeak } };
+			socket.emit("my notification", { data: notificationObj })
+		}
+		catch (error) {
+			next(error)
+		}
+	})
 
-	// const lastWeek = new Date(new Date() - 7 * 60 * 60 * 24 * 1000);
-	// const today = new Date();
-	// const notificationToday = await Notification.find({ timestamp: { $gte: today }, receiver: req?.user?._id });
-	// const notificationLastWeak = await Notification.find({ timestamp: { $gte: lastWeek }, receiver: req?.user?._id });
-	// const notificationObj = { today: { todayDate: today, data: notificationToday }, lastWeek: { lastWeekDate: lastWeek, data: notificationLastWeak } };
-	// socket.emit("my notification", { data: notificationObj })
 	socket.on("disconnect", async () => {
 		console.log('user disconnected')
 		const user = socket.request.user;
