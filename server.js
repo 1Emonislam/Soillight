@@ -34,6 +34,7 @@ const bankLinkedRoutes = require('./routes/bankLinkedRoutes');
 const balanceWithdrawRoutes = require('./routes/balanceWithdrawRoutes');
 const balanceHistoryRoutes = require('./routes/balanceHistoryRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const User = require("./models/userModel");
 const categoryCollectionRoutes = require("./routes/categoryCollectionRoutes")
 const Notification = require("./models/notificationMdels");
@@ -61,6 +62,7 @@ app.use('/', balanceWithdrawRoutes)
 app.use('/', balanceHistoryRoutes)
 app.use('/', subscriptionRoutes)
 app.use('/', categoryCollectionRoutes)
+app.use('/',notificationRoutes)
 serverApp.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });
