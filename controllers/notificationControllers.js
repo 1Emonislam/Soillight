@@ -1,3 +1,5 @@
+const Notification = require("../models/notificationMdels");
+
 const getMyNotification = async (req, res, next) => {
     const lastWeek = new Date(new Date() - 7 * 60 * 60 * 24 * 1000);
     const today = new Date();
