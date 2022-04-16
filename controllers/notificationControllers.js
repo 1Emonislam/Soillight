@@ -8,5 +8,11 @@ const getMyNotification = async (req, res, next) => {
     const notificationObj = { today: { todayDate: today, data: notificationToday }, lastWeek: { lastWeekDate: lastWeek, data: notificationLastWeak } };
     return res.status(200).json({ data: notificationObj })
 }
-
-module.exports = { getMyNotification };
+const singleNotificationView = async (req, res, next) => {
+    const single = await Notification.findOneAndUpdate({ _id: req.params?.id }, {
+        seen: true,
+        read_at: Date.now,
+    }, { new: true });
+    return res.status(200).json({ data: single });
+}
+module.exports = { getMyNotification, singleNotificationView };
