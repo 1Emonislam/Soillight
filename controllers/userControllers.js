@@ -370,7 +370,7 @@ const profileUpdate = async (req, res, next) => {
         return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
     }
     // console.log(req.body)
-    let { name, email, role, phone, pic, address } = req.body;
+    let { name,  role, pic, address } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
     const address1 = req?.body?.location?.address;
@@ -386,27 +386,13 @@ const profileUpdate = async (req, res, next) => {
     let front_side_card = req?.body?.license_card?.front_side_card;
     let id1 = req?.body?.valid_id?.id;
     let id2 = req?.body?.license_card?.id;
-    function validatePhone(elementValue) {
-        const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
-        return re.test(elementValue);
-    }
-    function bangladeshiPhoneValided(phone) {
-        const vaidPhone = /^(?:\+88|88)?(01[3-9]\d{8})$/.test(phone);
-        if (vaidPhone) {
-            return true;
-        }
-        return false;
-    }
-    if (!(validatePhone(phone) || bangladeshiPhoneValided(phone))) {
-        return res.status(400).json({ error: { phone: "Phone Number Invalid! Please provide a valid Phone Number!" } })
-    }
     try {
         if (!(req?.user?.isAdmin === true || (req?.user?.role === 'seller' || 'buyer' || 'rider' || 'admin'))) {
             return res.status(400).json({ error: { "role": "profile update permission denied! please switch to another role!" } })
         }
         if (req?.user?.role === 'buyer') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, role: role || req.user.role, phone, pic, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+                name, role: role || req.user.role, phone, pic, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Buyer profile update failed!" } })
@@ -417,7 +403,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, role: role || req.user.role, pic, phone, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+                name, role: role || req.user.role, pic, phone, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Seller profile update failed!" } })
@@ -428,7 +414,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'rider') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, phone, role: role || req.user.role, pic, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, phone, role: role || req.user.role, pic, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, address, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Rider profile update failed!" } })
@@ -439,7 +425,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.isAdmin === true) {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, email, phone, role: 'admin', pic, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
+                name, phone, role: 'admin', pic, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, valid_id: { id: id1, verify_id, back_side_id, front_side_id }, license_card: { id: id2, verify_card, back_side_card, front_side_card }
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Rider profile update failed!" } })
