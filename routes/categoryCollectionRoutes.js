@@ -12,7 +12,7 @@ router.put('/sub/category/:id', protect, subCategoryUpdate);
 router.put('/inside/pack/type/:id', protect, insidePackTypeUpdate);
 router.put('/inside/sub/category/:id', protect, insideSubCategoryUpdate);
 router.put('/inside/serving/size/:id', protect, insideServingSizeUpdate);
-router.get('/category/:id', protect, categoryGet);
+router.get('/category', protect, categoryGet);
 router.get('/sub/category/:id', protect, subCategoryGet);
 router.get('/inside/pack/type/:id', protect, insidePackTypeGet);
 router.get('/inside/sub/category/:id', protect, insideSubCategoryGet);
