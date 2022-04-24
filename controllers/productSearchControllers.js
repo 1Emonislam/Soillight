@@ -14,7 +14,7 @@ const productSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").populate("servingSize", "_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({ status: 'approved' }).populate({
                 path: "user",
                 select: "_id name sellerShop pic",
@@ -24,7 +24,7 @@ const productSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").populate("servingSize", "_id servingSize").count();
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").count();
             return res.json({ count: count, data: result })
         }
 
@@ -40,7 +40,7 @@ const productSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({
                 $or: [{ name: KeyWordRegExp }, { rating: { $lte: ratingMax || 1000000000, $gte: ratingMin || 0 }, price: { $lte: priceMax || 1000000000, $gte: priceMin || 0 } },], status: 'approved'
             }).count();
@@ -65,7 +65,7 @@ const productSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find(keyword).count();
             if (count === 0) {
                 return res.status(404).json({ error: { "product": "Search not found 404!" }, data: [] })
@@ -95,7 +95,7 @@ const categoriesSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }.populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").populate("servingSize", "_id servingSize")).limit(limit * 1).skip((page - 1) * limit);
+            }.populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize")).limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({
                 status: 'approved'
             }).populate({ path: 'category', match: { category: { $regex: category } } }).populate({ path: 'subCategory', match: { subCategory: { $regex: subCategory } } }).populate({
@@ -107,7 +107,7 @@ const categoriesSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").populate("servingSize", "_id servingSize").count();
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").count();
             return res.json({ count: count, data: result })
         }
         if (category) {
@@ -122,7 +122,7 @@ const categoriesSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").populate("servingSize", "_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({
                 status: 'approved'
             }).populate({ path: 'category', match: { category: { $regex: category } } }).populate("subCategory").populate({
@@ -134,7 +134,7 @@ const categoriesSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").populate("servingSize", "_id servingSize").count();
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").count();
             return res.json({ count: count, data: result })
         }
         if (subCategory) {
@@ -149,7 +149,7 @@ const categoriesSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").populate("servingSize", "_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find({
                 status: 'approved'
             }).populate({ path: 'subCategory', match: { name: { $regex: subCategory } } }).populate("category").populate({
@@ -161,7 +161,7 @@ const categoriesSearch = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").populate("servingSize", "_id servingSize").count()
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").count()
             return res.json({ count: count, data: result })
         }
 
@@ -204,7 +204,7 @@ const latestProducts = async (req, res, next) => {
                         select: "_id address location name",
                     },
                 ],
-            }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+            }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").limit(limit * 1).skip((page - 1) * limit);
             const count = await Product.find(keyword).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").count();
             return res.json({ count: count, data: result })
         }
