@@ -22,7 +22,8 @@ const subCategoryCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { subCategory: 'Sub Category creation failed!' } })
         }
-        return res.status(200).json({ message: "Sub Category Creation Successfully", data: create })
+        const resData = await Category.findOne({category:create?._id}).populate("category","_id category")
+        return res.status(200).json({ message: "Sub Category Creation Successfully", data: resData })
     }
     catch (error) {
         next(error)
@@ -37,7 +38,8 @@ const insideSubCategoryCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { insideSubCategory: 'Inside Sub Category creation failed!' } })
         }
-        return res.status(200).json({ message: "Inside Sub Category Creation Successfully", data: create })
+        const resData = await InsideSubCategory.findOne({category:create?._id}).populate("category","_id category").populate("subCategory","_id subCategory")
+        return res.status(200).json({ message: "Inside Sub Category Creation Successfully", data: resData })
     }
     catch (error) {
         next(error)
@@ -53,7 +55,8 @@ const insidePackTypeCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { packType: 'packType creation failed!' } })
         }
-        return res.status(200).json({ message: "pack type Creation Successfully", data: create })
+        const resData = await InsidePackType.findOne({category:create?._id}).populate("category","_id category").populate("subCategory","_id subCategory").populate("insideSubCategory","_id insideSubCategory")
+        return res.status(200).json({ message: "pack type Creation Successfully", data: resData })
 
     }
     catch (error) {
@@ -71,7 +74,8 @@ const insideSurvingSizeCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        return res.status(200).json({ message: "Serving Size Creation Successfully", data: create })
+        const resData = await InsidePackType.findOne({category:create?._id}).populate("category","_id category").populate("subCategory","_id subCategory").populate("insideSubCategory","_id insideSubCategory").populate("packType","_id packType")
+        return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
     }
     catch (error) {
         next(error)
