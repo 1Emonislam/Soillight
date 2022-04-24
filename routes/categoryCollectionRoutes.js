@@ -1,16 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { categoryCreate, subCategoryCreate, insideSubCategoryCreate, insidePackTypeCreate, insideSurvingSizeCreate, categoryUpdate, subCategoryUpdate, insidePackTypeUpdate, insideSubCategoryUpdate, insideSurvingSizeUpdate, getCategory } = require('../controllers/categoryCollectionControllers');
+const { categoryCreate, subCategoryCreate, insideSubCategoryCreate, insidePackTypeCreate, insideServingSizeCreate, categoryUpdate, subCategoryUpdate, insidePackTypeUpdate, insideSubCategoryUpdate, insideServingSizeUpdate, getCategory, categoryGet, subCategoryGet, insidePackTypeGet, insideSubCategoryGet, insideServingSizeGet } = require('../controllers/categoryCollectionControllers');
 const { protect } = require('../middlewares/authMiddleware');
 router.post('/category', protect, categoryCreate);
 router.post('/sub/category', protect, subCategoryCreate);
 router.post('/inside/pack/type', protect, insidePackTypeCreate);
 router.post('/inside/sub/category', protect, insideSubCategoryCreate);
-router.post('/inside/serving/size', protect, insideSurvingSizeCreate);
+router.post('/inside/serving/size', protect, insideServingSizeCreate);
 router.put('/category/:id', protect, categoryUpdate);
 router.put('/sub/category/:id', protect, subCategoryUpdate);
 router.put('/inside/pack/type/:id', protect, insidePackTypeUpdate);
 router.put('/inside/sub/category/:id', protect, insideSubCategoryUpdate);
-router.put('/inside/serving/size/:id', protect, insideSurvingSizeUpdate);
-router.get('/getCategory', protect, getCategory)
+router.put('/inside/serving/size/:id', protect, insideServingSizeUpdate);
+router.get('/category/:id', protect, categoryGet);
+router.get('/sub/category/:id', protect, subCategoryGet);
+router.get('/inside/pack/type/:id', protect, insidePackTypeGet);
+router.get('/inside/sub/category/:id', protect, insideSubCategoryGet);
+router.get('/inside/serving/size/:id', protect, insideServingSizeGet);
 module.exports = router;

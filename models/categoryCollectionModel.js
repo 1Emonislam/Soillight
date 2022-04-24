@@ -72,7 +72,7 @@ const insideServingSizeSchema = mongoose.Schema({
     servingSize: {
         type: String,
         trim: true,
-        required: [true, 'Please select a surving size!']
+        required: [true, 'Please select a Serving size!']
     },
     insideSubCategory: {
         type: mongoose.Schema.Types.ObjectId,

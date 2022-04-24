@@ -63,7 +63,7 @@ const insidePackTypeCreate = async (req, res, next) => {
         next(error)
     }
 }
-const insideSurvingSizeCreate = async (req, res, next) => {
+const insideServingSizeCreate = async (req, res, next) => {
     try {
         const servingSize = req.body?.servingSize;
         const packType = req.body?.packType;
@@ -74,8 +74,65 @@ const insideSurvingSizeCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        const resData = await InsideServingSize.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize")
+        const resData = await InsideServingSize.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize")
         return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const categoryGet = async (req, res, next) => {
+    try {
+        let { page = 1, limit = 30 } = req.query;
+        limit = parseInt(limit);
+        const resData = await Category.find({}).select("_id category").limit(limit * 1).skip((page - 1) * limit);
+        return res.status(200).json({ message: "Selecte Category", data: resData })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const subCategoryGet = async (req, res, next) => {
+    try {
+        let { page = 1, limit = 30 } = req.query;
+        limit = parseInt(limit);
+        const resData = await SubCategory.find({ category: req.params.id }).select("_id subCategory").limit(limit * 1).skip((page - 1) * limit);
+        return res.status(200).json({ message: "Selecte Sub Category", data: resData })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const insideSubCategoryGet = async (req, res, next) => {
+    try {
+        let { page = 1, limit = 30 } = req.query;
+        limit = parseInt(limit);
+        const resData = await InsideSubCategory.find({ subCategory: req.params.id }).select("_id insideSubCategory").limit(limit * 1).skip((page - 1) * limit);
+        return res.status(200).json({ message: "Selecte Inside Sub Category", data: resData });
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const insidePackTypeGet = async (req, res, next) => {
+    try {
+        let { page = 1, limit = 30 } = req.query;
+        limit = parseInt(limit);
+        const resData = await InsidePackType.find({ insideSubCategory: req.params.id }).select("_id packType").limit(limit * 1).skip((page - 1) * limit);
+        return res.status(200).json({ message: "Selecte Inside Pack Type", data: resData });
+
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const insideServingSizeGet = async (req, res, next) => {
+    try {
+        let { page = 1, limit = 30 } = req.query;
+        limit = parseInt(limit);
+        const resData = await InsideServingSize.find({ InsidePackType: req.params.id }).select("_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+        return res.status(200).json({ message: "Selecte Serving Size", data: resData });
+
     }
     catch (error) {
         next(error)
@@ -147,7 +204,7 @@ const insidePackTypeUpdate = async (req, res, next) => {
         next(error)
     }
 }
-const insideSurvingSizeUpdate = async (req, res, next) => {
+const insideServingSizeUpdate = async (req, res, next) => {
     try {
         const servingSize = req.body?.servingSize;
         const update = await InsideServingSize.findOneAndUpdate({ _id: req.params.id }, {
@@ -156,7 +213,7 @@ const insideSurvingSizeUpdate = async (req, res, next) => {
         if (!update) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        const resData = await InsideServingSize.findOne({ _id: update?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize")
+        const resData = await InsideServingSize.findOne({ _id: update?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize")
         return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
     }
     catch (error) {
@@ -166,7 +223,7 @@ const insideSurvingSizeUpdate = async (req, res, next) => {
 
 const getCategory = async (req, res, next) => {
     try {
-        const allCategory = await InsideServingSize.find({}).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize");
+        const allCategory = await InsideServingSize.find({}).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize");
         return res.status(200).json({ data: allCategory })
     }
     catch (error) {
@@ -175,16 +232,19 @@ const getCategory = async (req, res, next) => {
 }
 
 module.exports = {
-    getCategory,
     categoryCreate,
     subCategoryCreate,
     insideSubCategoryCreate,
     insidePackTypeCreate,
-    insideSurvingSizeCreate,
+    insideServingSizeCreate,
     categoryUpdate,
     subCategoryUpdate,
     insideSubCategoryUpdate,
     insidePackTypeUpdate,
-    insideSurvingSizeUpdate,
-
+    insideServingSizeUpdate,
+    categoryGet,
+    subCategoryGet,
+    insideSubCategoryGet,
+    insidePackTypeGet,
+    insideServingSizeGet,
 }
