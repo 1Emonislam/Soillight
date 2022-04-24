@@ -1,4 +1,5 @@
 const express = require('express');
+const router = express.Router();
 const { categoryCreate, subCategoryCreate, insideSubCategoryCreate, insidePackTypeCreate, insideSurvingSizeCreate } = require('../controllers/categoryCollectionControllers');
 const { protect } = require('../middlewares/authMiddleware');
 router.post('/category', protect, categoryCreate);

@@ -3,7 +3,7 @@ const { balanceWithdraw, withdrawTransAcction, withdrawStatusByHistory, getWithd
 const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.route('/balance/my').get(protect,myBalanceGet);
-router.route('/my/balance-add').get(protect,myBalanceAdd);
+router.route('/my/balance-add').post(protect,myBalanceAdd);
 router.route('/balance/withdraw').post(protect, balanceWithdraw);
 router.route('/balance/withdraw/:id').get(protect,getWithdrawSingle);
 router.route('/balance/withdraw/status/:id').put(protect, withdrawTransAcction);
