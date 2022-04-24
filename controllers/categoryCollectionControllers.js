@@ -74,7 +74,7 @@ const insideSurvingSizeCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        const resData = await InsideServingSize.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType")
+        const resData = await InsideServingSize.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize")
         return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
     }
     catch (error) {
@@ -156,7 +156,7 @@ const insideSurvingSizeUpdate = async (req, res, next) => {
         if (!update) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        const resData = await InsideServingSize.findOne({ _id: update?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType")
+        const resData = await InsideServingSize.findOne({ _id: update?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize")
         return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
     }
     catch (error) {
@@ -166,7 +166,7 @@ const insideSurvingSizeUpdate = async (req, res, next) => {
 
 const getCategory = async (req, res, next) => {
     try {
-        const allCategory = await InsideServingSize.find({}).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType");
+        const allCategory = await InsideServingSize.find({}).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize");
         return res.status(200).json({ data: allCategory })
     }
     catch (error) {

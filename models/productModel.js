@@ -21,12 +21,12 @@ const productSchema = mongoose.Schema({
         ref: 'InsideSubCategory',
         required: [true, 'Please select a inside Sub Category!']
     },
-    pack_type: {
+    packType: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'InsidePackType',
         required: [true, 'Please select a pack type!']
     },
-    serving_size: {
+    servingSize: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'InsideServingSize',
         required: [true, 'Please select a serving size!']

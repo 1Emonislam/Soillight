@@ -2,7 +2,7 @@ const Shop = require('../models/shopModel');
 const Product = require('../models/productModel');
 const Notification = require('../models/notificationMdels');
 const productCreate = async (req, res, next) => {
-    const { name, category, subCategory, pack_type, serving_size, insideSubCategory, img, quantity, price } = req.body;
+    const { name, category, subCategory, packType, servingSize, insideSubCategory, img, quantity, price } = req.body;
     const issue = {};
     if (!name) {
         issue.name = "Please fill up the Product Name!";
@@ -13,11 +13,11 @@ const productCreate = async (req, res, next) => {
     if (!subCategory) {
         issue.subCategory = "Please fill up the Product Sub CategoryId!"
     }
-    if (!pack_type) {
-        issue.pack_type = "Please fill up the Product Pack Type!"
+    if (!packType) {
+        issue.packType = "Please fill up the Product Pack Type!"
     }
-    if (!serving_size) {
-        issue.serving_size = "Please fill up the Product Serving Size!";
+    if (!servingSize) {
+        issue.servingSize = "Please fill up the Product Serving Size!";
     }
     if (!price) {
         issue.price = "Please fill up the Product Price!"
@@ -36,7 +36,7 @@ const productCreate = async (req, res, next) => {
         if (shop) {
             if (req?.user?.isAdmin === true) {
                 const productCreated = await Product.create({
-                    name, category, subCategory, pack_type, insideSubCategory, serving_size, status: 'approved', shop: shop._id, quantity, price, img, user: req?.user?._id
+                    name, category, subCategory, packType, insideSubCategory, servingSize, status: 'approved', shop: shop._id, quantity, price, img, user: req?.user?._id
                 });
                 if (!productCreated) {
                     return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })
@@ -48,13 +48,13 @@ const productCreate = async (req, res, next) => {
                         message: `Congratulations! The product is approved!.`,
                     };
                     await Notification.create(NotificationSend);
-                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType");
+                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize");
                     return res.status(200).json({ message: "Product submission successfully! The product is approved!.", data: resData })
                 }
             }
             if ((req?.user?.role === 'seller')) {
                 const productCreated = await Product.create({
-                    name, category, insideSubCategory, subCategory, pack_type, serving_size, quantity, price, img, user: req?.user?._id
+                    name, category, insideSubCategory, subCategory, packType, servingSize, quantity, price, img, user: req?.user?._id
                 });
                 if (!productCreated) {
                     return res.status(400).json({ error: { "product": "Products submission failed! Please try again!" } })
@@ -66,7 +66,7 @@ const productCreate = async (req, res, next) => {
                         message: `Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered.`,
                     };
                     await Notification.create(NotificationSend);
-                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType");
+                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("servingSize","_id servingSize");
                     return res.status(200).json({ message: "Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered.", data: resData })
                 }
             } else {
@@ -79,14 +79,14 @@ const productCreate = async (req, res, next) => {
     }
 }
 const productUpdate = async (req, res, next) => {
-    const { name, category, subCategory, pack_type, insideSubCategory, serving_size, img, quantity, price } = req.body;
+    const { name, category, subCategory, packType, insideSubCategory, servingSize, img, quantity, price } = req.body;
     try {
         if (!(req?.user?.role === 'seller' || req?.user?.isAdmin === true)) {
             return res.status(400).json({ error: { "product": "Permission denied! Buyers do not update the products!." } })
         } else {
             const productUpdated = await Product.findByIdAndUpdate(req.params.id, {
-                name, category, subCategory, pack_type, serving_size, insideSubCategory, img, quantity, price
-            }, { new: true }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType");
+                name, category, subCategory, packType, servingSize, insideSubCategory, img, quantity, price
+            }, { new: true }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize");
             if (!productUpdated) {
                 return res.status(400).json({ error: { "product": "Product not founds!" }, data: [] })
             }
@@ -143,7 +143,7 @@ const getSignleProduct = async (req, res, next) => {
                     select: "_id address location name",
                 },
             ],
-        }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType");
+        }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize");
         return res.status(200).json({ data: product })
     }
     catch (error) {
@@ -169,7 +169,7 @@ const productStatusUpdate = async (req, res, next) => {
                 select: "_id address location name",
             },
         ],
-    }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType");
+    }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize");
     if (!productCheck) {
         return res.status(404).json({ error: { "product": "product not founds!" }, data: [] })
     }
@@ -193,7 +193,7 @@ const productStatusUpdate = async (req, res, next) => {
                 select: "_id address location name",
             },
         ],
-    }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType");
+    }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize");
     if (product?.status === 'approved') {
         const NotificationSend = {
             sender: req?.user?._id,

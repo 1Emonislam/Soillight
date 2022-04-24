@@ -54,7 +54,7 @@ const orderAdd = async (req, res, next) => {
 				path: "user",
 				select: "_id name address phone email pic",
 			})
-				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -117,7 +117,7 @@ const orderSearch = async (req, res, next) => {
 					path: "user",
 					select: "_id name address phone email pic",
 				})
-				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -139,7 +139,7 @@ const orderSearch = async (req, res, next) => {
 					path: "user",
 					select: "_id name address phone email pic",
 				})
-				.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				.populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -211,7 +211,7 @@ const singleOrder = async (req, res, next) => {
 				path: "user",
 				select: "_id name address phone email pic",
 			})
-			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			.populate("products.productId", "_id name img packType servingSize numReviews rating")
 			.populate({
 				path: "products.productOwner",
 				select: "_id name address phone email sellerShop pic",
@@ -246,7 +246,7 @@ const orderStatusUpdate = async (req, res, next) => {
 			path: "user",
 			select: "_id name address phone email pic",
 		})
-			.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			.populate("products.productId", "_id name img packType servingSize numReviews rating")
 			.populate({
 				path: "products.productOwner",
 				select: "_id name address phone email sellerShop pic",
@@ -331,7 +331,7 @@ const orderStatusUpdate = async (req, res, next) => {
 						path: "user",
 						select: "_id name address phone email pic",
 					})
-						.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+						.populate("products.productId", "_id name img packType servingSize numReviews rating")
 						.populate({
 							path: "products.productOwner",
 							select: "_id name address phone email sellerShop pic",
@@ -425,7 +425,7 @@ const orderStatusUpdate = async (req, res, next) => {
 						path: "user",
 						select: "_id name address phone email pic",
 					})
-						.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+						.populate("products.productId", "_id name img packType servingSize numReviews rating")
 						.populate({
 							path: "products.productOwner",
 							select: "_id name address phone email sellerShop pic",
@@ -519,7 +519,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					path: "user",
 					select: "_id name address phone email pic",
 				})
-					.populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+					.populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -605,7 +605,7 @@ const allStatusOrder = async (req, res, next) => {
 		const order = await Order.find({ currentStatus: status }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
-		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+		}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 			.populate({
 				path: "products.productOwner",
 				select: "_id name address phone email sellerShop pic",
@@ -621,7 +621,7 @@ const allStatusOrder = async (req, res, next) => {
 		const count = await Order.find({ currentStatus: status }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
-		}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+		}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 			.populate({
 				path: "products.productOwner",
 				select: "_id name address phone email sellerShop pic",
@@ -648,7 +648,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const order = await Order.find({ currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -664,7 +664,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const count = await Order.find({ currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -684,7 +684,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const order = await Order.find({}).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -700,7 +700,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const count = await Order.find({}).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -724,7 +724,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -740,7 +740,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -760,7 +760,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -776,7 +776,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -799,7 +799,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -815,7 +815,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -836,7 +836,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -852,7 +852,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -876,7 +876,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -892,7 +892,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -912,7 +912,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -928,7 +928,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img pack_type serving_size numReviews rating")
+			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
