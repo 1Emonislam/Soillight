@@ -66,7 +66,7 @@ const productCreate = async (req, res, next) => {
                         message: `Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered.`,
                     };
                     await Notification.create(NotificationSend);
-                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("servingSize","_id servingSize");
+                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize");
                     return res.status(200).json({ message: "Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered.", data: resData })
                 }
             } else {
