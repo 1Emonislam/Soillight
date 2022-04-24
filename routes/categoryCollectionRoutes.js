@@ -1,10 +1,9 @@
 const express = require('express');
-const { categoryCollectionAdd, categoryCollectionRemove, categoryCollectionUpdate, categoryCollectionGet, subCategoryAndCategoryCollectionGet } = require('../controllers/categoryCollectionControllers');
+const { categoryCreate, subCategoryCreate, insideSubCategoryCreate, insidePackTypeCreate, insideSurvingSizeCreate } = require('../controllers/categoryCollectionControllers');
 const { protect } = require('../middlewares/authMiddleware');
-const router = express.Router();
-router.route("/category-collection-get").get(categoryCollectionGet)
-router.route("/category-collection-add").post(protect, categoryCollectionAdd)
-router.route("/category-collection-update").put(protect, categoryCollectionUpdate)
-router.route("/category-collection-removed").delete(protect, categoryCollectionRemove)
-router.route("/sub-category-and-category-collection-get").get(subCategoryAndCategoryCollectionGet)
+router.post('/category', protect, categoryCreate);
+router.post('/sub/category', protect, subCategoryCreate);
+router.post('/inside/pack/type', protect, insidePackTypeCreate);
+router.post('/inside/sub/category', protect, insideSubCategoryCreate);
+router.post('/inside/serving/size', protect, insideSurvingSizeCreate);
 module.exports = router;

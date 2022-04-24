@@ -1,9 +1,34 @@
 const BalanceWithdraw = require('../models/balanceWithdrawModels');
 const User = require('../models/userModel');
 const BankLinked = require('../models/bankLinkedModel');
-const MyBalance = require('../models/myBalance');
 const Notification = require('../models/notificationMdels');
-const myBalanceGet =async (req, res, next) => {
+const { BalanceAdd, MyBalance } = require('../models/myBalance');
+const myBalanceAdd = async (req, res, next) => {
+    try {
+        if (!req.user?._id) {
+            return res.status(400).json({ error: { email: "Permission denied Please Login Before access this page" } })
+        }
+        const { amount, transaction_id, tx_ref } = req.body;
+        const balanceAdded = await BalanceAdd.create({ amount, transaction_id, tx_ref, user: req.user?._id });
+        if (!balanceAdded) {
+            return res.status(400).json({ error: { my_balance: 'Balance added failed!' } })
+        }
+        if (balanceAdded) {
+            const myBalance = await MyBalance.findOneAndUpdate({ user: req.user?._id }, { $inc: { balance: balanceAdded?.amount } },
+                { new: true });
+            const notificationObj = {
+                receiver: req.user?._id,
+                message: `Congratulations you have added New Balance ${balanceAdded.amount} Total balance available ${myBalance.balance}`,
+            }
+            await Notification.create(notificationObj);
+            return res.status(200).json({ message: `Congratulations you have added New Balance ${balanceAdded.amount} Total balance available ${myBalance.balance}`, data: myBalance });
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const myBalanceGet = async (req, res, next) => {
     try {
         const myBalance = await User.findOne({ _id: req?.user?._id }).select("my_balance").populate("my_balance")
         return res.status(200).json({ data: myBalance })
@@ -164,4 +189,11 @@ const getWithdrawSingle = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = {myBalanceGet, balanceWithdraw, getWithdrawSingle, withdrawTransAcction, withdrawStatusByHistory };
+module.exports = {
+    myBalanceGet,
+    balanceWithdraw,
+    getWithdrawSingle,
+    withdrawTransAcction,
+    withdrawStatusByHistory,
+    myBalanceAdd
+};

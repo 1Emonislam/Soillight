@@ -1,21 +1,106 @@
 const mongoose = require('mongoose');
 const Schema = require('mongoose').Schema;
-const categoryCollectionSchema = mongoose.Schema({
+const categorySchema = mongoose.Schema({
     category: {
         type: String,
         trim: true,
         required: [true, 'Please select a category!']
     },
+}, { timestamps: true })
+
+const Category = mongoose.model("Category", categorySchema);
+const subCategorySchema = mongoose.Schema({
     subCategory: {
         type: String,
         trim: true,
         required: [true, 'Please select a sub category!']
     },
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: [true, "Please provide user ID"]
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: [true, 'Please select a category!']
     },
 }, { timestamps: true })
-const CategoryCollection = mongoose.model("CategoryCollection", categoryCollectionSchema);
-module.exports = CategoryCollection;
+
+const SubCategory = mongoose.model("SubCategory", subCategorySchema);
+
+const insideSubCategorySchema = mongoose.Schema({
+    insideSubCategory: {
+        type: String,
+        trim: true,
+        required: [true, 'Please select a inside Sub Category!']
+    },
+    subCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SubCategory",
+        required: [true, 'Please select a Sub Category!']
+    },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: [true, 'Please select a Category!']
+    },
+}, { timestamps: true })
+
+const InsideSubCategory = mongoose.model("InsideSubCategory", insideSubCategorySchema);
+
+const insidePackTypeSchema = mongoose.Schema({
+    packType: {
+        type: String,
+        trim: true,
+        required: [true, 'Please select a pack type!']
+    },
+    insideSubCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "InsideSubCategory",
+        required: [true, 'Please select a inside sub category!']
+    },
+    subCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SubCategory",
+        required: [true, 'Please select a Sub category!']
+    },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: [true, 'Please select a category!']
+    },
+}, { timestamps: true })
+const InsidePackType = mongoose.model("InsidePackType", insidePackTypeSchema);
+
+const insideServingSizeSchema = mongoose.Schema({
+    servingSize: {
+        type: String,
+        trim: true,
+        required: [true, 'Please select a surving size!']
+    },
+    insideSubCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "InsideSubCategory",
+        required: [true, 'Please select a inside sub category!']
+    },
+    packType: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "InsidePackType",
+        required: [true, 'Please select a Pack Type!']
+    },
+    subCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SubCategory",
+        required: [true, 'Please select a sub category!']
+    },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: [true, 'Please select a category!']
+    },
+}, { timestamps: true })
+
+const InsideServingSize = mongoose.model("InsideServingSize", insideServingSizeSchema);
+module.exports = {
+    Category,
+    SubCategory,
+    InsideSubCategory,
+    InsidePackType,
+    InsideServingSize
+};

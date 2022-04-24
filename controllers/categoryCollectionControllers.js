@@ -1,147 +1,87 @@
-const Category = require("../models/categoryModel");
-const SubCategory = require("../models/subCategory");
-const categoryCollectionAdd = async (req, res, next) => {
-    //category
-    const categoryName = req.body?.category?.name;
-    const categoryImage = req.body?.category?.img;
-    //sub category 
-    const subcategoryName = req.body?.subCategory?.name;
-    const subcategoryImage = req.body?.subCategory?.img;
-    const categoryId = req.body?.subCategory?.categoryId;
+const { Category, SubCategory, InsideSubCategory, InsidePackType, InsideServingSize } = require("../models/categoryCollectionModel");
+
+const categoryCreate = async (req, res, next) => {
     try {
-        if (categoryId) {
-            const created = await SubCategory.create({ name: subcategoryName, img: subcategoryImage, category: categoryId });
-            const resData = await SubCategory.findOne({ _id: created._id }).populate("category");
-            return res.status(201).json({ message: 'you have created new Sub Category', data: resData })
+        const category = req.body?.category;
+        const create = await Category.create({ category });
+        if (!create) {
+            return res.status(400).json({ error: { category: 'Category creation failed!' } })
         }
-        if (!categoryId) {
-            const created = await Category.create({ name: categoryName, img: categoryImage });
-            const resData = await Category.findOne({ _id: created?._id })
-            return res.status(201).json({ message: 'you have created new Category', data: resData });
-        }
+        return res.status(200).json({ message: "Category Creation Successfully", data: create })
+
     }
     catch (error) {
         next(error)
     }
 }
-const categoryCollectionRemove = async (req, res, next) => {
-    const { categoryId, subCategoryId } = req.body;
+const subCategoryCreate = async (req, res, next) => {
     try {
-        const issue = {}
-        let message = {};
-        if (categoryId && subCategoryId) {
-            await Category.findOneAndRemove({ _id: categoryId }, function (err) {
-                if (err) {
-                    issue.category = 'category removed failed!'
-                }
-                if (!err) {
-                    message.message = "Category Removed!"
-                }
-            });
-            await SubCategory.findOneAndRemove({ _id: subCategoryId, category: categoryId }, function (err) {
-                if (err) {
-                    issue.subCategory = 'SubCategory removed failed!'
-                }
-                if (!err) {
-                    message.message = "Removed category and subCategory!"
-                }
-            });
-            if (Object.keys(issue)?.length) {
-                return res.status(400).json({ error: issue })
-            }
-            if (Object.keys(message)?.length) {
-                return res.status(200).json({ message: message?.message })
-            }
+        const category = req.body?.category;
+        const subCategory = req.body?.subCategory;
+        const create = await SubCategory.create({ category: category, subCategory });
+        if (!create) {
+            return res.status(400).json({ error: { subCategory: 'Sub Category creation failed!' } })
         }
-        if (categoryId) {
-            await Category.findOneAndRemove({ _id: categoryId }, function (err) {
-                if (err) {
-                    return res.status(400).json({ category: 'Category removed failed!' })
-                }
-                if (!err) {
-                    return res.status(200).json({ message: "Category Removed!" })
-                }
-            });
-        }
-        if (subCategoryId) {
-            await SubCategory.findOneAndRemove({ _id: subCategoryId }, function (err) {
-                if (err) {
-                    return res.status(400).json({ category: 'SubCategory removed failed!' })
-                }
-                if (!err) {
-                    return res.status(200).json({ message: "Sub Category Removed!" })
-                }
-            });
-        }
+        return res.status(200).json({ message: "Sub Category Creation Successfully", data: create })
     }
     catch (error) {
         next(error)
     }
 }
-const categoryCollectionUpdate = async (req, res, next) => {
+const insideSubCategoryCreate = async (req, res, next) => {
     try {
-        const categoryName = req.body?.category?.name;
-        const categoryImage = req.body?.category?.img;
-        //sub category 
-        const subcategoryName = req.body?.subCategory?.name;
-        const subcategoryImage = req.body?.subCategory?.img;
-        const categoryId = req.body?.category?.categoryId;
-        const subCategoryId = req.body?.subCategory?.subCategoryId;
-        if (categoryId && subCategoryId) {
-            const update = await Category.findOneAndUpdate({ _id: categoryId }, { name: categoryName, img: categoryImage }, { new: true });
-            const subUpdate = await SubCategory.findOneAndUpdate({ _id: subCategoryId, category: categoryId }, { name: subcategoryName, img: subcategoryImage, category: categoryId }, { new: true }).populate("category");
-            return res.status(201).json({ message: 'Category and sub getegory update successfully!', cetagory: update, subCategory: subUpdate });
+        const category = req.body?.category;
+        const subCategory = req.body?.subCategory;
+        const insideSubCategory = req.body?.insideSubCategory;
+        const create = await InsideSubCategory.create({ category: category, subCategory: subCategory, insideSubCategory });
+        if (!create) {
+            return res.status(400).json({ error: { insideSubCategory: 'Inside Sub Category creation failed!' } })
         }
-        if (subCategoryId) {
-            const update = await SubCategory.findOneAndUpdate({ _id: subCategoryId }, { name: subcategoryName, img: subcategoryImage }, { new: true }).populate("category");
-            return res.status(201).json({ message: 'Sub Category update successfully!', data: update });
-        }
-        if (categoryId) {
-            const update = await Category.findOneAndUpdate({ _id: categoryId }, { name: categoryName, img: categoryImage }, { new: true });
-            return res.status(200).json({ message: 'Category update successfully!', data: update });
-        }
+        return res.status(200).json({ message: "Inside Sub Category Creation Successfully", data: create })
     }
     catch (error) {
         next(error)
     }
 }
-const categoryCollectionGet = async (req, res, next) => {
-    let { page = 1, limit = 10 } = req.query;
-    limit = parseInt(limit);
-    const keyword = req.query.search ? {
-        $or: [
-            { name: { $regex: req.query.search, $options: "i" } },
-        ],
-    } : {};
+const insidePackTypeCreate = async (req, res, next) => {
     try {
-        const data = await Category.find(keyword).limit(limit * 1).skip((page - 1) * limit);
-        return res.status(200).json({ count: data?.length, data: data })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-const subCategoryAndCategoryCollectionGet = async (req, res, next) => {
-    let { category, page = 1, limit = 10 } = req.query;
-    limit = parseInt(limit);
-    const keyword = req.query.search ? {
-        $or: [
-            { name: { $regex: req.query.search, $options: "i" } },
-        ],
-    } : {};
-    const keyword2 = req.query?.category ? {
-        category: category
-    } : { category: category };
-    try {
-        if (category) {
-            const data = await SubCategory.find(keyword2).populate("category").limit(limit * 1).skip((page - 1) * limit);;
-            return res.status(200).json({ data: data })
+        const packType = req.body?.packType;
+        const category = req.body?.category;
+        const subCategory = req.body?.subCategory;
+        const insideSubCategory = req.body?.insideSubCategory;
+        const create = await InsidePackType.create({ category: category, subCategory: subCategory, insideSubCategory: insideSubCategory, packType });
+        if (!create) {
+            return res.status(400).json({ error: { packType: 'packType creation failed!' } })
         }
-        const data = await SubCategory.find(keyword).populate("category").limit(limit * 1).skip((page - 1) * limit);;
-        return res.status(200).json({ data: data })
+        return res.status(200).json({ message: "pack type Creation Successfully", data: create })
+
     }
     catch (error) {
         next(error)
     }
 }
-module.exports = { subCategoryAndCategoryCollectionGet, categoryCollectionGet, categoryCollectionAdd, categoryCollectionRemove, categoryCollectionUpdate }
+const insideSurvingSizeCreate = async (req, res, next) => {
+    try {
+        const servingSize = req.body?.servingSize;
+        const packType = req.body?.packType;
+        const category = req.body?.category;
+        const subCategory = req.body?.subCategory;
+        const insideSubCategory = req.body?.insideSubCategory;
+        const create = await InsideServingSize.create({ category: category, subCategory: subCategory, insideSubCategory: insideSubCategory, packType: packType, servingSize });
+        if (!create) {
+            return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
+        }
+        return res.status(200).json({ message: "Serving Size Creation Successfully", data: create })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+module.exports = {
+    categoryCreate,
+    subCategoryCreate,
+    insideSubCategoryCreate,
+    insidePackTypeCreate,
+    insideSurvingSizeCreate
+}
