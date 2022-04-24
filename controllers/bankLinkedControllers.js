@@ -4,11 +4,14 @@ const bankLinked = async (req, res, next) => {
     const { bank_acc_name, address, bank_acc_num, bank_name, routing_num } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
-     const address1 = req?.body?.location?.address;
+    const address1 = req?.body?.location?.address;
     const houseNumber = req?.body?.location?.houseNumber;
     const floor = req?.body?.location?.floor;
     const information = req?.body?.location?.information;
     try {
+        if (!req.user?._id) {
+            return res.status(400).json({ error: { email: 'Please login Before access this page!' } })
+        }
         const bankCheck = await BankLinked.findOne({ bank_owner: req?.user?._id })
         if (bankCheck) {
             return res.status(302).json({ error: { "bank": "you have already linked bank!" } })
@@ -34,7 +37,7 @@ const bankLinkedUpdate = async (req, res, next) => {
     const { bank_acc_name, bank_name, bank_acc_num, routing_num } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
-     const address1 = req?.body?.location?.address;
+    const address1 = req?.body?.location?.address;
     const houseNumber = req?.body?.location?.houseNumber;
     const floor = req?.body?.location?.floor;
     const information = req?.body?.location?.information;

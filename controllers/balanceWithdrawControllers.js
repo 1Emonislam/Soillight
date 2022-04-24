@@ -38,9 +38,14 @@ const myBalanceGet = async (req, res, next) => {
     }
 }
 const balanceWithdraw = async (req, res, next) => {
-    const { amount, tax } = req.body;
+    let { amount, tax } = req.body;
     try {
+        // console.log(req.user)
+        if (!req.user?._id) {
+            return res.status(400).json({ error: { token: 'Please Login Before access this page!' } })
+        }
         const myBalance = await MyBalance.findOne({ user: req?.user?._id }).populate("user", "name");
+        // console.log(myBalance)
         const bankLinked = await BankLinked.findOne({ bank_owner: req?.user?._id });
         if (!bankLinked) {
             return res.status(400).json({ error: { "withdraw": "please bank linked before withdrawing your balance" } })
@@ -52,14 +57,19 @@ const balanceWithdraw = async (req, res, next) => {
         if (myBalance?.balance === 0) {
             return res.status(406).json({ error: { "withdraw": `You dont'n have enough balance to Insufficient Balance Withdraw incomplete! your account balance is ${myBalance?.balance} ` }, status: "incomplete" });
         }
-        if (myBalance?.balance < (Number(amount) + Number(tax))) {
+        if (tax && amount) {
+            amount = (Number(amount) + Number(tax));
+        } else {
+            amount = Number(amount);
+        }
+        if (myBalance?.balance < amount) {
             return res.status(406).json({ error: { "withdraw": `You don't have enough balance to Insufficient Balance Withdraw incomplete! your account balance is ${myBalance?.balance} ` }, status: "incomplete" });
         }
         const updateTransaction = await MyBalance.findOneAndUpdate(
             {
                 user: req?.user?._id
             },
-            { $inc: { balance: -(Number(amount) + Number(tax)) } },
+            { $inc: { balance: -amount } },
             { new: true }
         );
 

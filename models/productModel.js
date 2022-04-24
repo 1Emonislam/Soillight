@@ -9,19 +9,26 @@ const productSchema = mongoose.Schema({
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
-        required: true
+        required: [true, 'Please select a Category!']
     },
     subCategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'SubCategory',
-        required: false
+        required: [true, 'Please select a Sub Category!']
+    },
+    insideSubCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'InsideSubCategory',
+        required: [true, 'Please select a inside Sub Category!']
     },
     pack_type: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'InsidePackType',
         required: [true, 'Please select a pack type!']
     },
     serving_size: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'InsideServingSize',
         required: [true, 'Please select a serving size!']
     },
     status: {

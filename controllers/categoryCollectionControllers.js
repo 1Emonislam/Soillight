@@ -164,7 +164,18 @@ const insideSurvingSizeUpdate = async (req, res, next) => {
     }
 }
 
+const getCategory = async (req, res, next) => {
+    try {
+        const allCategory = await InsideServingSize.find({}).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType");
+        return res.status(200).json({ data: allCategory })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
+    getCategory,
     categoryCreate,
     subCategoryCreate,
     insideSubCategoryCreate,
@@ -175,4 +186,5 @@ module.exports = {
     insideSubCategoryUpdate,
     insidePackTypeUpdate,
     insideSurvingSizeUpdate,
+
 }
