@@ -22,7 +22,7 @@ const subCategoryCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { subCategory: 'Sub Category creation failed!' } })
         }
-        const resData = await Category.findOne({_id:create?._id}).populate("category","_id category")
+        const resData = await SubCategory.findOne({_id:create?._id}).populate("category","_id category")
         return res.status(200).json({ message: "Sub Category Creation Successfully", data: resData })
     }
     catch (error) {
@@ -74,7 +74,7 @@ const insideSurvingSizeCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        const resData = await InsidePackType.findOne({_id:create?._id}).populate("category","_id category").populate("subCategory","_id subCategory").populate("insideSubCategory","_id insideSubCategory").populate("packType","_id packType")
+        const resData = await InsideServingSize.findOne({_id:create?._id}).populate("category","_id category").populate("subCategory","_id subCategory").populate("insideSubCategory","_id insideSubCategory").populate("packType","_id packType")
         return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
     }
     catch (error) {
