@@ -181,7 +181,7 @@ const latestProducts = async (req, res, next) => {
             ], status: status || 'approved'
         } : { status: 'approved' };
         if (!(req.query?.search || status)) {
-            const result = await Product.find(keyword).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").populate({
+            const result = await Product.find(keyword).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -195,7 +195,7 @@ const latestProducts = async (req, res, next) => {
             return res.json({ count: count, data: result })
         }
         if (req.query?.search || status) {
-            const result = await Product.find(keyword).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").populate({
+            const result = await Product.find(keyword).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -205,7 +205,7 @@ const latestProducts = async (req, res, next) => {
                     },
                 ],
             }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find(keyword).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").count();
+            const count = await Product.find(keyword).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").count();
             return res.json({ count: count, data: result })
         }
     }
@@ -218,7 +218,7 @@ const myProducts = async (req, res, next) => {
     limit = parseInt(limit);
     try {
         if (status) {
-            const result = await Product.find({ user: req?.user?._id, status: status }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").populate({
+            const result = await Product.find({ user: req?.user?._id, status: status }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -228,7 +228,7 @@ const myProducts = async (req, res, next) => {
                     },
                 ],
             }).limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({ user: req?.user?._id, status: status }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").populate({
+            const count = await Product.find({ user: req?.user?._id, status: status }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -240,7 +240,7 @@ const myProducts = async (req, res, next) => {
             }).count();
             return res.json({ count: count, data: result })
         } else {
-            const result = await Product.find({ user: req?.user?._id }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").populate({
+            const result = await Product.find({ user: req?.user?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").populate({
                 path: "user",
                 select: "_id name sellerShop pic",
                 populate: [
@@ -250,7 +250,7 @@ const myProducts = async (req, res, next) => {
                     },
                 ],
             }).limit(limit * 1).skip((page - 1) * limit);
-            const count = await Product.find({ user: req?.user?._id }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").count();
+            const count = await Product.find({ user: req?.user?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").count();
             return res.json({ count: count, data: result })
         }
     }
@@ -262,7 +262,7 @@ const othersSellerProducts = async (req, res, next) => {
     let { page = 1, limit = 10 } = req.query;
     limit = parseInt(limit);
     try {
-        const result = await Product.find({ user: req?.params.id, status: 'approved' }).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").populate({
+        const result = await Product.find({ user: req?.params.id, status: 'approved' }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").populate({
             path: "user",
             select: "_id name pic sellerShop",
             populate: [
@@ -295,7 +295,7 @@ const allProductGet = async (req, res, next) => {
                 { name: { $regex: req.query.search, $options: "i" } },
             ], status: status
         } : { status: status };
-        const product = await Product.find(keyword).populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize").sort("-createdAt").populate({
+        const product = await Product.find(keyword).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").sort("-createdAt").populate({
             path: "user",
             select: "_id name sellerShop pic",
             populate: [
