@@ -118,7 +118,7 @@ const insidePackTypeGet = async (req, res, next) => {
     try {
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
-        const resData = await InsidePackType.find({ insideSubCategory: req.params.id }).select("_id packType").limit(limit * 1).skip((page - 1) * limit);
+        const resData = await InsidePackType.find({ subCategory: req.params.id }).select("_id packType").limit(limit * 1).skip((page - 1) * limit);
         return res.status(200).json({ message: "Selecte Inside Pack Type", data: resData });
 
     }
@@ -130,7 +130,7 @@ const insideServingSizeGet = async (req, res, next) => {
     try {
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
-        const resData = await InsideServingSize.find({ insidePackType: req.params.id }).select("_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+        const resData = await InsideServingSize.find({ subCategory: req.params.id }).select("_id servingSize").limit(limit * 1).skip((page - 1) * limit);
         return res.status(200).json({ message: "Selecte Serving Size", data: resData });
 
     }
