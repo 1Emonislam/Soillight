@@ -1,7 +1,7 @@
 const BankLinked = require("../models/bankLinkedModel");
 const Notification = require("../models/notificationMdels");
 const bankLinked = async (req, res, next) => {
-    const { bank_acc_name, address, bank_acc_num, bank_name, routing_num } = req.body;
+    const { bank_acc_name,bank_acc_num, bank_name, routing_num } = req.body;
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
     const address1 = req?.body?.location?.address;
@@ -17,7 +17,7 @@ const bankLinked = async (req, res, next) => {
             return res.status(302).json({ error: { "bank": "you have already linked bank!" } })
         }
         const created = await BankLinked.create({
-            bank_acc_name, bank_acc_num, routing_num, address, bank_name, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, bank_owner: req?.user?._id,
+            bank_acc_name, bank_acc_num, routing_num, bank_name, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] }, bank_owner: req?.user?._id,
         })
         if (created) {
             const NotificationSendObj = {

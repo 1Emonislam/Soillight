@@ -53,10 +53,6 @@ const bankLinkedSchema = mongoose.Schema({
         type: String,
         default: 'N/A'
     },
-    address: {
-        type: String,
-        default: 'N/A'
-    },
     geometry: LocationSchema,
     bank_owner: {
         type: Schema.Types.ObjectId,
