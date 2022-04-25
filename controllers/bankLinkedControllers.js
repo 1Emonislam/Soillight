@@ -82,6 +82,15 @@ const bankLinkedRemoved = async (req, res, next) => {
         next(error)
     }
 }
+const getBankLinked = async (req, res, next) => {
+    try {
+        const bank = await BankLinked.find({ bank_owner: req?.user?._id });
+        return res.status(200).json({ data: bank })
+    }
+    catch (error) {
+        next(error)
+    }
+}
 const bankStatusAction = async (req, res, next) => {
     const { status } = req.body;
     if (!(req?.user?.isAdmin === true)) {
@@ -120,4 +129,4 @@ const bankStatusAction = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { bankLinked, bankLinkedUpdate, bankLinkedRemoved, bankStatusAction }
+module.exports = { bankLinked, bankLinkedUpdate, bankLinkedRemoved, bankStatusAction,getBankLinked }
