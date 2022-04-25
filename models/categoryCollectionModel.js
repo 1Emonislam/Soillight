@@ -53,7 +53,6 @@ const insidePackTypeSchema = mongoose.Schema({
     insideSubCategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "InsideSubCategory",
-        required: [true, 'Please select a inside sub category!']
     },
     subCategory: {
         type: mongoose.Schema.Types.ObjectId,
@@ -77,12 +76,10 @@ const insideServingSizeSchema = mongoose.Schema({
     insideSubCategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "InsideSubCategory",
-        required: [true, 'Please select a inside sub category!']
     },
     packType: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "InsidePackType",
-        required: [true, 'Please select a Pack Type!']
     },
     subCategory: {
         type: mongoose.Schema.Types.ObjectId,
