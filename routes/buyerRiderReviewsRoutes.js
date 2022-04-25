@@ -1,8 +1,7 @@
 const express = require('express');
+const { giveAReviewUser, updateUserReview } = require('../controllers/buyerRiderReviewControllers');
 const { protect } = require('../middlewares/authMiddleware');
 const router = express.Router();
-router.post('/buyer/reviews', protect);
-router.post('/seller/reviews', protect);
-router.put('/buyer/reviews', protect);
-router.put('/seller/reviews', protect);
+router.post('/user/give/review/:id', protect, giveAReviewUser);
+router.put('/user/give/review', protect, updateUserReview);
 module.exports = router;
