@@ -50,12 +50,11 @@ const insidePackTypeCreate = async (req, res, next) => {
         const packType = req.body?.packType;
         const category = req.body?.category;
         const subCategory = req.body?.subCategory;
-        const insideSubCategory = req.body?.insideSubCategory;
-        const create = await InsidePackType.create({ category: category, subCategory: subCategory, insideSubCategory: insideSubCategory, packType });
+        const create = await InsidePackType.create({ category: category, subCategory: subCategory, packType });
         if (!create) {
             return res.status(400).json({ error: { packType: 'packType creation failed!' } })
         }
-        const resData = await InsidePackType.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory")
+        const resData = await InsidePackType.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory")
         return res.status(200).json({ message: "pack type Creation Successfully", data: resData })
 
     }
@@ -66,15 +65,13 @@ const insidePackTypeCreate = async (req, res, next) => {
 const insideServingSizeCreate = async (req, res, next) => {
     try {
         const servingSize = req.body?.servingSize;
-        const packType = req.body?.packType;
         const category = req.body?.category;
         const subCategory = req.body?.subCategory;
-        const insideSubCategory = req.body?.insideSubCategory;
-        const create = await InsideServingSize.create({ category: category, subCategory: subCategory, insideSubCategory: insideSubCategory, packType: packType, servingSize });
+        const create = await InsideServingSize.create({ category: category, subCategory: subCategory,servingSize });
         if (!create) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        const resData = await InsideServingSize.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize")
+        const resData = await InsideServingSize.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory")
         return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
     }
     catch (error) {
