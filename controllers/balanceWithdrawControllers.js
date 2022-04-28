@@ -36,7 +36,7 @@ const myBalanceGet = async (req, res, next) => {
         perviousMonth.setTime(perviousMonth.getTime() - (30 * 24 * 60 * 60 * 1000));
         const currentDate = new Date();
         const myBalance = await User.findOne({ _id: req?.user?._id }).select("my_balance").populate("my_balance");
-        let monthlyCost = await Order.find({ timestamp: { $gte: currentDate, $lte: perviousMonth }, role: 'buyer' });
+        let monthlyCost = await Order.find({ timestamp: { $gte: currentDate, $lte: perviousMonth }, user: req?.user?._id, role: 'buyer' });
         // console.log(req.user._id)
         if (req?.user?.role === 'buyer') {
             let amount;
