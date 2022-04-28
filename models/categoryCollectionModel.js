@@ -6,6 +6,9 @@ const categorySchema = mongoose.Schema({
         trim: true,
         required: [true, 'Please select a category!']
     },
+    img: {
+        type: String,
+    }
 }, { timestamps: true })
 
 const Category = mongoose.model("Category", categorySchema);

@@ -4,6 +4,7 @@ const MyBlance = require('../models/myBalance');
 const Notification = require('../models/notificationMdels');
 const { genToken } = require('../utils/genToken');
 const { sendOtpVia, verifyOtp } = require('../utils/otp');
+const MyBalance = require('../models/myBalance');
 const singleUser = async (req, res, next) => {
     const { id } = req.params;
     try {
@@ -157,11 +158,13 @@ const registrationBuyer = async (req, res, next) => {
             return res.status(400).json({ error: { "email": "Buyer Registration failed!" } });
         }
         if (created) {
-            const balance = await MyBlance.create({
+            const balance = await MyBalance.create({
                 user: created._id,
             })
-            created.my_balance = balance._id;
-            await created.save();
+            if(balance){
+                created.my_balance = balance._id;
+                await created.save();
+            }
             const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             if (send?.sent === false) {

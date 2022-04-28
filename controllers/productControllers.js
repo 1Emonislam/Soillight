@@ -48,7 +48,7 @@ const productCreate = async (req, res, next) => {
                         message: `Congratulations! The product is approved!.`,
                     };
                     await Notification.create(NotificationSend);
-                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
+                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
                     return res.status(200).json({ message: "Product submission successfully! The product is approved!.", data: resData })
                 }
             }
@@ -66,7 +66,7 @@ const productCreate = async (req, res, next) => {
                         message: `Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered.`,
                     };
                     await Notification.create(NotificationSend);
-                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
+                    const resData = await Product.findOne({ _id: productCreated?._id }).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
                     return res.status(200).json({ message: "Your products are Under Review. You will Receive Confirmation Soon. you Can Check the status in products section once registered.", data: resData })
                 }
             } else {
@@ -86,7 +86,7 @@ const productUpdate = async (req, res, next) => {
         } else {
             const productUpdated = await Product.findByIdAndUpdate(req.params.id, {
                 name, category, subCategory, packType, servingSize, insideSubCategory, img, quantity, price
-            }, { new: true }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
+            }, { new: true }).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
             if (!productUpdated) {
                 return res.status(400).json({ error: { "product": "Product not founds!" }, data: [] })
             }
@@ -143,7 +143,7 @@ const getSignleProduct = async (req, res, next) => {
                     select: "_id address location name",
                 },
             ],
-        }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
+        }).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
         return res.status(200).json({ data: product })
     }
     catch (error) {
@@ -169,7 +169,7 @@ const productStatusUpdate = async (req, res, next) => {
                 select: "_id address location name",
             },
         ],
-    }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
+    }).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
     if (!productCheck) {
         return res.status(404).json({ error: { "product": "product not founds!" }, data: [] })
     }
@@ -193,7 +193,7 @@ const productStatusUpdate = async (req, res, next) => {
                 select: "_id address location name",
             },
         ],
-    }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
+    }).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize","_id servingSize").populate("shop","_id name address location phone email closeDate openDate status");
     if (product?.status === 'approved') {
         const NotificationSend = {
             sender: req?.user?._id,

@@ -3,7 +3,8 @@ const { Category, SubCategory, InsideSubCategory, InsidePackType, InsideServingS
 const categoryCreate = async (req, res, next) => {
     try {
         const category = req.body?.category;
-        const create = await Category.create({ category });
+        const img = req.body?.img;
+        const create = await Category.create({ category, img });
         if (!create) {
             return res.status(400).json({ error: { category: 'Category creation failed!' } })
         }
@@ -22,7 +23,7 @@ const subCategoryCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { subCategory: 'Sub Category creation failed!' } })
         }
-        const resData = await SubCategory.findOne({ _id: create?._id }).populate("category", "_id category")
+        const resData = await SubCategory.findOne({ _id: create?._id }).populate("category", "_id category img")
         return res.status(200).json({ message: "Sub Category Creation Successfully", data: resData })
     }
     catch (error) {
@@ -38,7 +39,7 @@ const insideSubCategoryCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { insideSubCategory: 'Inside Sub Category creation failed!' } })
         }
-        const resData = await InsideSubCategory.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory")
+        const resData = await InsideSubCategory.findOne({ _id: create?._id }).populate("category", "_id category img").populate("subCategory", "_id subCategory")
         return res.status(200).json({ message: "Inside Sub Category Creation Successfully", data: resData })
     }
     catch (error) {
@@ -54,7 +55,7 @@ const insidePackTypeCreate = async (req, res, next) => {
         if (!create) {
             return res.status(400).json({ error: { packType: 'packType creation failed!' } })
         }
-        const resData = await InsidePackType.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory")
+        const resData = await InsidePackType.findOne({ _id: create?._id }).populate("category", "_id category img").populate("subCategory", "_id subCategory")
         return res.status(200).json({ message: "pack type Creation Successfully", data: resData })
 
     }
@@ -67,11 +68,11 @@ const insideServingSizeCreate = async (req, res, next) => {
         const servingSize = req.body?.servingSize;
         const category = req.body?.category;
         const subCategory = req.body?.subCategory;
-        const create = await InsideServingSize.create({ category: category, subCategory: subCategory,servingSize });
+        const create = await InsideServingSize.create({ category: category, subCategory: subCategory, servingSize });
         if (!create) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        const resData = await InsideServingSize.findOne({ _id: create?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory")
+        const resData = await InsideServingSize.findOne({ _id: create?._id }).populate("category", "_id category img").populate("subCategory", "_id subCategory")
         return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
     }
     catch (error) {
@@ -82,7 +83,7 @@ const categoryGet = async (req, res, next) => {
     try {
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
-        const resData = await Category.find({}).select("_id category").limit(limit * 1).skip((page - 1) * limit);
+        const resData = await Category.find({}).select("_id category img").limit(limit * 1).skip((page - 1) * limit);
         return res.status(200).json({ message: "Selecte Category", data: resData })
     }
     catch (error) {
@@ -139,8 +140,10 @@ const insideServingSizeGet = async (req, res, next) => {
 const categoryUpdate = async (req, res, next) => {
     try {
         const category = req.body?.category;
+        const img = req.body?.img;
         const update = await Category.findOneAndUpdate({ _id: req?.params?.id }, {
-            category: category
+            category,
+            img
         }, { new: true });
         if (!update) {
             return res.status(400).json({ error: { category: 'Category updated failed!' } })
@@ -161,7 +164,7 @@ const subCategoryUpdate = async (req, res, next) => {
         if (!update) {
             return res.status(400).json({ error: { subCategory: 'Sub Category updated failed!' } })
         }
-        const resData = await SubCategory.findOne({ _id: update?._id }).populate("category", "_id category")
+        const resData = await SubCategory.findOne({ _id: update?._id }).populate("category", "_id category img")
         return res.status(200).json({ message: "Sub category updated successfully", data: resData })
     }
     catch (error) {
@@ -177,7 +180,7 @@ const insideSubCategoryUpdate = async (req, res, next) => {
         if (!update) {
             return res.status(400).json({ error: { insideSubCategory: 'Inside Sub Category updated failed!' } })
         }
-        const resData = await InsideSubCategory.findOne({ _id: update?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory")
+        const resData = await InsideSubCategory.findOne({ _id: update?._id }).populate("category", "_id category img").populate("subCategory", "_id subCategory")
         return res.status(200).json({ message: "Inside Sub Category update Successfully", data: resData })
     }
     catch (error) {
@@ -193,7 +196,7 @@ const insidePackTypeUpdate = async (req, res, next) => {
         if (!update) {
             return res.status(400).json({ error: { packType: 'Pack Type updated failed!' } })
         }
-        const resData = await InsidePackType.findOne({ _id: update?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory")
+        const resData = await InsidePackType.findOne({ _id: update?._id }).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory")
         return res.status(200).json({ message: "Pack Updated Successfully", data: resData })
 
     }
@@ -210,7 +213,7 @@ const insideServingSizeUpdate = async (req, res, next) => {
         if (!update) {
             return res.status(400).json({ error: { servingSize: 'Serving Size creation failed!' } })
         }
-        const resData = await InsideServingSize.findOne({ _id: update?._id }).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize")
+        const resData = await InsideServingSize.findOne({ _id: update?._id }).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize")
         return res.status(200).json({ message: "Serving Size Creation Successfully", data: resData })
     }
     catch (error) {
@@ -220,7 +223,7 @@ const insideServingSizeUpdate = async (req, res, next) => {
 
 const getCategory = async (req, res, next) => {
     try {
-        const allCategory = await InsideServingSize.find({}).populate("category", "_id category").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize");
+        const allCategory = await InsideServingSize.find({}).populate("category", "_id category img").populate("subCategory", "_id subCategory").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize");
         return res.status(200).json({ data: allCategory })
     }
     catch (error) {

@@ -8,13 +8,13 @@ const orderAdd = async (req, res, next) => {
 	if (!(req?.user?._id)) {
 		return res.status(400).json({ error: { status: "user do not exists! please provide valid user credentials!" } })
 	}
-	const { products, maxDistance,address, transaction_id, tx_ref } = req.body;
+	const { products, maxDistance, address, transaction_id, tx_ref } = req.body;
 	const latitude = req?.body?.location?.latitude || 0;
 	const longitude = req?.body?.location?.longitude || 0;
 	const address1 = req?.body?.location?.address;
-    const houseNumber = req?.body?.location?.houseNumber;
-    const floor = req?.body?.location?.floor;
-    const information = req?.body?.location?.information;
+	const houseNumber = req?.body?.location?.houseNumber;
+	const floor = req?.body?.location?.floor;
+	const information = req?.body?.location?.information;
 	const productOwner = [];
 	for (let i = 0; i < products.length; i++) {
 		productOwner.unshift(products[i]?.productOwner)
@@ -53,8 +53,55 @@ const orderAdd = async (req, res, next) => {
 			}, { new: true }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			})
-				.populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -117,7 +164,55 @@ const orderSearch = async (req, res, next) => {
 					path: "user",
 					select: "_id name address phone email pic",
 				})
-				.populate("products.productId", "_id name img packType servingSize numReviews rating")
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -139,7 +234,55 @@ const orderSearch = async (req, res, next) => {
 					path: "user",
 					select: "_id name address phone email pic",
 				})
-				.populate("products.productId", "_id name img packType servingSize numReviews rating")
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -211,7 +354,55 @@ const singleOrder = async (req, res, next) => {
 				path: "user",
 				select: "_id name address phone email pic",
 			})
-			.populate("products.productId", "_id name img packType servingSize numReviews rating")
+			.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 			.populate({
 				path: "products.productOwner",
 				select: "_id name address phone email sellerShop pic",
@@ -246,7 +437,55 @@ const orderStatusUpdate = async (req, res, next) => {
 			path: "user",
 			select: "_id name address phone email pic",
 		})
-			.populate("products.productId", "_id name img packType servingSize numReviews rating")
+			.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 			.populate({
 				path: "products.productOwner",
 				select: "_id name address phone email sellerShop pic",
@@ -331,7 +570,55 @@ const orderStatusUpdate = async (req, res, next) => {
 						path: "user",
 						select: "_id name address phone email pic",
 					})
-						.populate("products.productId", "_id name img packType servingSize numReviews rating")
+						.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 						.populate({
 							path: "products.productOwner",
 							select: "_id name address phone email sellerShop pic",
@@ -425,7 +712,55 @@ const orderStatusUpdate = async (req, res, next) => {
 						path: "user",
 						select: "_id name address phone email pic",
 					})
-						.populate("products.productId", "_id name img packType servingSize numReviews rating")
+						.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 						.populate({
 							path: "products.productOwner",
 							select: "_id name address phone email sellerShop pic",
@@ -519,7 +854,55 @@ const orderStatusUpdate = async (req, res, next) => {
 					path: "user",
 					select: "_id name address phone email pic",
 				})
-					.populate("products.productId", "_id name img packType servingSize numReviews rating")
+					.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -605,7 +988,55 @@ const allStatusOrder = async (req, res, next) => {
 		const order = await Order.find({ currentStatus: status }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
-		}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+		}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 			.populate({
 				path: "products.productOwner",
 				select: "_id name address phone email sellerShop pic",
@@ -621,7 +1052,55 @@ const allStatusOrder = async (req, res, next) => {
 		const count = await Order.find({ currentStatus: status }).populate({
 			path: "user",
 			select: "_id name address phone email pic",
-		}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+		}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 			.populate({
 				path: "products.productOwner",
 				select: "_id name address phone email sellerShop pic",
@@ -648,7 +1127,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const order = await Order.find({ currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -664,7 +1191,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const count = await Order.find({ currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -684,7 +1259,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const order = await Order.find({}).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -700,7 +1323,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const count = await Order.find({}).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -724,7 +1395,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -740,7 +1459,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -760,7 +1527,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -776,7 +1591,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -799,7 +1662,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -815,7 +1726,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -836,7 +1795,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -852,7 +1859,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -876,7 +1931,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -892,7 +1995,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 				const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: status }).populate({
 					path: "user",
 					select: "_id name address phone email pic",
-				}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 					.populate({
 						path: "products.productOwner",
 						select: "_id name address phone email sellerShop pic",
@@ -912,7 +2063,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const order = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",
@@ -928,7 +2127,55 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 			const count = await Order.find({ statusUpdatedBy: req.user._id, currentStatus: "progress" }).populate({
 				path: "user",
 				select: "_id name address phone email pic",
-			}).populate("products.productId", "_id name img packType servingSize numReviews rating")
+			}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "category",
+							select: "_id category img",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "subCategory",
+							select: "_id subCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "insideSubCategory",
+							select: "_id insideSubCategory",
+						},
+					],
+				})
+				.populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "packType",
+							select: "_id packType",
+						},
+					],
+				}).populate({
+					path: "products.productId",
+					select: "_id name img category subCategory insideSubCategory packType  servingSize numReviews rating",
+					populate: [
+						{
+							path: "servingSize",
+							select: "_id servingSize",
+						},
+					],
+				})
 				.populate({
 					path: "products.productOwner",
 					select: "_id name address phone email sellerShop pic",

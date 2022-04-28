@@ -2,7 +2,8 @@ const BalanceWithdraw = require('../models/balanceWithdrawModels');
 const User = require('../models/userModel');
 const BankLinked = require('../models/bankLinkedModel');
 const Notification = require('../models/notificationMdels');
-const { BalanceAdd, MyBalance } = require('../models/myBalance');
+const MyBalance = require('../models/myBalance');
+const BalanceAdd = require('../models/addBalanceModel');
 const myBalanceAdd = async (req, res, next) => {
     try {
         if (!req.user?._id) {
