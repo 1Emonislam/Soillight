@@ -8,6 +8,9 @@ const categorySchema = mongoose.Schema({
     },
     img: {
         type: String,
+    },
+    age: {
+        type: String,
     }
 }, { timestamps: true })
 
@@ -17,6 +20,12 @@ const subCategorySchema = mongoose.Schema({
         type: String,
         trim: true,
         required: [true, 'Please select a sub category!']
+    },
+    img: {
+        type: String,
+    },
+    age: {
+        type: String,
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,

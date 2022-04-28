@@ -59,7 +59,7 @@ const orderAdd = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -69,7 +69,7 @@ const orderAdd = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -170,7 +170,7 @@ const orderSearch = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -180,7 +180,7 @@ const orderSearch = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -240,7 +240,7 @@ const orderSearch = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -250,7 +250,7 @@ const orderSearch = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -360,7 +360,7 @@ const singleOrder = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -370,7 +370,7 @@ const singleOrder = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -443,7 +443,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -453,7 +453,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -576,7 +576,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -586,7 +586,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -718,7 +718,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -728,7 +728,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -860,7 +860,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -870,7 +870,7 @@ const orderStatusUpdate = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -994,7 +994,7 @@ const allStatusOrder = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1004,7 +1004,7 @@ const allStatusOrder = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1058,7 +1058,7 @@ const allStatusOrder = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1068,7 +1068,7 @@ const allStatusOrder = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1133,7 +1133,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1143,7 +1143,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1197,7 +1197,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1207,7 +1207,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1265,7 +1265,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1275,7 +1275,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1329,7 +1329,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1339,7 +1339,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1401,7 +1401,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1411,7 +1411,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1465,7 +1465,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1475,7 +1475,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1533,7 +1533,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1543,7 +1543,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1597,7 +1597,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1607,7 +1607,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1668,7 +1668,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1678,7 +1678,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1732,7 +1732,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1742,7 +1742,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1801,7 +1801,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1811,7 +1811,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1865,7 +1865,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1875,7 +1875,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -1937,7 +1937,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -1947,7 +1947,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -2001,7 +2001,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -2011,7 +2011,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -2069,7 +2069,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -2079,7 +2079,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
@@ -2133,7 +2133,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "category",
-							select: "_id category img",
+							select: "_id category img age",
 						},
 					],
 				})
@@ -2143,7 +2143,7 @@ const orderStatusUpdatedMyHistory = async (req, res, next) => {
 					populate: [
 						{
 							path: "subCategory",
-							select: "_id subCategory",
+							select: "_id subCategory img age",
 						},
 					],
 				})
