@@ -110,16 +110,7 @@ const registrationBuyer = async (req, res, next) => {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
     }
-    function bangladeshiPhoneValided(phone) {
-        const vaidPhone = /^(?:\+88|88)?(01[3-9]\d{8})$/.test(phone);
-        if (vaidPhone) {
-            return true;
-        }
-        return false;
-    }
-    if (!(validatePhone(phone) || bangladeshiPhoneValided(phone))) {
-        return res.status(400).json({ error: { phone: "Phone Number Invalid! Please provide a valid Phone Number!" } })
-    }
+    
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         return emailPattern.test(elementValue);
@@ -192,16 +183,7 @@ const registrationSeller = async (req, res, next) => {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
     }
-    function bangladeshiPhoneValided(phone) {
-        const vaidPhone = /^(?:\+88|88)?(01[3-9]\d{8})$/.test(phone);
-        if (vaidPhone) {
-            return true;
-        }
-        return false;
-    }
-    if (!(validatePhone(phone) || bangladeshiPhoneValided(phone))) {
-        return res.status(400).json({ error: { phone: "Phone Number Invalid! Please provide a valid Phone Number!" } })
-    }
+    
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -286,16 +268,7 @@ const registrationRider = async (req, res, next) => {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
     }
-    function bangladeshiPhoneValided(phone) {
-        const vaidPhone = /^(?:\+88|88)?(01[3-9]\d{8})$/.test(phone);
-        if (vaidPhone) {
-            return true;
-        }
-        return false;
-    }
-    if (!(validatePhone(phone) || bangladeshiPhoneValided(phone))) {
-        return res.status(400).json({ error: { phone: "Phone Number Invalid! Please provide a valid Phone Number!" } })
-    }
+    
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -691,16 +664,7 @@ const ForgetPassword = async (req, res, next) => {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
     }
-    function bangladeshiPhoneValided(phone) {
-        const vaidPhone = /^(?:\+88|88)?(01[3-9]\d{8})$/.test(phone);
-        if (vaidPhone) {
-            return true;
-        }
-        return false;
-    }
-    if (!(validatePhone(phone) || bangladeshiPhoneValided(phone))) {
-        return res.status(400).json({ error: { phone: "Phone Number Invalid! Please provide a valid Phone Number!" } })
-    }
+    
     const userCheck = await User.findOne({ phone: phone });
     if (!userCheck) {
         return res.status(400).json({ error: { phone: "User not exists!. Phone Number doesn't match" } })
