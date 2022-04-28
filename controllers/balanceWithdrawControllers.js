@@ -4,6 +4,7 @@ const BankLinked = require('../models/bankLinkedModel');
 const Notification = require('../models/notificationMdels');
 const MyBalance = require('../models/myBalance');
 const BalanceAdd = require('../models/addBalanceModel');
+const Order = require('../models/ordersModel');
 const myBalanceAdd = async (req, res, next) => {
     try {
         if (!req.user?._id) {
@@ -31,7 +32,30 @@ const myBalanceAdd = async (req, res, next) => {
 }
 const myBalanceGet = async (req, res, next) => {
     try {
-        const myBalance = await User.findOne({ _id: req?.user?._id }).select("my_balance").populate("my_balance")
+        var perviousMonth = new Date();
+        perviousMonth.setTime(perviousMonth.getTime() - (30 * 24 * 60 * 60 * 1000));
+        const currentDate = new Date();
+        const myBalance = await User.findOne({ _id: req?.user?._id }).select("my_balance").populate("my_balance");
+        let monthlyCost = await Order.find({ timestamp: { $gte: currentDate, $lte: perviousMonth }, role: 'buyer' });
+        // console.log(req.user._id)
+        if (req?.user?.role === 'buyer') {
+            let amount;
+            if (monthlyCost) {
+                let price = []
+                monthlyCost?.flat()?.reduce((a, b) => {
+                    price.push({ price: b?.products?.reduce((a, b) => a + Number(b?.price), 0) })
+                })
+                amount = price?.reduce((a, b) => a + Number(b?.price), 0)
+            }
+            // console.log(amount)
+            const data = {
+                role: req?.user?.role,
+                myBalance,
+                monthlyUseCost: amount
+            }
+            // console.log(data)
+            return res.status(200).json(data)
+        }
         return res.status(200).json({ data: myBalance })
     }
     catch (error) {

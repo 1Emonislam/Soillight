@@ -418,7 +418,6 @@ const singleOrder = async (req, res, next) => {
 		return res.status(400).json({ error: { admin: "admin permission required!" } });
 	}
 };
-
 const orderStatusUpdate = async (req, res, next) => {
 	let { status } = req.body;
 	if (!(req?.user?._id)) {
