@@ -40,13 +40,11 @@ const myBalanceGet = async (req, res, next) => {
         // console.log(req.user._id)
         if (monthlyCost?.length) {
             let amount;
-            if (monthlyCost) {
-                let price = []
-                monthlyCost?.flat()?.reduce((a, b) => {
-                    price.push({ price: b?.products?.reduce((a, b) => a + Number(b?.price), 0) })
-                }, 0)
-                amount = price?.reduce((a, b) => a + Number(b?.price), 0)
-            }
+            let price = []
+            monthlyCost?.flat()?.reduce((a, b) => {
+                price.push({ price: b?.products?.reduce((a, b) => a + Number(b?.price), 0) })
+            }, 0)
+            amount = price?.reduce((a, b) => a + Number(b?.price), 0)
             // console.log(amount)
             const data = {
                 role: req?.user?.role,
