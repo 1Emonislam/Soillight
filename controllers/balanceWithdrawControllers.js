@@ -38,23 +38,27 @@ const myBalanceGet = async (req, res, next) => {
         const myBalance = await User.findOne({ _id: req?.user?._id }).select("my_balance").populate("my_balance");
         let monthlyCost = await Order.find({ timestamp: { $gte: currentDate, $lte: perviousMonth }, user: req?.user?._id, role: 'buyer' });
         // console.log(req.user._id)
-        if (req?.user?.role === 'buyer') {
-            let amount;
-            if (monthlyCost) {
-                let price = []
-                monthlyCost?.flat()?.reduce((a, b) => {
-                    price.push({ price: b?.products?.reduce((a, b) => a + Number(b?.price), 0) })
-                })
-                amount = price?.reduce((a, b) => a + Number(b?.price), 0)
+        if (monthlyCost?.length) {
+            if (req?.user?.role === 'buyer') {
+                let amount;
+                if (monthlyCost) {
+                    let price = []
+                    monthlyCost?.flat()?.reduce((a, b) => {
+                        price.push({ price: b?.products?.reduce((a, b) => a + Number(b?.price), 0) })
+                    })
+                    amount = price?.reduce((a, b) => a + Number(b?.price), 0)
+                }
+                // console.log(amount)
+                const data = {
+                    role: req?.user?.role,
+                    myBalance,
+                    monthlyUseCost: amount
+                }
+                // console.log(data)
+                return res.status(200).json(data)
+            } else {
+                return res.status(200).json({ data: myBalance })
             }
-            // console.log(amount)
-            const data = {
-                role: req?.user?.role,
-                myBalance,
-                monthlyUseCost: amount
-            }
-            // console.log(data)
-            return res.status(200).json(data)
         }
         return res.status(200).json({ data: myBalance })
     }
