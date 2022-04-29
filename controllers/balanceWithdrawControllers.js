@@ -45,7 +45,7 @@ const myBalanceGet = async (req, res, next) => {
                     let price = []
                     monthlyCost?.flat()?.reduce((a, b) => {
                         price.push({ price: b?.products?.reduce((a, b) => a + Number(b?.price), 0) })
-                    })
+                    },0)
                     amount = price?.reduce((a, b) => a + Number(b?.price), 0)
                 }
                 // console.log(amount)
