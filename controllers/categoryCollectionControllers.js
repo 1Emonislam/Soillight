@@ -1,11 +1,16 @@
 const { Category, SubCategory, InsideSubCategory, InsidePackType, InsideServingSize } = require("../models/categoryCollectionModel");
+const { upload } = require("../utils/file");
 
 const categoryCreate = async (req, res, next) => {
     try {
         const category = req.body?.category;
-        const img = req.body?.img;
+        let img = req.body?.img;
         const age = req.body?.age;
-        const create = await Category.create({ category, img,age });
+        if (req?.body?.img) {
+            const url = await upload(req?.body?.img);
+            img = url.url;
+        }
+        const create = await Category.create({ category, img, age });
         if (!create) {
             return res.status(400).json({ error: { category: 'Category creation failed!' } })
         }
@@ -20,9 +25,13 @@ const subCategoryCreate = async (req, res, next) => {
     try {
         const category = req.body?.category;
         const subCategory = req.body?.subCategory;
-        const img = req.body?.img;
+        let img = req.body?.img;
         const age = req.body?.age;
-        const create = await SubCategory.create({ category: category, subCategory,img,age });
+        if (req?.body?.img) {
+            const url = await upload(req?.body?.img);
+            img = url.url;
+        }
+        const create = await SubCategory.create({ category: category, subCategory, img, age });
         if (!create) {
             return res.status(400).json({ error: { subCategory: 'Sub Category creation failed!' } })
         }

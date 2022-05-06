@@ -1,6 +1,7 @@
 require("dotenv").config();
 const http = require("http");
 const express = require("express");
+const bodyParser = require('body-parser')
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const { Server, Socket } = require("socket.io");
@@ -46,6 +47,12 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/socket/client/index.html")
 });
+app.use(express.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({
+	extended: false, limit: '50mb', parameterLimit: 100000,
+	extended: true
+}))
+app.use(bodyParser.json({ limit: '50mb' }))
 //Notification Models
 //db connected
 dbConnect();
@@ -63,8 +70,8 @@ app.use('/', balanceWithdrawRoutes)
 app.use('/', balanceHistoryRoutes)
 app.use('/', subscriptionRoutes)
 app.use('/', categoryCollectionRoutes)
-app.use('/',notificationRoutes);
-app.use('/',buyerRiderReviewRoutes)
+app.use('/', notificationRoutes);
+app.use('/', buyerRiderReviewRoutes)
 serverApp.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });
@@ -117,7 +124,7 @@ io.on('connection', async (socket) => {
 			const lastWeek = new Date(new Date() - 7 * 60 * 60 * 24 * 1000);
 			const today = new Date();
 			const notificationToday = await Notification.find({ timestamp: { $gte: today }, receiver: socket.request?.user?._id });
-			const notificationLastWeak = await Notification.find({ timestamp: { $gte: lastWeek }, receiver: socket.request?.user?._id});
+			const notificationLastWeak = await Notification.find({ timestamp: { $gte: lastWeek }, receiver: socket.request?.user?._id });
 			const notificationObj = { today: { todayDate: today, data: notificationToday }, lastWeek: { lastWeekDate: lastWeek, data: notificationLastWeak } };
 			socket.emit("my notification", { data: notificationObj })
 		}

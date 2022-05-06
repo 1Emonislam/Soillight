@@ -5,6 +5,7 @@ const Notification = require('../models/notificationMdels');
 const { genToken } = require('../utils/genToken');
 const { sendOtpVia, verifyOtp } = require('../utils/otp');
 const MyBalance = require('../models/myBalance');
+const { upload } = require('../utils/file');
 const singleUser = async (req, res, next) => {
     const { id } = req.params;
     try {
@@ -347,6 +348,10 @@ const profileUpdate = async (req, res, next) => {
     }
     // console.log(req.body)
     let { name,  role, pic, address } = req.body;
+    if (req?.body?.pic) {
+        const url = await upload(req?.body?.pic);
+        img = url.url;
+    }
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
     const address1 = req?.body?.location?.address;
