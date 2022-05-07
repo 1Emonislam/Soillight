@@ -17,4 +17,9 @@ router.get('/sub/category/:id', protect, subCategoryGet);
 router.get('/inside/pack/type/:id', protect, insidePackTypeGet);
 router.get('/inside/sub/category/:id', protect, insideSubCategoryGet);
 router.get('/inside/serving/size/:id', protect, insideServingSizeGet);
+//categories all search
+router.get('/sub/category', protect, subCategoryGet);
+router.get('/inside/pack/type', protect, insidePackTypeGet);
+router.get('/inside/sub/category', protect, insideSubCategoryGet);
+router.get('/inside/serving/size', protect, insideServingSizeGet);
 module.exports = router;
