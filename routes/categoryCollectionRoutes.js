@@ -4,6 +4,12 @@ const { categoryCreate, subCategoryCreate, insideSubCategoryCreate, insidePackTy
 const { protect } = require('../middlewares/authMiddleware');
 router.post('/category', protect, categoryCreate);
 router.post('/sub/category', protect, subCategoryCreate);
+//categories all search
+router.get('/sub/category', protect, subCategoryGet);
+router.get('/inside/pack/type', protect, insidePackTypeGet);
+router.get('/inside/sub/category', protect, insideSubCategoryGet);
+router.get('/inside/serving/size', protect, insideServingSizeGet);
+//categories search ended
 router.post('/inside/pack/type', protect, insidePackTypeCreate);
 router.post('/inside/sub/category', protect, insideSubCategoryCreate);
 router.post('/inside/serving/size', protect, insideServingSizeCreate);
@@ -17,9 +23,5 @@ router.get('/sub/category/:id', protect, subCategoryGet);
 router.get('/inside/pack/type/:id', protect, insidePackTypeGet);
 router.get('/inside/sub/category/:id', protect, insideSubCategoryGet);
 router.get('/inside/serving/size/:id', protect, insideServingSizeGet);
-//categories all search
-router.get('/sub/category', protect, subCategoryGet);
-router.get('/inside/pack/type', protect, insidePackTypeGet);
-router.get('/inside/sub/category', protect, insideSubCategoryGet);
-router.get('/inside/serving/size', protect, insideServingSizeGet);
+
 module.exports = router;
