@@ -120,6 +120,7 @@ const subCategoryGet = async (req, res, next) => {
         const resData = await SubCategory.find({ keyword }).select("_id subCategory img age").limit(limit * 1).skip((page - 1) * limit);
         const count = await SubCategory.find({ keyword }).select("_id subCategory img age").count()
         return res.status(200).json({ message: "Selecte Sub Category", data: resData, count })
+        
     }
     catch (error) {
         next(error)
