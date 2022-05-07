@@ -95,8 +95,14 @@ const categoryGet = async (req, res, next) => {
     try {
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
-        const resData = await Category.find({}).select("_id category img age").limit(limit * 1).skip((page - 1) * limit);
-        return res.status(200).json({ message: "Selecte Category", data: resData })
+        const keyword = req.query.search ? {
+            $or: [
+                { category: { $regex: req.query.search, $options: "i" } },
+            ],
+        } : {};
+        const resData = await Category.find(keyword).select("_id category img age").limit(limit * 1).skip((page - 1) * limit);
+        const count = await Category.find(keyword).count()
+        return res.status(200).json({ message: "Selecte Category", data: resData, count })
     }
     catch (error) {
         next(error)
@@ -106,8 +112,14 @@ const subCategoryGet = async (req, res, next) => {
     try {
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
-        const resData = await SubCategory.find({ category: req.params.id }).select("_id subCategory img age").limit(limit * 1).skip((page - 1) * limit);
-        return res.status(200).json({ message: "Selecte Sub Category", data: resData })
+        const keyword = req.query.search ? {
+            $or: [
+                { subCategory: { $regex: req.query.search, $options: "i" } },
+            ],
+        } : { category: req.params.id };
+        const resData = await SubCategory.find({ keyword }).select("_id subCategory img age").limit(limit * 1).skip((page - 1) * limit);
+        const count = await SubCategory.find({ keyword }).select("_id subCategory img age").count()
+        return res.status(200).json({ message: "Selecte Sub Category", data: resData, count })
     }
     catch (error) {
         next(error)
@@ -117,8 +129,14 @@ const insideSubCategoryGet = async (req, res, next) => {
     try {
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
-        const resData = await InsideSubCategory.find({ subCategory: req.params.id }).select("_id insideSubCategory").limit(limit * 1).skip((page - 1) * limit);
-        return res.status(200).json({ message: "Selecte Inside Sub Category", data: resData });
+        const keyword = req.query.search ? {
+            $or: [
+                { insideSubCategory: { $regex: req.query.search, $options: "i" } },
+            ],
+        } : { subCategory: req.params.id };
+        const resData = await InsideSubCategory.find(keyword).select("_id insideSubCategory").limit(limit * 1).skip((page - 1) * limit);
+        const count = await InsideSubCategory.find(keyword).count()
+        return res.status(200).json({ message: "Selecte Inside Sub Category", data: resData, count });
     }
     catch (error) {
         next(error)
@@ -128,8 +146,14 @@ const insidePackTypeGet = async (req, res, next) => {
     try {
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
-        const resData = await InsidePackType.find({ subCategory: req.params.id }).select("_id packType").limit(limit * 1).skip((page - 1) * limit);
-        return res.status(200).json({ message: "Selecte Inside Pack Type", data: resData });
+        const keyword = req.query.search ? {
+            $or: [
+                { packType: { $regex: req.query.search, $options: "i" } },
+            ],
+        } : { subCategory: req.params.id };
+        const resData = await InsidePackType.find(keyword).select("_id packType").limit(limit * 1).skip((page - 1) * limit);
+        const count = await InsidePackType.find(keyword).count()
+        return res.status(200).json({ message: "Selecte Inside Pack Type", data: resData, count });
 
     }
     catch (error) {
@@ -140,8 +164,14 @@ const insideServingSizeGet = async (req, res, next) => {
     try {
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
-        const resData = await InsideServingSize.find({ subCategory: req.params.id }).select("_id servingSize").limit(limit * 1).skip((page - 1) * limit);
-        return res.status(200).json({ message: "Selecte Serving Size", data: resData });
+        const keyword = req.query.search ? {
+            $or: [
+                { servingSize: { $regex: req.query.search, $options: "i" } },
+            ],
+        } : { subCategory: req.params.id };
+        const resData = await InsideServingSize.find(keyword).select("_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+        const count = await InsideServingSize.find(keyword).count()
+        return res.status(200).json({ message: "Selecte Serving Size", data: resData, count });
 
     }
     catch (error) {
