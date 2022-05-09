@@ -3,8 +3,8 @@ const { upload } = require("../utils/file");
 
 const categoryCreate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const category = req.body?.category;
         let img = req.body?.img;
@@ -26,8 +26,8 @@ const categoryCreate = async (req, res, next) => {
 }
 const subCategoryCreate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const category = req.body?.category;
         const subCategory = req.body?.subCategory;
@@ -50,8 +50,8 @@ const subCategoryCreate = async (req, res, next) => {
 }
 const insideSubCategoryCreate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const category = req.body?.category;
         const subCategory = req.body?.subCategory;
@@ -69,8 +69,8 @@ const insideSubCategoryCreate = async (req, res, next) => {
 }
 const insidePackTypeCreate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const packType = req.body?.packType;
         const category = req.body?.category;
@@ -89,8 +89,8 @@ const insidePackTypeCreate = async (req, res, next) => {
 }
 const insideServingSizeCreate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const servingSize = req.body?.servingSize;
         const category = req.body?.category;
@@ -108,8 +108,8 @@ const insideServingSizeCreate = async (req, res, next) => {
 }
 const categoryGet = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
@@ -128,8 +128,8 @@ const categoryGet = async (req, res, next) => {
 }
 const subCategoryGet = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
@@ -158,8 +158,8 @@ const subCategoryGet = async (req, res, next) => {
 }
 const insideSubCategoryGet = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
@@ -187,8 +187,8 @@ const insideSubCategoryGet = async (req, res, next) => {
 }
 const insidePackTypeGet = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
@@ -217,8 +217,8 @@ const insidePackTypeGet = async (req, res, next) => {
 }
 const insideServingSizeGet = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
@@ -248,8 +248,8 @@ const insideServingSizeGet = async (req, res, next) => {
 
 const categoryUpdate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const category = req.body?.category;
         const img = req.body?.img;
@@ -271,8 +271,8 @@ const categoryUpdate = async (req, res, next) => {
 }
 const subCategoryUpdate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const subCategory = req.body?.subCategory;
         const img = req.body?.img;
@@ -294,8 +294,8 @@ const subCategoryUpdate = async (req, res, next) => {
 }
 const insideSubCategoryUpdate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const insideSubCategory = req.body?.insideSubCategory;
         const update = await InsideSubCategory.findOneAndUpdate({ _id: req.params.id }, {
@@ -313,8 +313,8 @@ const insideSubCategoryUpdate = async (req, res, next) => {
 }
 const insidePackTypeUpdate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const packType = req.body?.packType;
         const update = await InsidePackType.findOneAndUpdate({ _id: req.params.id }, {
@@ -333,8 +333,8 @@ const insidePackTypeUpdate = async (req, res, next) => {
 }
 const insideServingSizeUpdate = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const servingSize = req.body?.servingSize;
         const update = await InsideServingSize.findOneAndUpdate({ _id: req.params.id }, {
@@ -354,15 +354,15 @@ const insideServingSizeUpdate = async (req, res, next) => {
 //delete Category 
 const deleteCategory = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = Category.findOneAndRemove({ _id: req.params.id });
-        if (!deleted) {
-            res.status.json({ error: { "exist": "Category Delete Failed! Not Exists!" } })
-        }
-        if (deleted) {
+        const deleted = Category.deleteOne({ _id: req.params.id });
+        if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Category Deleted Successfully!' })
+
+        } else {
+            res.status(400).json({ error: { "exist": "Category Delete Failed! Not Exists!" } })
         }
     }
     catch (error) {
@@ -371,15 +371,14 @@ const deleteCategory = async (req, res, next) => {
 }
 const deleteSubCategory = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = SubCategory.findOneAndRemove({ _id: req.params.id });
-        if (!deleted) {
-            res.status.json({ error: { "exist": "Sub Category Delete Failed! Not Exist!" } })
-        }
-        if (deleted) {
+        const deleted = SubCategory.deleteOne({ _id: req.params.id });
+        if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Sub Category Deleted Successfully!' })
+        } else {
+            res.status(400).json({ error: { "exist": "Sub Category Delete Failed! Not Exist!" } })
         }
     }
     catch (error) {
@@ -388,15 +387,14 @@ const deleteSubCategory = async (req, res, next) => {
 }
 const deleteInsideSubCategory = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = InsideSubCategory.findOneAndRemove({ _id: req.params.id });
-        if (!deleted) {
-            res.status.json({ error: { "exist": "Inside Sub Category Delete Failed! Not Exists!" } })
-        }
-        if (deleted) {
+        const deleted = InsideSubCategory.deleteOne({ _id: req.params.id });
+        if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Inside Sub Category  Deleted Successfully!' })
+        } else {
+            res.status(400).json({ error: { "exist": "Inside Sub Category Delete Failed! Not Exists!" } })
         }
     }
     catch (error) {
@@ -405,15 +403,14 @@ const deleteInsideSubCategory = async (req, res, next) => {
 }
 const deletePackType = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = InsidePackType.findOneAndRemove({ _id: req.params.id });
-        if (!deleted) {
-            res.status.json({ error: { "exist": "Pack Type Delete Failed! Not Exist!" } })
-        }
-        if (deleted) {
+        const deleted = InsidePackType.deleteOne({ _id: req.params.id });
+        if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Pack Type Deleted Successfully!' })
+        }else{
+            res.status(400).json({ error: { "exist": "Pack Type Delete Failed! Not Exist!" } })
         }
     }
     catch (error) {
@@ -422,14 +419,13 @@ const deletePackType = async (req, res, next) => {
 }
 const deleteServingSize = async (req, res, next) => {
     try {
-        if(req.user?.isAdmin !== true){
-            return res.status(400).json({error:{permission:"You can perform only Admin"}})
+        if (req.user?.isAdmin !== true) {
+            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = InsideServingSize.findOneAndRemove({ _id: req.params.id });
-        if (!deleted) {
-            res.status.json({ error: { "exist": "Surving Size Delete Failed! Not Exist" } })
-        }
-        if (deleted) {
+        const deleted = InsideServingSize.deleteOne({ _id: req.params.id });
+        if (deleted?.deletedCount === 1) {
+            res.status(400).json({ error: { "exist": "Surving Size Delete Failed! Not Exist" } })
+        }else{
             res.status(200).json({ message: 'Surving Size Deleted Successfully!' })
         }
     }
