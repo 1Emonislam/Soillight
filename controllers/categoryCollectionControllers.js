@@ -358,6 +358,7 @@ const deleteCategory = async (req, res, next) => {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
         const deleted = Category.deleteOne({ _id: req.params.id });
+        console.log(deleted)
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Category Deleted Successfully!' })
 
