@@ -424,9 +424,9 @@ const deleteServingSize = async (req, res, next) => {
         }
         const deleted = InsideServingSize.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
-            res.status(400).json({ error: { "exist": "Surving Size Delete Failed! Not Exist" } })
-        }else{
             res.status(200).json({ message: 'Surving Size Deleted Successfully!' })
+        }else{
+            res.status(400).json({ error: { "exist": "Surving Size Delete Failed! Not Exist" } })
         }
     }
     catch (error) {
