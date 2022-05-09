@@ -23,7 +23,7 @@ router.get('/sub/category/:id', protect, subCategoryGet);
 router.get('/inside/pack/type/:id', protect, insidePackTypeGet);
 router.get('/inside/sub/category/:id', protect, insideSubCategoryGet);
 router.get('/inside/serving/size/:id', protect, insideServingSizeGet);
-router.delete('/category:/id', protect, deleteCategory);
+router.delete('/category/:id', protect, deleteCategory);
 router.delete('/sub/category/:id', protect, deleteSubCategory);
 router.delete('/inside/pack/type/:id', protect,deletePackType );
 router.delete('/inside/sub/category/:id', protect,deleteInsideSubCategory);
