@@ -422,7 +422,7 @@ const deleteServingSize = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted =await InsideServingSize.deleteOne({ _id: req.params.id });
+        const deleted = await InsideServingSize.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Surving Size Deleted Successfully!' })
         } else {
