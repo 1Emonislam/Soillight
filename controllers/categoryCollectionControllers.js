@@ -306,10 +306,72 @@ const insideServingSizeUpdate = async (req, res, next) => {
     }
 }
 
-const getCategory = async (req, res, next) => {
+//delete Category 
+const deleteCategory = async (req, res, next) => {
     try {
-        const allCategory = await InsideServingSize.find({}).populate("category", "_id category img age").populate("subCategory", "_id subCategory img age").populate("insideSubCategory", "_id insideSubCategory").populate("packType", "_id packType").populate("servingSize", "_id servingSize");
-        return res.status(200).json({ data: allCategory })
+        const deleted = Category.findOneAndRemove({ _id: req.params.id });
+        if (!deleted) {
+            res.status.json({ error: { "exist": "Category Delete Failed! Not Exists!" } })
+        }
+        if (deleted) {
+            res.status(200).json({ message: 'Category Deleted Successfully!' })
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const deleteSubCategory = async (req, res, next) => {
+    try {
+        const deleted = SubCategory.findOneAndRemove({ _id: req.params.id });
+        if (!deleted) {
+            res.status.json({ error: { "exist": "Sub Category Delete Failed! Not Exist!" } })
+        }
+        if (deleted) {
+            res.status(200).json({ message: 'Sub Category Deleted Successfully!' })
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const deleteInsideSubCategory = async (req, res, next) => {
+    try {
+        const deleted = InsideSubCategory.findOneAndRemove({ _id: req.params.id });
+        if (!deleted) {
+            res.status.json({ error: { "exist": "Inside Sub Category Delete Failed! Not Exists!" } })
+        }
+        if (deleted) {
+            res.status(200).json({ message: 'Inside Sub Category  Deleted Successfully!' })
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const deletePackType = async (req, res, next) => {
+    try {
+        const deleted = InsidePackType.findOneAndRemove({ _id: req.params.id });
+        if (!deleted) {
+            res.status.json({ error: { "exist": "Pack Type Delete Failed! Not Exist!" } })
+        }
+        if (deleted) {
+            res.status(200).json({ message: 'Pack Type Deleted Successfully!' })
+        }
+    }
+    catch (error) {
+        next(error)
+    }
+}
+const deleteServingSize = async (req, res, next) => {
+    try {
+        const deleted = InsideServingSize.findOneAndRemove({ _id: req.params.id });
+        if (!deleted) {
+            res.status.json({ error: { "exist": "Surving Size Delete Failed! Not Exist" } })
+        }
+        if (deleted) {
+            res.status(200).json({ message: 'Surving Size Deleted Successfully!' })
+        }
     }
     catch (error) {
         next(error)
@@ -317,6 +379,11 @@ const getCategory = async (req, res, next) => {
 }
 
 module.exports = {
+    deleteCategory,
+    deleteServingSize,
+    deleteInsideSubCategory,
+    deleteSubCategory,
+    deletePackType,
     categoryCreate,
     subCategoryCreate,
     insideSubCategoryCreate,

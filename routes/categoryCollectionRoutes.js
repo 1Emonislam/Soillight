@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { categoryCreate, subCategoryCreate, insideSubCategoryCreate, insidePackTypeCreate, insideServingSizeCreate, categoryUpdate, subCategoryUpdate, insidePackTypeUpdate, insideSubCategoryUpdate, insideServingSizeUpdate, getCategory, categoryGet, subCategoryGet, insidePackTypeGet, insideSubCategoryGet, insideServingSizeGet } = require('../controllers/categoryCollectionControllers');
+const { categoryCreate, subCategoryCreate, insideSubCategoryCreate, insidePackTypeCreate, insideServingSizeCreate, categoryUpdate, subCategoryUpdate, insidePackTypeUpdate, insideSubCategoryUpdate, insideServingSizeUpdate, getCategory, categoryGet, subCategoryGet, insidePackTypeGet, insideSubCategoryGet, insideServingSizeGet, deleteCategory, deleteSubCategory, deleteInsideSubCategory, deletePackType, deleteServingSize } = require('../controllers/categoryCollectionControllers');
 const { protect } = require('../middlewares/authMiddleware');
 router.post('/category', protect, categoryCreate);
 router.post('/sub/category', protect, subCategoryCreate);
@@ -23,5 +23,10 @@ router.get('/sub/category/:id', protect, subCategoryGet);
 router.get('/inside/pack/type/:id', protect, insidePackTypeGet);
 router.get('/inside/sub/category/:id', protect, insideSubCategoryGet);
 router.get('/inside/serving/size/:id', protect, insideServingSizeGet);
+router.delete('/category:/id', protect, deleteCategory);
+router.delete('/sub/category/:id', protect, deleteSubCategory);
+router.delete('/inside/pack/type/:id', protect,deletePackType );
+router.delete('/inside/sub/category/:id', protect,deleteInsideSubCategory);
+router.delete('/inside/serving/size/:id', protect, deleteServingSize);
 
 module.exports = router;
