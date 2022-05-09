@@ -118,7 +118,7 @@ const categoryGet = async (req, res, next) => {
                 { category: { $regex: req.query.search, $options: "i" } },
             ],
         } : {};
-        const resData = await Category.find(keyword).select("_id category img age").limit(limit * 1).skip((page - 1) * limit);
+        const resData = await Category.find(keyword).select("_id category img age").sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
         const count = await Category.find(keyword).count()
         return res.status(200).json({ message: "Selecte Category", data: resData, count })
     }
@@ -147,7 +147,7 @@ const subCategoryGet = async (req, res, next) => {
                 ],
             } : {};
         }
-        const resData = await SubCategory.find(keyword).select("_id subCategory img age").limit(limit * 1).skip((page - 1) * limit);
+        const resData = await SubCategory.find(keyword).select("_id subCategory img age").sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
         const count = await SubCategory.find(keyword).select("_id subCategory img age").count()
         return res.status(200).json({ message: "Selecte Sub Category", data: resData, count })
 
@@ -177,7 +177,7 @@ const insideSubCategoryGet = async (req, res, next) => {
                 ],
             } : {};
         }
-        const resData = await InsideSubCategory.find(keyword).select("_id insideSubCategory").limit(limit * 1).skip((page - 1) * limit);
+        const resData = await InsideSubCategory.find(keyword).select("_id insideSubCategory").sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
         const count = await InsideSubCategory.find(keyword).count()
         return res.status(200).json({ message: "Selecte Inside Sub Category", data: resData, count });
     }
@@ -206,7 +206,7 @@ const insidePackTypeGet = async (req, res, next) => {
                 ],
             } : {};
         }
-        const resData = await InsidePackType.find(keyword).select("_id packType").limit(limit * 1).skip((page - 1) * limit);
+        const resData = await InsidePackType.find(keyword).select("_id packType").sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
         const count = await InsidePackType.find(keyword).count()
         return res.status(200).json({ message: "Selecte Inside Pack Type", data: resData, count });
 
@@ -236,7 +236,7 @@ const insideServingSizeGet = async (req, res, next) => {
                 ],
             } : {};
         }
-        const resData = await InsideServingSize.find(keyword).select("_id servingSize").limit(limit * 1).skip((page - 1) * limit);
+        const resData = await InsideServingSize.find(keyword).select("_id servingSize").sort("-createdAt").limit(limit * 1).skip((page - 1) * limit);
         const count = await InsideServingSize.find(keyword).count()
         return res.status(200).json({ message: "Selecte Serving Size", data: resData, count });
 
