@@ -357,8 +357,7 @@ const deleteCategory = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = Category.deleteOne({ _id: req.params.id });
-        console.log(deleted)
+        const deleted = await Category.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Category Deleted Successfully!' })
 
@@ -375,7 +374,7 @@ const deleteSubCategory = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = SubCategory.deleteOne({ _id: req.params.id });
+        const deleted =await SubCategory.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Sub Category Deleted Successfully!' })
         } else {
@@ -391,7 +390,7 @@ const deleteInsideSubCategory = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = InsideSubCategory.deleteOne({ _id: req.params.id });
+        const deleted =await InsideSubCategory.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Inside Sub Category  Deleted Successfully!' })
         } else {
@@ -407,10 +406,10 @@ const deletePackType = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = InsidePackType.deleteOne({ _id: req.params.id });
+        const deleted =await InsidePackType.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Pack Type Deleted Successfully!' })
-        }else{
+        } else {
             res.status(400).json({ error: { "exist": "Pack Type Delete Failed! Not Exist!" } })
         }
     }
@@ -423,10 +422,10 @@ const deleteServingSize = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted = InsideServingSize.deleteOne({ _id: req.params.id });
+        const deleted =await InsideServingSize.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Surving Size Deleted Successfully!' })
-        }else{
+        } else {
             res.status(400).json({ error: { "exist": "Surving Size Delete Failed! Not Exist" } })
         }
     }
