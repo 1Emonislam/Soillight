@@ -13,7 +13,7 @@ const categoryCreate = async (req, res, next) => {
             const url = await upload(req?.body?.img);
             img = url.url;
         }
-        const create = await Category.create({ category, img, age });
+        const create = await Category.create({ category, img: img || '', age });
         if (!create) {
             return res.status(400).json({ error: { category: 'Category creation failed!' } })
         }
@@ -37,7 +37,7 @@ const subCategoryCreate = async (req, res, next) => {
             const url = await upload(req?.body?.img);
             img = url.url;
         }
-        const create = await SubCategory.create({ category: category, subCategory, img, age });
+        const create = await SubCategory.create({ category: category, subCategory, img: img || '', age });
         if (!create) {
             return res.status(400).json({ error: { subCategory: 'Sub Category creation failed!' } })
         }
@@ -374,7 +374,7 @@ const deleteSubCategory = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted =await SubCategory.deleteOne({ _id: req.params.id });
+        const deleted = await SubCategory.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Sub Category Deleted Successfully!' })
         } else {
@@ -390,7 +390,7 @@ const deleteInsideSubCategory = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted =await InsideSubCategory.deleteOne({ _id: req.params.id });
+        const deleted = await InsideSubCategory.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Inside Sub Category  Deleted Successfully!' })
         } else {
@@ -406,7 +406,7 @@ const deletePackType = async (req, res, next) => {
         if (req.user?.isAdmin !== true) {
             return res.status(400).json({ error: { permission: "You can perform only Admin" } })
         }
-        const deleted =await InsidePackType.deleteOne({ _id: req.params.id });
+        const deleted = await InsidePackType.deleteOne({ _id: req.params.id });
         if (deleted?.deletedCount === 1) {
             res.status(200).json({ message: 'Pack Type Deleted Successfully!' })
         } else {
