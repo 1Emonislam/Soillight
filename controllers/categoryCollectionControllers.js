@@ -108,9 +108,6 @@ const insideServingSizeCreate = async (req, res, next) => {
 }
 const categoryGet = async (req, res, next) => {
     try {
-        if (req.user?.isAdmin !== true) {
-            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
-        }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
         const keyword = req.query.search ? {
@@ -128,9 +125,6 @@ const categoryGet = async (req, res, next) => {
 }
 const subCategoryGet = async (req, res, next) => {
     try {
-        if (req.user?.isAdmin !== true) {
-            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
-        }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
         let keyword;
@@ -158,9 +152,6 @@ const subCategoryGet = async (req, res, next) => {
 }
 const insideSubCategoryGet = async (req, res, next) => {
     try {
-        if (req.user?.isAdmin !== true) {
-            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
-        }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
         let keyword;
@@ -187,9 +178,6 @@ const insideSubCategoryGet = async (req, res, next) => {
 }
 const insidePackTypeGet = async (req, res, next) => {
     try {
-        if (req.user?.isAdmin !== true) {
-            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
-        }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
         let keyword;
@@ -217,9 +205,6 @@ const insidePackTypeGet = async (req, res, next) => {
 }
 const insideServingSizeGet = async (req, res, next) => {
     try {
-        if (req.user?.isAdmin !== true) {
-            return res.status(400).json({ error: { permission: "You can perform only Admin" } })
-        }
         let { page = 1, limit = 30 } = req.query;
         limit = parseInt(limit);
         let keyword;
