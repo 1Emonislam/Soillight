@@ -20,7 +20,7 @@ global.io = io;
 // socket server binding
 // const socketServer = require("./socket/server");
 // socketServer();
-const port = process.env.PORT || 6000;
+const port = process.env.PORT || 7000;
 const { errorLog, errorHandlerNotify } = require("express-error-handle");
 const dbConnect = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
