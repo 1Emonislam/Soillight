@@ -1,0 +1,11 @@
+const express = require('express');
+const { productSearch, latestProducts, categoriesSearch, myProducts, allProductGet, othersSellerProducts } = require('../controllers/productSearchControllers');
+const { protect } = require('../middlewares/authMiddleware');
+const router = express.Router();
+router.route('/products').get(productSearch);
+router.route('/products/my').get(protect,myProducts);
+router.route('/products/all').get(allProductGet);
+router.route('/products/latests').get(latestProducts);
+router.route('/products/categories').get(categoriesSearch);
+router.route('/products/sellers/:id').get(othersSellerProducts);
+module.exports = router;
