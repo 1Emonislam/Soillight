@@ -4,21 +4,13 @@ import { USER_LOGIN_FAIL, USER_LOGIN_LOGOUT, USER_LOGIN_REQUEST, USER_LOGIN_SUCC
 export const login = (subData, reset, navigate) => async (dispatch) => {
     try {
         dispatch({ type: USER_LOGIN_REQUEST })
-        fetch('http://18.142.184.204:7000/users/login',{
-            method:'POST',
-            headers: {
-                "Content-type": "application/json"
-            },
-            body:JSON.stringify(subData)
-        })
-        .then(res => res.json())
-        .then(data => {
-            window.localStorage.setItem('user', JSON.stringify(data?.data))
-            dispatch({ type: USER_LOGIN_SUCCESS, payload: data?.data })
-            if (data?.message) {
-                reset()
-                navigate('/dashboard/dashboard')
-            }
+        axios.post('http://18.142.184.204:7000/users/login',subData).then(({data}) =>{
+            window.localStorage.setItem('user', JSON.stringify(data))
+                dispatch({ type: USER_LOGIN_SUCCESS, payload: data})
+                if (data) {
+                    reset()
+                    navigate('/dashboard/dashboard')
+                }
         })
     } catch (error) {
         // console.log(error.response.data.error.email)
