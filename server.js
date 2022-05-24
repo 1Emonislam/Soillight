@@ -78,7 +78,7 @@ serverApp.listen(port, () => {
 // const socketServer = require("./socket/server");
 // socketServer();
 app.get('/',(req,res) =>{
-	res.send("server connected")
+	res.send("server connected Soillight")
 })
 // io.on('connection', async (socket) => {
 // 	console.log('user connected')
