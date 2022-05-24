@@ -7,8 +7,8 @@ router.route('/forget-pass').post(ForgetPassword)
 router.route('/otp-verify').post(protect,otpVerifyForgetPass)
 router.route('/reset-pass').put(protect,resetPassword)
 router.route('/change-pass').put(protect,changedPassword)
-router.route('/otp/resend').post(protect, resendOtp)
 router.route('/users/login').post(login);
+router.route('/otp/resend').post(protect, resendOtp)
 router.route('/users/:id').get(protect, singleUser)
 router.route('/users/buyer').post(registrationBuyer);
 router.route('/users/rider').post(registrationRider);
