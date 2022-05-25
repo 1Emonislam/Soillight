@@ -12,8 +12,6 @@ env:
   CLOUDINARY_NAME: ${{secrets.DB_PASS}}
   DB_USER: ${{secrets.DB_USER}}
   JWT_SECRET: ${{secrets.NODE_ENV}}
-  SERVICE_EMAIL: ${{secrets.SERVICE_ID}}
-  SERVICE_NAME: ${{secrets.SERVICE_PASS}}
   TWILIO_ACCOUNT_SID: ${{secrets.TWILIO_ACCOUNT_SID}}
   TWILIO_AUTH_TOKEN: ${{secrets.TWILIO_AUTH_TOKEN}}
 jobs:
