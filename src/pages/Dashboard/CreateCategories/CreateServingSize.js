@@ -32,7 +32,7 @@ export default function CreateServingSize({ createServingSizeOpen, handleServing
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/category?page=1&limit=500&search=${categorySearch || ''}`, {
+        fetch(`https://soillight-api.makereal.click/category?page=1&limit=500&search=${categorySearch || ''}`, {
             method: 'GET',
             headers: {
                 "Content-type": "application/json",
@@ -63,7 +63,7 @@ export default function CreateServingSize({ createServingSizeOpen, handleServing
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/sub/category?page=1&limit=500&search=${subCategorySearch || ''}`, {
+        fetch(`https://soillight-api.makereal.click/sub/category?page=1&limit=500&search=${subCategorySearch || ''}`, {
             method: 'GET',
             headers: {
                 "Content-type": "application/json",
@@ -96,7 +96,7 @@ export default function CreateServingSize({ createServingSizeOpen, handleServing
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/sub/category/${e.target?.value}`, {
+        fetch(`https://soillight-api.makereal.click/sub/category/${e.target?.value}`, {
             method: 'GET',
             headers: {
                 "Content-type": "application/json",
@@ -127,7 +127,7 @@ export default function CreateServingSize({ createServingSizeOpen, handleServing
                 loading: true
             }
         })
-        fetch('http://18.142.184.204:7000/inside/serving/size', {
+        fetch('https://soillight-api.makereal.click/inside/serving/size', {
             method: 'POST',
             headers: {
                 "Content-type": "application/json",

@@ -45,7 +45,7 @@ export default function CreateCategory({ createCategoryOpen, handleCategoryOpen,
             }
         })
         if (previewSource) data.img = previewSource;
-        fetch('http://18.142.184.204:7000/category', {
+        fetch('https://soillight-api.makereal.click/category', {
             method: 'POST',
             headers: {
                 "Content-type": "application/json",

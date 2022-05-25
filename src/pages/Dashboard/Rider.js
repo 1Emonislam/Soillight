@@ -29,7 +29,7 @@ function Rider() {
     const handlePendingRequest = async (e) => {
         const search = searchText || '';
         try {
-            await fetch(`http://18.142.184.204:7000/dashboard/users/role/status?search=${search}&role=rider&status=pending&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/dashboard/users/role/status?search=${search}&role=rider&status=pending&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -55,7 +55,7 @@ function Rider() {
         setStatus('approved')
         const search = searchText || '';
         try {
-            await fetch(`http://18.142.184.204:7000/dashboard/users/role/status/latest?search=${search}&role=rider&status=approved&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/dashboard/users/role/status/latest?search=${search}&role=rider&status=approved&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -79,7 +79,7 @@ function Rider() {
 
     useEffect(() => {
         let search = searchText || '';
-        fetch(`http://18.142.184.204:7000/dashboard/users/role/status/latest?search=${search}&role=rider&status=${status || 'pending'}&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/dashboard/users/role/status/latest?search=${search}&role=rider&status=${status || 'pending'}&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -96,7 +96,7 @@ function Rider() {
             })
     }, [page, searchText, status, user?.token]);
     const handleSingleUser = (id) => {
-        fetch(`http://18.142.184.204:7000/users/${id}`, {
+        fetch(`https://soillight-api.makereal.click/users/${id}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -112,7 +112,7 @@ function Rider() {
     }
     const handleApproved = (id) => {
         // console.log(id)
-        fetch(`http://18.142.184.204:7000/users/approved/${id}`, {
+        fetch(`https://soillight-api.makereal.click/users/approved/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -138,7 +138,7 @@ function Rider() {
             })
     }
     const riderCancelled = (id) => {
-        fetch(`http://18.142.184.204:7000/users/rejected/${id}`, {
+        fetch(`https://soillight-api.makereal.click/users/rejected/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',

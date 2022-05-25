@@ -47,7 +47,7 @@ export default function SubCategoryDetails({ handleSubCategoryDetailsClose, hand
             }
         })
         if (previewSource) data.img = previewSource;
-        fetch(`http://18.142.184.204:7000/sub/category/${selectedSubCategory?._id}`, {
+        fetch(`https://soillight-api.makereal.click/sub/category/${selectedSubCategory?._id}`, {
             method: 'PUT',
             headers: {
                 "Content-type": "application/json",
@@ -108,7 +108,7 @@ export default function SubCategoryDetails({ handleSubCategoryDetailsClose, hand
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/sub/category/${selectedSubCategory?._id}`, {
+        fetch(`https://soillight-api.makereal.click/sub/category/${selectedSubCategory?._id}`, {
             method: 'DELETE',
             headers: {
                 "Content-type": "application/json",

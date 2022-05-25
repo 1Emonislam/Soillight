@@ -24,7 +24,7 @@ function Buyer() {
     const limit = 50;
     useEffect(() => {
         let search = searchText || '';
-        fetch(`http://18.142.184.204:7000/dashboard/users/role?search=${search}&role=buyer&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/dashboard/users/role?search=${search}&role=buyer&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -43,7 +43,7 @@ function Buyer() {
     const [chkValue, setChkValue] = useState(false);
     const handleSingleUser = (id) => {
         setChkValue(!chkValue)
-        fetch(`http://18.142.184.204:7000/users/${id}`, {
+        fetch(`https://soillight-api.makereal.click/users/${id}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',

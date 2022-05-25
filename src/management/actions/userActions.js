@@ -4,7 +4,7 @@ import { USER_LOGIN_FAIL, USER_LOGIN_LOGOUT, USER_LOGIN_REQUEST, USER_LOGIN_SUCC
 export const login = (subData, reset, navigate) => async (dispatch) => {
     try {
         dispatch({ type: USER_LOGIN_REQUEST })
-        axios.post('http://18.142.184.204:7000/users/login',subData).then(({data}) =>{
+        axios.post('https://soillight-api.makereal.click/users/login',subData).then(({data}) =>{
             window.localStorage.setItem('user', JSON.stringify(data))
                 dispatch({ type: USER_LOGIN_SUCCESS, payload: data})
                 if (data) {
@@ -35,7 +35,7 @@ export const registerUser = (subData, picUrl, reset) => async (dispatch) => {
                 "Content-type": "application/json"
             }
         }
-        const { data } = await axios.post('http://18.142.184.204:7000/users/users/buyer', subData, config)
+        const { data } = await axios.post('https://soillight-api.makereal.click/users/users/buyer', subData, config)
         dispatch({ type: USER_REGISTER_SUCCESS, payload: data })
         if (data) {
             reset()

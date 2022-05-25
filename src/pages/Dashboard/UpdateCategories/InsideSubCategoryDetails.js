@@ -32,7 +32,7 @@ export default function InsideSubCategoryDetails({ handleInsideSubCategoryDetail
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/inside/sub/category/${selectedInsideSubCategory?._id}`, {
+        fetch(`https://soillight-api.makereal.click/inside/sub/category/${selectedInsideSubCategory?._id}`, {
             method: 'PUT',
             headers: {
                 "Content-type": "application/json",
@@ -86,7 +86,7 @@ export default function InsideSubCategoryDetails({ handleInsideSubCategoryDetail
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/inside/sub/category/${selectedInsideSubCategory?._id}`, {
+        fetch(`https://soillight-api.makereal.click/inside/sub/category/${selectedInsideSubCategory?._id}`, {
             method: 'DELETE',
             headers: {
                 "Content-type": "application/json",

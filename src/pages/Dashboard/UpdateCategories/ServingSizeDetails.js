@@ -33,7 +33,7 @@ export default function ServingSizeDetails({handleServingSizeClose,setServingSiz
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/inside/serving/size/${selectedServingSize?._id}`, {
+        fetch(`https://soillight-api.makereal.click/inside/serving/size/${selectedServingSize?._id}`, {
             method: 'PUT',
             headers: {
                 "Content-type": "application/json",
@@ -87,7 +87,7 @@ export default function ServingSizeDetails({handleServingSizeClose,setServingSiz
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/inside/serving/size/${selectedServingSize?._id}`, {
+        fetch(`https://soillight-api.makereal.click/inside/serving/size/${selectedServingSize?._id}`, {
             method: 'DELETE',
             headers: {
                 "Content-type": "application/json",

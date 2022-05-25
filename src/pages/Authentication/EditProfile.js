@@ -34,8 +34,8 @@ function EditProfile() {
   };
   // console.log(url && url)
   const onSubmit = data => {
-    //http://18.142.184.204:7000
-    fetch(`http://18.142.184.204:7000/users`, {
+    //https://soillight-api.makereal.click
+    fetch(`https://soillight-api.makereal.click/users`, {
       method: 'PUT',
       headers: {
         "access-control-allow-origin": "*",
@@ -74,7 +74,7 @@ function EditProfile() {
   }, [open]);
   useEffect(() => {
     if (url) {
-      fetch(`http://18.142.184.204:7000/users`, {
+      fetch(`https://soillight-api.makereal.click/users`, {
         method: 'PUT',
         headers: {
           "access-control-allow-origin": "*",

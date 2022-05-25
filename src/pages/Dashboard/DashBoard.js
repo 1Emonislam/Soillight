@@ -22,8 +22,8 @@ function DashBoard() {
   const [todayDate, setTodayDate] = useState("")
   const [lastWeekDate, setLastWeekDate] = useState("")
   useEffect(() => {
-    // let url = `http://18.142.184.204:7000/dashboard/count`;
-    fetch('http://18.142.184.204:7000/dashboard/count', {
+    // let url = `https://soillight-api.makereal.click/dashboard/count`;
+    fetch('https://soillight-api.makereal.click/dashboard/count', {
       method: 'GET',
       headers: {
         'Content-type': 'application/json; charset=UTF-8',

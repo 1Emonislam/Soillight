@@ -31,7 +31,7 @@ function Seller() {
         let search = searchText || '';
         // setLatest()
         try {
-            await fetch(`http://18.142.184.204:7000/dashboard/users/role/status?search=${search}&role=seller&status=pending&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/dashboard/users/role/status?search=${search}&role=seller&status=pending&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -58,7 +58,7 @@ function Seller() {
         setStatus('approved')
         let search = searchText || '';
         try {
-            await fetch(`http://18.142.184.204:7000/dashboard/users/role/status?search=${search}&role=seller&status=approved&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/dashboard/users/role/status?search=${search}&role=seller&status=approved&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -85,7 +85,7 @@ function Seller() {
     useEffect(() => {
         let search = searchText || '';
 
-        fetch(`http://18.142.184.204:7000/dashboard/users/role/status?search=${search}&role=seller&status=${status || 'pending'}&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/dashboard/users/role/status?search=${search}&role=seller&status=${status || 'pending'}&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -104,7 +104,7 @@ function Seller() {
     const handleSingleUser = (id) => {
         // console.log(id)
         // console.log(index)
-        fetch(`http://18.142.184.204:7000/users/${id}`, {
+        fetch(`https://soillight-api.makereal.click/users/${id}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -127,7 +127,7 @@ function Seller() {
     }
     const handleApproved = (id) => {
         // console.log(id)
-        fetch(`http://18.142.184.204:7000/users/approved/${id}`, {
+        fetch(`https://soillight-api.makereal.click/users/approved/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -152,7 +152,7 @@ function Seller() {
             })
     }
     const handleRejected = (id) => {
-        fetch(`http://18.142.184.204:7000/users/rejected/${id}`, {
+        fetch(`https://soillight-api.makereal.click/users/rejected/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',

@@ -29,7 +29,7 @@ function WithdrawTransaction() {
         let search = searchText || '';
         setStatus('pending')
         try {
-            await fetch(`http://18.142.184.204:7000/balance/withdraw/status/history?search=${search}&status=pending&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/balance/withdraw/status/history?search=${search}&status=pending&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -55,7 +55,7 @@ function WithdrawTransaction() {
         let search = searchText || '';
         setStatus('approved')
         try {
-            await fetch(`http://18.142.184.204:7000/balance/withdraw/status/history?search=${search}&status=approved&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/balance/withdraw/status/history?search=${search}&status=approved&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -80,7 +80,7 @@ function WithdrawTransaction() {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         setStatus('cancelled')
         let search = searchText || '';
-        fetch(`http://18.142.184.204:7000/balance/withdraw/status/history?search=${search}&status=cancelled&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/balance/withdraw/status/history?search=${search}&status=cancelled&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -101,7 +101,7 @@ function WithdrawTransaction() {
     useEffect(() => {
         let search = searchText || '';
         let statusText = status || '';
-        fetch(`http://18.142.184.204:7000/balance/withdraw/status/history?search=${search}&status=${statusText || 'pending'}&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/balance/withdraw/status/history?search=${search}&status=${statusText || 'pending'}&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -119,7 +119,7 @@ function WithdrawTransaction() {
     }, [page, searchText, status, user?.token]);
     const handleSingleClick = (id) => {
         // console.log(id)
-        fetch(`http://18.142.184.204:7000/balance/withdraw/${id}`, {
+        fetch(`https://soillight-api.makereal.click/balance/withdraw/${id}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -135,7 +135,7 @@ function WithdrawTransaction() {
     const withdrawApproved = (id) => {
         setIsOpen(true)
         // console.log(id)
-        fetch(`http://18.142.184.204:7000/balance/withdraw/status/${id}`, {
+        fetch(`https://soillight-api.makereal.click/balance/withdraw/status/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -166,7 +166,7 @@ function WithdrawTransaction() {
 
     const withdrawCancelled = (id) => {
         setIsOpen(true)
-        fetch(`http://18.142.184.204:7000/balance/withdraw/status/${id}`, {
+        fetch(`https://soillight-api.makereal.click/balance/withdraw/status/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',

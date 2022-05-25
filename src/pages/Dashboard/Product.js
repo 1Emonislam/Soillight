@@ -29,7 +29,7 @@ function Product() {
         let search = searchText || '';
         setStatus('pending')
         try {
-            await fetch(`http://18.142.184.204:7000/products/all?search=${search}&status=pending&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/products/all?search=${search}&status=pending&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -55,7 +55,7 @@ function Product() {
         let search = searchText || '';
         setStatus('approved')
         try {
-            await fetch(`http://18.142.184.204:7000/products/all?search=${search}&status=approved&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/products/all?search=${search}&status=approved&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -80,7 +80,7 @@ function Product() {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         setStatus('cancelled')
         let search = searchText || '';
-        fetch(`http://18.142.184.204:7000/products/all?search=${search}&status=cancelled&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/products/all?search=${search}&status=cancelled&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -101,7 +101,7 @@ function Product() {
     useEffect(() => {
         let search = searchText || '';
         let statusText = status || '';
-        fetch(`http://18.142.184.204:7000/products/all?search=${search}&status=${statusText || 'pending'}&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/products/all?search=${search}&status=${statusText || 'pending'}&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -119,7 +119,7 @@ function Product() {
     }, [page, searchText, status, user?.token]);
     const handleSingleClick = (id) => {
         // console.log(id)
-        fetch(`http://18.142.184.204:7000/products/singleProduct/${id}`, {
+        fetch(`https://soillight-api.makereal.click/products/singleProduct/${id}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -136,7 +136,7 @@ function Product() {
     const productApproved = (id) => {
         setIsOpen(true)
         // console.log(id)
-        fetch(`http://18.142.184.204:7000/products/status/${id}`, {
+        fetch(`https://soillight-api.makereal.click/products/status/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -167,7 +167,7 @@ function Product() {
 
     const productCancelled = (id) => {
         setIsOpen(true)
-        fetch(`http://18.142.184.204:7000/products/status/${id}`, {
+        fetch(`https://soillight-api.makereal.click/products/status/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',

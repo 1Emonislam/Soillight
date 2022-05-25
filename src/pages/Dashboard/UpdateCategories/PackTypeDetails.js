@@ -32,7 +32,7 @@ export default function PackTypeDetails({ handlePackTypeDetailsClose, handlePack
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/inside/pack/type/${selectedPackType?._id}`, {
+        fetch(`https://soillight-api.makereal.click/inside/pack/type/${selectedPackType?._id}`, {
             method: 'PUT',
             headers: {
                 "Content-type": "application/json",
@@ -86,7 +86,7 @@ export default function PackTypeDetails({ handlePackTypeDetailsClose, handlePack
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/inside/pack/type/${selectedPackType?._id}`, {
+        fetch(`https://soillight-api.makereal.click/inside/pack/type/${selectedPackType?._id}`, {
             method: 'DELETE',
             headers: {
                 "Content-type": "application/json",

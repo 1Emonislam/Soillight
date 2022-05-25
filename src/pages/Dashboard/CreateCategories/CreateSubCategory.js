@@ -45,7 +45,7 @@ export default function CreateSubCategory({ createSubCategoryOpen, handleSubCate
                 loading: true
             }
         })
-        fetch(`http://18.142.184.204:7000/category?page=1&limit=500&search=${categorySearch || ''}`, {
+        fetch(`https://soillight-api.makereal.click/category?page=1&limit=500&search=${categorySearch || ''}`, {
             method: 'GET',
             headers: {
                 "Content-type": "application/json",
@@ -77,7 +77,7 @@ export default function CreateSubCategory({ createSubCategoryOpen, handleSubCate
             }
         })
         if (previewSource) data.img = previewSource;
-        fetch('http://18.142.184.204:7000/sub/category', {
+        fetch('https://soillight-api.makereal.click/sub/category', {
             method: 'POST',
             headers: {
                 "Content-type": "application/json",

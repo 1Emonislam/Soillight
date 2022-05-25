@@ -29,7 +29,7 @@ function Order() {
         setStatus('pending')
         let search = searchText || '';
         try {
-            await fetch(`http://18.142.184.204:7000/products/orders/searching?search=${search}&&status=pending&&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/products/orders/searching?search=${search}&&status=pending&&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -55,7 +55,7 @@ function Order() {
         setStatus('delivered')
         let search = searchText || '';
         try {
-            await fetch(`http://18.142.184.204:7000/products/orders/searching?search=${search}&&status=delivered&&page=${page}&limit=${limit}`, {
+            await fetch(`https://soillight-api.makereal.click/products/orders/searching?search=${search}&&status=delivered&&page=${page}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -80,7 +80,7 @@ function Order() {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         setStatus('cancelled')
         let search = searchText || '';
-        fetch(`http://18.142.184.204:7000/products/orders/searching?search=${search}&&status=cancelled&&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/products/orders/searching?search=${search}&&status=cancelled&&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -99,7 +99,7 @@ function Order() {
 
     useEffect(() => {
         let search = searchText || '';
-        fetch(`http://18.142.184.204:7000/products/orders/searching?search=${search}&&status=${status || 'pending'}&&page=${page}&limit=${limit}`, {
+        fetch(`https://soillight-api.makereal.click/products/orders/searching?search=${search}&&status=${status || 'pending'}&&page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -117,7 +117,7 @@ function Order() {
     }, [page, searchText, status, user?.token]);
     const handleSingleClick = (id) => {
         // console.log(id)
-        fetch(`http://18.142.184.204:7000/products/orders/singleOrder/${id}`, {
+        fetch(`https://soillight-api.makereal.click/products/orders/singleOrder/${id}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -132,7 +132,7 @@ function Order() {
     }
     const orderDelivered = (id) => {
         setIsOpen(true)
-        fetch(`http://18.142.184.204:7000/products/order/status/${id}`, {
+        fetch(`https://soillight-api.makereal.click/products/order/status/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
@@ -162,7 +162,7 @@ function Order() {
 
     const orderCancelled = (id) => {
         setIsOpen(true)
-        fetch(`http://18.142.184.204:7000/products/order/status/${id}`, {
+        fetch(`https://soillight-api.makereal.click/products/order/status/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
