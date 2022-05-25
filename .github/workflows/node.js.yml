@@ -6,11 +6,19 @@ name: Node.js CI
 on:
   push:
     branches: [main]
-
+env:
+  CLOUDINARY_API_KEY: ${{secrets.CLOUDINARY_API_KEY}}
+  CLOUDINARY_API_SECRET: ${{secrets.CLOUDINARY_API_SECRET}}
+  CLOUDINARY_NAME: ${{secrets.DB_PASS}}
+  DB_USER: ${{secrets.DB_USER}}
+  JWT_SECRET: ${{secrets.NODE_ENV}}
+  TWILIO_ACCOUNT_SID: ${{secrets.TWILIO_ACCOUNT_SID}}
+  TWILIO_AUTH_TOKEN: ${{secrets.TWILIO_AUTH_TOKEN}}
 jobs:
   build:
     runs-on: self-hosted
-
+  
+  
     strategy:
       matrix:
         node-version: [16.x]
