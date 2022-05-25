@@ -1,0 +1,176 @@
+.search-title {
+  padding-top: 30px;
+  margin-left: 10px;
+  font-weight: 600;
+  color: #222;
+  margin-top: -3px;
+  font-size: 18px;
+}
+.search-container-box {
+  background-color: #f7f7fa;
+  padding-bottom: 5px;
+}
+.searchInput-relative {
+  position: relative;
+}
+.searchInput {
+  width: 70%;
+  border-radius: 20px;
+  border: none;
+  padding: 15px;
+  background: #ececec;
+  position: relative;
+  padding-left: 34px;
+  display: block;
+  margin: 0 auto;
+}
+.searchInput-icon {
+  top: 13px;
+  left: 13%;
+  color: #191918;
+  position: absolute;
+}
+.searchInput:focus {
+  outline: none;
+}
+.dashboard-section ul {
+  padding-left: 16px !important;
+}
+@media (min-width: 1077px) {
+  img.img-box-list-item {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+  }
+}
+@media (max-width: 1077px) {
+  img.img-box-list-item {
+    width: 34px;
+    height: 34px;
+    border-radius: 50px;
+  }
+}
+@media (max-width: 768px) {
+  img.img-box-list-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 50px;
+  }
+  .searchInput {
+    width: 70%;
+    border-radius: 20px;
+    border: none;
+    padding: 15px;
+    background: #ececec;
+    position: relative;
+    padding-left: 34px;
+  }
+}
+
+.MenuItem.Mui-selected {
+  border-left: 8px solid #3858cd;
+  outline: transparent;
+}
+.user-list:focus {
+  border-left: 8px solid #3858cd;
+  outline: transparent;
+}
+.active {
+  border-left: 8px solid #3858cd !important;
+  outline: transparent;
+}
+.inactive {
+  border-left: 8px solid transparent;
+  outline: transparent;
+}
+.user-list {
+  border-left: 8px solid transparent;
+  width: 90%;
+  margin: 18px auto;
+  background: #ffffff;
+  box-shadow: 0px 1px 4px rgb(0 0 0 / 20%);
+  border: 8px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  display: block;
+}
+.user-list h5 {
+  margin: 0px;
+  padding: 0px;
+}
+.user-list h5 strong {
+  margin: 0px;
+  font-weight: 500;
+  font-size: 17px;
+  color: #222;
+  display: block;
+}
+.user-list b {
+  margin: 0px;
+  font-weight: 500;
+  font-size: 17px;
+  color: #222;
+}
+.user-list h5 {
+  margin: 0px;
+  padding: 3px 0;
+  color: #444;
+}
+.user-list small {
+  margin: 0px;
+  padding: 0px;
+  font-size: 13px;
+  color: #444;
+}
+.profile-info {
+  padding-left: 10px;
+}
+@media (max-width: 300px) {
+  .user-list h5 strong {
+    font-size: 12px !important;
+  }
+  .user-list small {
+    margin: 0px;
+    padding: 0px;
+    font-size: 10px;
+  }
+}
+.btn-search {
+  min-height: 42px !important;
+}
+.btn-search {
+  background: white;
+  border: oldlace;
+  border-radius: 32px;
+  color: #222222;
+  cursor: pointer;
+}
+.search-container-box .css-1aquho2-MuiTabs-indicator {
+  height: 0px !important;
+}
+.search-container-box .Mui-selected {
+  background-color: #3858cd !important;
+  color: white !important;
+  text-transform: capitalize !important;
+  border-radius: 32px;
+  color: #222222;
+  cursor: pointer;
+}
+.btn-search:hover {
+  background-color: #3858cd;
+  color: white;
+  border-radius: 32px;
+}
+.btn-search:focus {
+  background-color: #3858cd;
+  color: white;
+}
+@media (min-width: 768px) {
+  .search-container-box {
+    background-color: #f7f7fa;
+    padding-bottom: 5px;
+    height: 100%;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+  }
+}

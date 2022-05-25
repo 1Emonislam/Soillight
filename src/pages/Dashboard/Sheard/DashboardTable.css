@@ -1,0 +1,29 @@
+.table-data-container {
+  padding-top: 60px;
+}
+@media (min-width: 768px) {
+  .table-data-container {
+    padding-left: 50px;
+  }
+}
+@media (max-width: 768px) {
+  .table-data-container {
+    padding-top: 60px;
+    padding-bottom: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background: white;
+  }
+}
+.table-data-container .list {
+  border: 1px solid #e6e7e8;
+  padding: 14px 22px;
+  border-radius: 1px;
+}
+.table-data-container {
+  border-radius: 3px;
+}
+.table-data-container .subtitle span,
+.table-data-container .subtitle small {
+  color: #444444;
+}

@@ -1,0 +1,28 @@
+.item-view {
+  padding-left: 10px;
+  border-radius: 3px;
+  border-left: 1px solid #c4c4c4;
+  margin: 16px 0;
+  font-size: 14px;
+}
+@media (min-width: 1200px) {
+  .all-center {
+    padding-left: 80px !important;
+  }
+  .profile-view-section {
+    position: fixed;
+    scroll-behavior: smooth;
+    overflow-y: scroll;
+    height: 70%;
+  }
+}
+@media (min-width: 768px) and (max-width: 1200px) {
+  .all-center {
+    padding-left: 30px !important;
+  }
+}
+@media (max-width: 1200px) {
+  .profile-view-section {
+    background-color: white;
+  }
+}
