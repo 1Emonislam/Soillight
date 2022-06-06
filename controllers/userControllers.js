@@ -128,7 +128,7 @@ const registrationBuyer = async (req, res, next) => {
     }
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
-    if (userExist?.phoneVerified || phoneExist?.phoneVerified === false) {
+    if ((userExist?.phoneVerified || phoneExist?.phoneVerified) === false) {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
@@ -202,7 +202,7 @@ const registrationSeller = async (req, res, next) => {
     }
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
-    if (userExist?.phoneVerified || phoneExist?.phoneVerified === false) {
+    if ((userExist?.phoneVerified || phoneExist?.phoneVerified) === false) {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
@@ -287,7 +287,7 @@ const registrationRider = async (req, res, next) => {
     }
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
-    if (userExist?.phoneVerified || phoneExist?.phoneVerified === false) {
+    if ((userExist?.phoneVerified || phoneExist?.phoneVerified) === false) {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
