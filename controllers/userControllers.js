@@ -54,10 +54,10 @@ const login = async (req, res, next) => {
                 role: role
             }, { new: true });
             if (send?.sent === false) {
-                return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(data?._id), sent: false })
+                return res.status(400).json({ message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(data?._id), sent: false })
             }
             if (send?.sent === true) {
-                return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(user?._id), sent: true })
+                return res.status(200).json({ message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(user?._id), sent: true })
             }
         }
         if (!(user && (await user.matchPassword(password)))) {
@@ -132,10 +132,10 @@ const registrationBuyer = async (req, res, next) => {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({  token: genToken(userExist?._id || phoneExist?._id), sent: false })
         }
         if (send?.sent === true) {
-            return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", token: genToken(userExist?._id || phoneExist?._id), sent: true })
+            return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
         }
     }
     if (userExist) {
@@ -206,10 +206,10 @@ const registrationSeller = async (req, res, next) => {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({  token: genToken(userExist?._id || phoneExist?._id), sent: false })
         }
         if (send?.sent === true) {
-            return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", token: genToken(userExist?._id || phoneExist?._id), sent: true })
+            return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
         }
     }
     if (userExist) {
@@ -291,10 +291,10 @@ const registrationRider = async (req, res, next) => {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({ error: { "phone": "Phone Number UnVerified! Verify Your Phone Number. Otp Sending failed! Please try again!" }, token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({  token: genToken(userExist?._id || phoneExist?._id), sent: false })
         }
         if (send?.sent === true) {
-            return res.status(200).json({ message: "Phone Number UnVerified! Verify Your Phone Number. Otp Sending Successfully!", token: genToken(userExist?._id || phoneExist?._id), sent: true })
+            return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
         }
     }
     if (userExist) {
