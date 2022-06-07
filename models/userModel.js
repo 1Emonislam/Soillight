@@ -73,6 +73,11 @@ const userSchema = new Schema(
 			type: String,
 			required: [true, "Please fillup the Password!"],
 		},
+		action: {
+			type: String,
+			enum: ['active', 'inactive', 'block', 'closed'],
+			default: 'active'
+		},
 		socketId: String,
 		lastOnline: Date,
 		valid_id: {

@@ -6,6 +6,8 @@ const { genToken } = require('../utils/genToken');
 const { sendOtpVia, verifyOtp } = require('../utils/otp');
 const MyBalance = require('../models/myBalance');
 const { upload } = require('../utils/file');
+
+
 const singleUser = async (req, res, next) => {
     const { id } = req.params;
     try {
@@ -111,7 +113,7 @@ const registrationBuyer = async (req, res, next) => {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
     }
-    
+
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         return emailPattern.test(elementValue);
@@ -132,7 +134,7 @@ const registrationBuyer = async (req, res, next) => {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({  token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), sent: false })
         }
         if (send?.sent === true) {
             return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
@@ -153,7 +155,7 @@ const registrationBuyer = async (req, res, next) => {
             const balance = await MyBalance.create({
                 user: created._id,
             })
-            if(balance){
+            if (balance) {
                 created.my_balance = balance._id;
                 await created.save();
             }
@@ -184,7 +186,7 @@ const registrationSeller = async (req, res, next) => {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
     }
-    
+
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -206,7 +208,7 @@ const registrationSeller = async (req, res, next) => {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({  token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), sent: false })
         }
         if (send?.sent === true) {
             return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
@@ -269,7 +271,7 @@ const registrationRider = async (req, res, next) => {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
     }
-    
+
     email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -291,7 +293,7 @@ const registrationRider = async (req, res, next) => {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({  token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), sent: false })
         }
         if (send?.sent === true) {
             return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
@@ -347,7 +349,7 @@ const profileUpdate = async (req, res, next) => {
         return res.status(400).json({ error: { "email": "permission denied! Please provide valid user credentials and try again!" } })
     }
     // console.log(req.body)
-    let { name,  role, pic, address } = req.body;
+    let { name, role, pic, address } = req.body;
     if (req?.body?.pic) {
         const url = await upload(req?.body?.pic);
         img = url.url;
@@ -384,7 +386,7 @@ const profileUpdate = async (req, res, next) => {
         }
         if (req?.user?.role === 'seller') {
             const updatedCheck = await User.findOneAndUpdate({ _id: req?.user?._id }, {
-                name, role: role || req.user.role, pic,  address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
+                name, role: role || req.user.role, pic, address, location: { latitude, longitude, address: address1, houseNumber, floor, information }, geometry: { type: "Point", "coordinates": [Number(longitude), Number(latitude)] },
             }, { new: true });
             if (!updatedCheck) {
                 return res.status(304).json({ error: { email: "Seller profile update failed!" } })
@@ -669,7 +671,7 @@ const ForgetPassword = async (req, res, next) => {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
     }
-    
+
     const userCheck = await User.findOne({ phone: phone });
     if (!userCheck) {
         return res.status(400).json({ error: { phone: "User not exists!. Phone Number doesn't match" } })

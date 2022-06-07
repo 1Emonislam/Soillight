@@ -37,6 +37,7 @@ const balanceHistoryRoutes = require('./routes/balanceHistoryRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const buyerRiderReviewRoutes = require('./routes/buyerRiderReviewsRoutes')
+const userActionRoutes = require('./routes/userActionRoutes')
 // const User = require("./models/userModel");
 const categoryCollectionRoutes = require("./routes/categoryCollectionRoutes")
 // const Notification = require("./models/notificationMdels");
@@ -72,6 +73,7 @@ app.use('/', subscriptionRoutes)
 app.use('/', categoryCollectionRoutes)
 app.use('/', notificationRoutes);
 app.use('/', buyerRiderReviewRoutes)
+app.use('/user/', userActionRoutes)
 serverApp.listen(port, () => {
 	console.log(`app listening on port ${port}`);
 });
