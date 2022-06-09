@@ -187,7 +187,7 @@ const registrationSeller = async (req, res, next) => {
         return re.test(elementValue);
     }
 
-    email?.toLowerCase();
+   email = email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         return emailPattern.test(elementValue);
@@ -272,7 +272,7 @@ const registrationRider = async (req, res, next) => {
         return re.test(elementValue);
     }
 
-    email?.toLowerCase();
+   email = email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         return emailPattern.test(elementValue);
