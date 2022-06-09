@@ -636,7 +636,7 @@ const NotificationTest = async (req, res, next) => {
 }
 
 const changedPassword = async (req, res) => {
-    // console.log(req.body)
+    //console.log(req.body)
     const { oldPassword, password, password2 } = req.body;
     const user = await User.findOne({ _id: req?.user?._id });
     if (!(oldPassword && (await user.matchPassword(oldPassword)))) {
