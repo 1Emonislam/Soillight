@@ -10,7 +10,7 @@ const twilio = require("twilio")(TWILIO_ACCOUNT_SID,TWILIO_AUTH_TOKEN);
  async function sendOtpVia(to, via = "sms", ) {
 	try {
 		const otpSend = await twilio.verify.services(SERVICE_ID).verifications.create({ to, channel: via });
-
+		// console.log(otpSend)
 		if (otpSend.status === "pending") {
 			return { sent: true };
 		} else {

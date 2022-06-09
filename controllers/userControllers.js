@@ -30,7 +30,7 @@ const resendOtp = async (req, res, next) => {
             const send = await sendOtpVia(req?.user?.phone);
             // console.log(send)
             if (send?.sent === false) {
-                return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!" }, token: genToken(req?.user?._id), sent: false })
+                return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!" }, token: genToken(req?.user?._id), send })
             } if (send?.sent === true) {
                 return res.status(200).json({ message: "Resend Otp Sending Successfully!", token: genToken(req?.user?._id), sent: true })
             }
@@ -56,7 +56,7 @@ const login = async (req, res, next) => {
                 role: role
             }, { new: true });
             if (send?.sent === false) {
-                return res.status(400).json({ message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(data?._id), sent: false })
+                return res.status(400).json({ message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(data?._id), send })
             }
             if (send?.sent === true) {
                 return res.status(200).json({ message: `Switch Mode ${data?.role}`, role: data?.role, token: genToken(user?._id), sent: true })
@@ -134,7 +134,7 @@ const registrationBuyer = async (req, res, next) => {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id),send })
         }
         if (send?.sent === true) {
             return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
@@ -162,7 +162,7 @@ const registrationBuyer = async (req, res, next) => {
             const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             if (send?.sent === false) {
-                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id), data: userRes }, sent: false })
+                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id)}, send })
             }
             if (send?.sent === true) {
                 return res.status(200).json({ message: "Verify Your Phone Number. Otp Sending Successfully!", data: userRes, token: genToken(created._id), sent: true })
@@ -187,7 +187,7 @@ const registrationSeller = async (req, res, next) => {
         return re.test(elementValue);
     }
 
-   email = email?.toLowerCase();
+    email = email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         return emailPattern.test(elementValue);
@@ -205,10 +205,11 @@ const registrationSeller = async (req, res, next) => {
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
     if ((userExist?.phoneVerified || phoneExist?.phoneVerified) === false) {
+        // console.log(userExist?.phone || phoneExist?.phone)
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id),send })
         }
         if (send?.sent === true) {
             return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
@@ -238,7 +239,7 @@ const registrationSeller = async (req, res, next) => {
             const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             if (send?.sent === false) {
-                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id), data: userRes }, sent: false })
+                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id) },send })
             }
             if (send?.sent === true) {
                 return res.status(200).json({ message: "Verify Your Phone Number. Otp Sending Successfully!", data: userRes, token: genToken(created._id), sent: true })
@@ -272,7 +273,7 @@ const registrationRider = async (req, res, next) => {
         return re.test(elementValue);
     }
 
-   email = email?.toLowerCase();
+    email = email?.toLowerCase();
     function validateEmail(elementValue) {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         return emailPattern.test(elementValue);
@@ -293,7 +294,7 @@ const registrationRider = async (req, res, next) => {
         const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
-            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), sent: false })
+            return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), send })
         }
         if (send?.sent === true) {
             return res.status(200).json({ token: genToken(userExist?._id || phoneExist?._id), sent: true })
@@ -334,7 +335,7 @@ const registrationRider = async (req, res, next) => {
             const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             if (send?.sent === false) {
-                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id), data: userRes }, sent: false })
+                return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id)},send  })
             }
             if (send?.sent === true) {
                 return res.status(200).json({ message: "Verify Your Phone Number. Otp Sending Successfully!", data: userRes, token: genToken(created._id), sent: true })
