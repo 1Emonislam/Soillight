@@ -27,7 +27,7 @@ const resendOtp = async (req, res, next) => {
             return res.status(400).json({ error: { phone: 'Resend otp sending Phone Number is Required' } })
         }
         if (req?.user?.phone) {
-            const send = await sendOtpVia('+' + req?.user?.phone);
+            const send = await sendOtpVia(req?.user?.phone);
             // console.log(send)
             if (send?.sent === false) {
                 return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!" }, token: genToken(req?.user?._id), error: { otp: send?.issue, sent: false } })
@@ -50,7 +50,7 @@ const login = async (req, res, next) => {
             return res.status(400).json({ error: { "email": "Could not find user" } })
         }
         if (user?.phoneVerified === false) {
-            const send = await sendOtpVia('+' + user?.phone);
+            const send = await sendOtpVia(user?.phone);
             // console.log(send)
             const data = await User.findOneAndUpdate({ _id: user._id }, {
                 role: role
@@ -102,6 +102,9 @@ const login = async (req, res, next) => {
 
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
+    if (phone) {
+        phone = '+' + phone;
+    }
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
     const address1 = req?.body?.location?.address;
@@ -131,7 +134,7 @@ const registrationBuyer = async (req, res, next) => {
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
     if ((userExist?.phoneVerified || phoneExist?.phoneVerified) === false) {
-        const send = await sendOtpVia('+' + userExist?.phone || '+' + phoneExist?.phone);
+        const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
             return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), error: { otp: send?.issue, sent: false } })
@@ -159,7 +162,7 @@ const registrationBuyer = async (req, res, next) => {
                 created.my_balance = balance._id;
                 await created.save();
             }
-            const send = await sendOtpVia('+'+created?.phone);
+            const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             if (send?.sent === false) {
                 return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id) }, error: { otp: send?.issue, sent: false } })
@@ -176,6 +179,9 @@ const registrationBuyer = async (req, res, next) => {
 }
 const registrationSeller = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
+    if (phone) {
+        phone = '+' + phone;
+    }
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
     const address1 = req?.body?.location?.address;
@@ -206,7 +212,7 @@ const registrationSeller = async (req, res, next) => {
     const phoneExist = await User.findOne({ phone });
     if ((userExist?.phoneVerified || phoneExist?.phoneVerified) === false) {
         // console.log(userExist?.phone || phoneExist?.phone)
-        const send = await sendOtpVia('+'+userExist?.phone || '+'+phoneExist?.phone);
+        const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
             return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), error: { otp: send?.issue, sent: false } })
@@ -236,7 +242,7 @@ const registrationSeller = async (req, res, next) => {
             })
             created.my_balance = balance._id;
             await created.save();
-            const send = await sendOtpVia('+'+created?.phone);
+            const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             if (send?.sent === false) {
                 return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id) }, error: { otp: send?.issue, sent: false } })
@@ -254,6 +260,9 @@ const registrationSeller = async (req, res, next) => {
 
 const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
+    if (phone) {
+        phone = '+' + phone;
+    }
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
     const address1 = req?.body?.location?.address;
@@ -291,7 +300,7 @@ const registrationRider = async (req, res, next) => {
     const userExist = await User.findOne({ email });
     const phoneExist = await User.findOne({ phone });
     if ((userExist?.phoneVerified || phoneExist?.phoneVerified) === false) {
-        const send = await sendOtpVia('+'+userExist?.phone || '+'+phoneExist?.phone);
+        const send = await sendOtpVia(userExist?.phone || phoneExist?.phone);
         // console.log(send)
         if (send?.sent === false) {
             return res.status(400).json({ token: genToken(userExist?._id || phoneExist?._id), error: { otp: send?.issue, sent: false } })
@@ -332,7 +341,7 @@ const registrationRider = async (req, res, next) => {
             })
             created.my_balance = balance._id;
             await created.save();
-            const send = await sendOtpVia('+'+created?.phone);
+            const send = await sendOtpVia(created?.phone);
             const userRes = await User.findOne({ _id: created._id }).select("-password");
             if (send?.sent === false) {
                 return res.status(400).json({ error: { "phone": "Verify Your Phone Number. Otp Sending failed! Please try again!", token: genToken(created._id) }, error: { otp: send?.issue, sent: false } })
@@ -678,7 +687,7 @@ const ForgetPassword = async (req, res, next) => {
         return res.status(400).json({ error: { phone: "User not exists!. Phone Number doesn't match" } })
     }
     try {
-        const send = await sendOtpVia('+'+phone);
+        const send = await sendOtpVia(phone);
         if (send?.sent === false) {
             return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!", otp: send?.issue, sent: false }, token: genToken(userCheck._id) })
         } if (send?.sent === true) {
