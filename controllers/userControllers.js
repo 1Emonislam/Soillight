@@ -42,6 +42,9 @@ const resendOtp = async (req, res, next) => {
 }
 const login = async (req, res, next) => {
     let { email, phone, password, role } = req.body;
+    if(phone){
+        phone = '+'+phone;
+    }
     email?.toLowerCase();
     const user = await User.findOne({ phone }) || await User.findOne({ email });
     // console.log(user)
