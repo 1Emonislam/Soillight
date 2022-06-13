@@ -42,8 +42,8 @@ const resendOtp = async (req, res, next) => {
 }
 const login = async (req, res, next) => {
     let { email, phone, password, role } = req.body;
-    if(phone){
-        phone = '+'+phone;
+    if(!phone.startsWith('+')){
+        phone = '+' +phone;
     }
     email?.toLowerCase();
     const user = await User.findOne({ phone }) || await User.findOne({ email });
@@ -105,8 +105,8 @@ const login = async (req, res, next) => {
 
 const registrationBuyer = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
-    if (phone) {
-        phone = '+' + phone;
+    if(!phone.startsWith('+')){
+        phone = '+' +phone;
     }
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
@@ -182,8 +182,8 @@ const registrationBuyer = async (req, res, next) => {
 }
 const registrationSeller = async (req, res, next) => {
     let { name, phone, email, password, address } = req.body;
-    if (phone) {
-        phone = '+' + phone;
+    if(!phone.startsWith('+')){
+        phone = '+' +phone;
     }
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
@@ -263,8 +263,8 @@ const registrationSeller = async (req, res, next) => {
 
 const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
-    if (phone) {
-        phone = '+' + phone;
+    if(!phone.startsWith('+')){
+        phone = '+' +phone;
     }
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
@@ -679,7 +679,10 @@ const changedPassword = async (req, res) => {
 }
 
 const ForgetPassword = async (req, res, next) => {
-    const { phone } = req.body;
+    let { phone } = req.body;
+    if(!phone.startsWith('+')){
+        phone = '+' +phone;
+    }
     function validatePhone(elementValue) {
         const re = /^(\+?\(61\)|\(\+?61\)|\+?61|\(0[1-9]\)|0[1-9])?( ?-?[0-9]){7,9}$/
         return re.test(elementValue);
