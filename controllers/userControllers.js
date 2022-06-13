@@ -690,7 +690,7 @@ const ForgetPassword = async (req, res, next) => {
         return res.status(400).json({ error: { phone: "User not exists!. Phone Number doesn't match" } })
     }
     try {
-        const send = await sendOtpVia(phone);
+        const send = await sendOtpVia(userCheck?.phone);
         if (send?.sent === false) {
             return res.status(400).json({ error: { "phone": "Resend Otp Sending failed! Please try again!", otp: send?.issue, sent: false }, token: genToken(userCheck._id) })
         } if (send?.sent === true) {
