@@ -16,6 +16,7 @@ env:
   TWILIO_ACCOUNT_SID: ${{secrets.TWILIO_ACCOUNT_SID}}
   TWILIO_AUTH_TOKEN: ${{secrets.TWILIO_AUTH_TOKEN}}
   SERVICE_EMAIL: ${{secrets.SERVICE_EMAIL}}
+  NODE_MODULES_CACHE: true
 jobs:
   build:
     runs-on: self-hosted
