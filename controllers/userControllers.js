@@ -265,6 +265,7 @@ const registrationRider = async (req, res, next) => {
     let { name, email, phone, password, address } = req.body;
     if(!phone.startsWith('+')){
         phone = '+' +phone;
+        
     }
     const latitude = req?.body?.location?.latitude || 0;
     const longitude = req?.body?.location?.longitude || 0;
